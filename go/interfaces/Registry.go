@@ -13,4 +13,12 @@ type IRegistry interface {
 	TypeByName(string) (reflect.Type, error)
 }
 
-var Registry IRegistry
+var registry IRegistry
+
+func Registry() IRegistry {
+	return registry
+}
+
+func SetRegistry(r IRegistry) {
+	registry = r
+}
