@@ -7,6 +7,6 @@ RUN apt install -y protobuf-compiler
 RUN apt install -y protoc-gen-go
 # Add the generating script
 WORKDIR /home
-COPY ./protoc.sh /home/protoc.sh
+COPY protoc.sh /home/protoc.sh
 
 ENTRYPOINT ["/bin/bash","-c","/home/protoc.sh"]
