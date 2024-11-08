@@ -5,7 +5,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type OverlayEdge interface {
+type IEdge interface {
 	Start()
 	Addr() string
 	Uuid() string
@@ -16,7 +16,7 @@ type OverlayEdge interface {
 	CreatedAt() int64
 }
 
-type DatatListener interface {
-	PortShutdown(OverlayEdge)
-	HandleData([]byte, OverlayEdge)
+type IDatatListener interface {
+	PortShutdown(IEdge)
+	HandleData([]byte, IEdge)
 }
