@@ -36,8 +36,8 @@ func Warning(args ...interface{}) {
 	logger.Warning(args...)
 }
 
-func Error(args ...interface{}) {
-	logger.Error(args...)
+func Error(args ...interface{}) error {
+	return logger.Error(args...)
 }
 
 func Empty() bool {
