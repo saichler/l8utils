@@ -16,7 +16,18 @@ enum ActionType {
   GET = 5;
 }
 
-message Action {
+enum State {
+  Invalid_Status = 0;
+  Up = 1;
+  Down = 2;
+  NA = 3;
+}
+
+message Request {
   ActionType type = 1;
-  string user = 2;
+  State status = 2;
+  string entity = 3;
+  string group = 4;
+  string domain = 5;
+  string network = 6;
 }
