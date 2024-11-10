@@ -11,7 +11,7 @@ type IEdge interface {
 	Uuid() string
 	Send([]byte) error
 	Name() string
-	Do(*types.Action, string, proto.Message) error
+	Do(*types.Request, string, proto.Message) error
 	Shutdown()
 	CreatedAt() int64
 }

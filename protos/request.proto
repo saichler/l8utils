@@ -7,7 +7,7 @@ option java_outer_classname = "Types";
 option java_package = "com.shared.types";
 option go_package = "./types";
 
-enum ActionType {
+enum Action {
   Invalid_Action = 0;
   POST = 1;
   PUT = 2;
@@ -24,7 +24,12 @@ enum State {
 }
 
 message Request {
-  ActionType type = 1;
+  Action type = 1;
+  Status status = 2;
+}
+
+message Status {
+  int64 start_time = 1;
   State status = 2;
   string entity = 3;
   string group = 4;
