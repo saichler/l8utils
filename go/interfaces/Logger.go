@@ -7,7 +7,7 @@ type ILogger interface {
 	Warning(...interface{})
 	Error(...interface{}) error
 	Empty() bool
-	Fail(...interface{})
+	Fail(interface{}, ...interface{})
 }
 
 var logger ILogger
@@ -44,6 +44,6 @@ func Empty() bool {
 	return logger.Empty()
 }
 
-func Fail(args ...interface{}) {
-	logger.Fail(args...)
+func Fail(t interface{}, args ...interface{}) {
+	logger.Fail(t, args...)
 }

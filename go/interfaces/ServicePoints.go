@@ -1,13 +1,13 @@
 package interfaces
 
 import (
-	"github.com/saichler/my.simple/go/net/model"
+	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
 )
 
 type IServicePoints interface {
-	RegisterServicePoint(proto.Message, IServicePointHandler, IRegistry) error
-	Handle(proto.Message, model.Action, IEdge) (proto.Message, error)
+	RegisterServicePoint(proto.Message, IServicePointHandler, IStructRegistry) error
+	Handle(proto.Message, types.Action, IEdge) (proto.Message, error)
 }
 
 type IServicePointHandler interface {

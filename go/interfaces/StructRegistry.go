@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-type IRegistry interface {
+type IStructRegistry interface {
 	RegisterStruct(interface{}) bool
 	RegisterStructType(reflect.Type) bool
 	NewProtobufInstance(string) (proto.Message, error)
@@ -13,12 +13,12 @@ type IRegistry interface {
 	TypeByName(string) (reflect.Type, error)
 }
 
-var registry IRegistry
+var registry IStructRegistry
 
-func Registry() IRegistry {
+func StructRegistry() IStructRegistry {
 	return registry
 }
 
-func SetRegistry(r IRegistry) {
+func SetStructRegistry(r IStructRegistry) {
 	registry = r
 }
