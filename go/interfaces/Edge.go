@@ -20,3 +20,7 @@ type IDatatListener interface {
 	PortShutdown(IEdge)
 	HandleData([]byte, IEdge)
 }
+
+var EdgeConfig types.MessageConfig
+var EdgeSwitchConfig types.MessageConfig
+var SwitchConfig types.MessageConfig

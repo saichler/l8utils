@@ -1,8 +1,8 @@
 package service_points
 
 import (
-	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/shared/go/interfaces"
+	logs "github.com/saichler/shared/go/interfaces"
 	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
 	"reflect"
