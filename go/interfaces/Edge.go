@@ -21,6 +21,23 @@ type IDatatListener interface {
 	HandleData([]byte, IEdge)
 }
 
-var EdgeConfig types.MessageConfig
-var EdgeSwitchConfig types.MessageConfig
-var SwitchConfig types.MessageConfig
+var EdgeConfig *types.MessagingConfig
+var EdgeSwitchConfig *types.MessagingConfig
+var SwitchConfig *types.MessagingConfig
+
+func NewMessageConfig(maxDataSize uint64,
+	txQueueSize,
+	rxQueueSize uint64,
+	switchPort uint32,
+	sendStatusInfo bool,
+	sendStatusIntervalSeconds uint64) *types.MessagingConfig {
+	mc := &types.MessagingConfig{
+		MaxDataSize:               maxDataSize,
+		TxQueueSize:               txQueueSize,
+		RxQueueSize:               rxQueueSize,
+		SwitchPort:                switchPort,
+		SendStatusInfo:            sendStatusInfo,
+		SendStatusIntervalSeconds: sendStatusIntervalSeconds,
+	}
+	return mc
+}

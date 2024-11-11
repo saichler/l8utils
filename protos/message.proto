@@ -31,9 +31,9 @@ message Message {
 }
 
 // A config for the messages limitation and data size
-message MessageConfig {
+message MessagingConfig {
   // The maximum data size for a message
-  int64 max_data_size = 1;
+  uint64 max_data_size = 1;
   // The transmit message queue size
   uint64 tx_queue_size = 2;
   // The received message queue size
@@ -43,5 +43,5 @@ message MessageConfig {
   // Send Status Info
   bool send_status_info = 5;
   // Send Status Info Interval in seconds
-  int64 send_status_interval_seconds = 6;
+  uint64 send_status_interval_seconds = 6;
 }
