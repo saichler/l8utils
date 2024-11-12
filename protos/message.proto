@@ -44,4 +44,12 @@ message MessagingConfig {
   bool send_status_info = 5;
   // Send Status Info Interval in seconds
   uint64 send_status_interval_seconds = 6;
+  // The Uuid to use
+  string uuid = 7;
+  // Is this a switch edge and part of the switch table
+  bool isSwitch = 8;
+  // The zSideUuid
+  string z_uuid = 9;
+  // The local/remote address, depending on if this edge is the initiator of the connection
+  string addr = 10;
 }
