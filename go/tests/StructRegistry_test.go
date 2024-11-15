@@ -1,7 +1,7 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/interfaces"
+	. "github.com/saichler/shared/go/src/interfaces"
 	"testing"
 )
 

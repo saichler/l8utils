@@ -2,7 +2,7 @@ package string_utils
 
 import (
 	"errors"
-	"github.com/saichler/shared/go/interfaces"
+	"github.com/saichler/shared/go/src/interfaces"
 	"reflect"
 	"strconv"
 	"strings"

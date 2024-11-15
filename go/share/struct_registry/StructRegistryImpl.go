@@ -2,8 +2,8 @@ package struct_registry
 
 import (
 	"errors"
-	logs "github.com/saichler/shared/go/interfaces"
-	"github.com/saichler/shared/go/maps"
+	logs "github.com/saichler/shared/go/src/interfaces"
+	"github.com/saichler/shared/go/src/maps"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 )

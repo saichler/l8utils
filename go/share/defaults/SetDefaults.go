@@ -1,10 +1,10 @@
 package defaults
 
 import (
-	"github.com/saichler/shared/go/interfaces"
-	"github.com/saichler/shared/go/logger"
-	"github.com/saichler/shared/go/service_points"
-	"github.com/saichler/shared/go/struct_registry"
+	"github.com/saichler/shared/go/src/interfaces"
+	"github.com/saichler/shared/go/src/logger"
+	"github.com/saichler/shared/go/src/service_points"
+	"github.com/saichler/shared/go/src/struct_registry"
 )
 
 func LoadDefaultImplementations() {}

@@ -1,8 +1,7 @@
 package service_points
 
 import (
-	"github.com/saichler/shared/go/interfaces"
-	logs "github.com/saichler/shared/go/interfaces"
+	logs "github.com/saichler/shared/go/src/interfaces"
 	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
 	"reflect"
@@ -12,13 +11,13 @@ type ServicePointsImpl struct {
 	structName2ServicePoint *String2ServicePointMap
 }
 
-func NewServicePoints() interfaces.IServicePoints {
+func NewServicePoints() logs.IServicePoints {
 	sp := &ServicePointsImpl{}
 	sp.structName2ServicePoint = NewString2ServicePointMap()
 	return sp
 }
 
-func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler, registry interfaces.IStructRegistry) error {
+func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler logs.IServicePointHandler, registry logs.IStructRegistry) error {
 	if pb == nil {
 		return logs.Error("cannot register handler with nil proto")
 	}
@@ -31,7 +30,7 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 	return nil
 }
 
-func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, edge interfaces.IEdge) (proto.Message, error) {
+func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, edge logs.IEdge) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {

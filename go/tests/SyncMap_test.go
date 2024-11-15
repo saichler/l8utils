@@ -1,8 +1,8 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/interfaces"
-	"github.com/saichler/shared/go/maps"
+	. "github.com/saichler/shared/go/src/interfaces"
+	"github.com/saichler/shared/go/src/maps"
 	"reflect"
 
 	"testing"

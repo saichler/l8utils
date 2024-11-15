@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/defaults"
+	"github.com/saichler/shared/go/src/defaults"
 )
 
 func init() {
