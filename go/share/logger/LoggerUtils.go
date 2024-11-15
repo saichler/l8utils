@@ -2,7 +2,7 @@ package logger
 
 import (
 	"bytes"
-	"github.com/saichler/shared/go/src/string_utils"
+	"github.com/saichler/shared/go/share/string_utils"
 	"strconv"
 	"time"
 )

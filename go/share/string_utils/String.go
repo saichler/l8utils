@@ -2,7 +2,7 @@ package string_utils
 
 import (
 	"bytes"
-	"github.com/saichler/shared/go/src/interfaces"
+	"github.com/saichler/shared/go/share/interfaces"
 )
 
 // String is a wrapper over buff.bytes to make it seamless to concatenate strings

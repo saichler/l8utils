@@ -1,8 +1,8 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/src/interfaces"
-	. "github.com/saichler/shared/go/src/string_utils"
+	. "github.com/saichler/shared/go/share/interfaces"
+	. "github.com/saichler/shared/go/share/string_utils"
 	"reflect"
 	"strings"
 	"testing"

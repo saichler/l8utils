@@ -2,7 +2,7 @@ package tests
 
 import (
 	"errors"
-	"github.com/saichler/shared/go/src/interfaces"
+	"github.com/saichler/shared/go/share/interfaces"
 	"strings"
 	"testing"
 )
