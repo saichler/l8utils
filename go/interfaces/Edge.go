@@ -42,6 +42,18 @@ func NewMessageConfig(maxDataSize uint64,
 	return mc
 }
 
+func SetEdgeConfig(config *types.MessagingConfig) {
+	edgeConfig = config
+}
+
+func SetEdgeSwitchConfig(config *types.MessagingConfig) {
+	edgeSwitchConfig = config
+}
+
+func SetSwitchConfig(config *types.MessagingConfig) {
+	switchConfig = config
+}
+
 func EdgeConfig() *types.MessagingConfig {
 	return cloneConfig(*edgeConfig)
 }

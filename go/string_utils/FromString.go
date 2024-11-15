@@ -2,7 +2,7 @@ package string_utils
 
 import (
 	"errors"
-	"fmt"
+	"github.com/saichler/shared/go/interfaces"
 	"reflect"
 	"strconv"
 	"strings"
@@ -15,11 +15,7 @@ const (
 	errorValue = "Failed to convert string to instance:"
 )
 
-type StructInstantiationProvider interface {
-	NewInstance(string) (interface{}, error)
-}
-
-var Provider StructInstantiationProvider
+var Registry interfaces.IStructRegistry
 
 // initialize the map
 func init() {
@@ -192,9 +188,9 @@ func interfaceFromString(str string, kinds []reflect.Kind) reflect.Value {
 	f := fromstrings[kinds[0]]
 	if f != nil {
 		v := f(str, kinds[1:])
-		newInt := reflect.New(v.Type())
-		newInt.Set(v)
-		return newInt
+		newVal := reflect.New(v.Type())
+		newVal.Elem().Set(v)
+		return newVal.Elem()
 	}
 	er(errors.New("Pointer cloud not be created for kind "+kinds[0].String()), "interface")
 	return reflect.ValueOf(nil)
@@ -280,13 +276,14 @@ func InstanceOf(str string) interface{} {
 }
 
 func structFromString(str string, kinds []reflect.Kind) reflect.Value {
-	if Provider == nil {
-		New("No struct instantiation provider available to instantiate ", str).Panic()
+	if Registry == nil {
+		New("No struct instantiation provider available to instantiate ", str).LogError()
+		return reflect.ValueOf(nil)
 	}
 	if str == "<Nil>" {
 		return reflect.ValueOf(nil)
 	}
-	v, e := Provider.NewInstance(str)
+	v, e := Registry.NewInstance(str)
 	if e != nil {
 		panic("Failed to instantiate struct " + str + ", please check that you registered it in the registry. " + e.Error())
 	}
@@ -301,7 +298,8 @@ func FromString(str string) reflect.Value {
 	v, k := parseStringForKinds(str)
 	f := fromstrings[k[0]]
 	if f == nil {
-		New("no converter was found for kind ", k[0].String()).Panic()
+		New("no converter was found for kind ", k[0].String()).LogError()
+		return reflect.ValueOf(nil)
 	}
 	return f(v, k[1:])
 }
@@ -309,14 +307,17 @@ func FromString(str string) reflect.Value {
 // Extract the kinds from the prefix of the string
 func parseStringForKinds(str string) (string, []reflect.Kind) {
 	if len(str) < 3 {
-		New("'", str, "'lenght is less than 3, which means it is not in the correct format of {kind}...").Panic()
+		New("'", str, "'lenght is less than 3, which means it is not in the correct format of {kind}...").LogError()
+		return "", nil
 	}
 	if str[0] != '{' {
-		New("'", str, "' does not start with '{'").Panic()
+		New("'", str, "' does not start with '{'").LogError()
+		return "", nil
 	}
 	index := strings.Index(str, "}")
 	if index == -1 {
-		New("'", str, "'does not have a closing '}'").Panic()
+		New("'", str, "'does not have a closing '}'").LogError()
+		return "", nil
 	}
 	types := str[1:index]
 	result := str[index+1:]
@@ -331,7 +332,8 @@ func parseKinds(types string) []reflect.Kind {
 	for i, v := range split {
 		k, e := strconv.Atoi(v)
 		if e != nil {
-			New("Error parsing kind:", v).Panic()
+			New("Error parsing kind:", v).LogError()
+			return []reflect.Kind{}
 		}
 		kinds[i] = reflect.Kind(k)
 	}
@@ -339,5 +341,5 @@ func parseKinds(types string) []reflect.Kind {
 }
 
 func er(err error, tag string) {
-	fmt.Println(errorValue, tag, ":", err)
+	interfaces.Error(errorValue, tag, ":", err)
 }

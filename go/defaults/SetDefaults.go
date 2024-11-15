@@ -2,22 +2,28 @@ package defaults
 
 import (
 	"github.com/saichler/shared/go/interfaces"
+	"github.com/saichler/shared/go/logger"
 	"github.com/saichler/shared/go/service_points"
 	"github.com/saichler/shared/go/struct_registry"
 )
 
-func LoadDefaults() {}
+func LoadDefaultImplementations() {}
 
 func init() {
-	initEdge()
+	initLogger()
+	initEdgeConfig()
 	initRegistry()
 	initServicePoints()
 }
 
-func initEdge() {
-	interfaces.EdgeConfig = interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, true, 30)
-	interfaces.EdgeSwitchConfig = interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, false, 0)
-	interfaces.SwitchConfig = interfaces.NewMessageConfig(1024*1024, 5000, 5000, 50000, true, 30)
+func initLogger() {
+	interfaces.SetLogger(&logger.FmtLogger{})
+}
+
+func initEdgeConfig() {
+	interfaces.SetEdgeConfig(interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, true, 30))
+	interfaces.SetEdgeSwitchConfig(interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, false, 0))
+	interfaces.SetSwitchConfig(interfaces.NewMessageConfig(1024*1024, 5000, 5000, 50000, true, 30))
 }
 
 func initRegistry() {

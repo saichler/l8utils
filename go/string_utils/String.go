@@ -2,7 +2,7 @@ package string_utils
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/saichler/shared/go/interfaces"
 )
 
 // String is a wrapper over buff.bytes to make it seamless to concatenate strings
@@ -10,7 +10,6 @@ type String struct {
 	buff               *bytes.Buffer
 	TypesPrefix        bool
 	AddSpaceWhenAdding bool
-	ShouldPanic        bool
 }
 
 // New construct a new String instance and initialize the buff with the input string
@@ -35,7 +34,7 @@ func (s *String) init() {
 // Add concatenate a string to this String instance
 func (s *String) Add(strs ...string) *String {
 	s.init()
-	if s.AddSpaceWhenAdding {
+	if s.AddSpaceWhenAdding && len(s.Bytes()) > 0 {
 		s.buff.WriteString(" ")
 	}
 	if strs != nil {
@@ -79,16 +78,6 @@ func (s *String) AddBytes(bytes []byte) {
 	s.buff.Write(bytes)
 }
 
-func (s *String) Panic(anys ...interface{}) {
-	if anys != nil {
-		for _, any := range anys {
-			s.Add(s.StringOf(any))
-		}
-	}
-	s.Add("\nPlease email stack trace to saichler@gmail.com")
-	if s.ShouldPanic {
-		panic(s.String())
-	} else {
-		fmt.Println(s.String())
-	}
+func (s *String) LogError() {
+	interfaces.Logger().Error(s.buff.String())
 }

@@ -22,7 +22,7 @@ func (syncMap *SyncMap) Put(key, value interface{}) bool {
 	defer syncMap.s.Unlock()
 	_, ok := syncMap.m[key]
 	syncMap.m[key] = value
-	return ok
+	return !ok
 }
 
 func (syncMap *SyncMap) Get(key interface{}) (interface{}, bool) {
@@ -74,9 +74,9 @@ func (syncMap *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) 
 		index++
 	}
 
-	if index+1 < len(syncMap.m) {
-		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index+1, index+1)
-		for i := 0; i < index+1; i++ {
+	if index < len(syncMap.m) {
+		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index, index)
+		for i := 0; i < index; i++ {
 			filterSlice.Index(i).Set(newSlice.Index(i))
 		}
 		return filterSlice.Interface()

@@ -25,3 +25,5 @@ go.work.sum
 .env
 .idea
 vendor
+tests.pb.go
+cover.html
