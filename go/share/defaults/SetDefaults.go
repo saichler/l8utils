@@ -1,9 +1,12 @@
 package defaults
 
 import (
+	"crypto/md5"
+	"encoding/base64"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/shared/go/share/service_points"
+	"github.com/saichler/shared/go/share/shallow_security"
 	"github.com/saichler/shared/go/share/struct_registry"
 )
 
@@ -14,6 +17,7 @@ func init() {
 	initEdgeConfig()
 	initRegistry()
 	initServicePoints()
+	initSecurityProvider()
 }
 
 func initLogger() {
@@ -32,4 +36,13 @@ func initRegistry() {
 
 func initServicePoints() {
 	interfaces.SetServicePoints(service_points.NewServicePoints())
+}
+
+func initSecurityProvider() {
+	hash := md5.New()
+	secret := "Default Security Provider"
+	hash.Write([]byte(secret))
+	kHash := hash.Sum(nil)
+	k := base64.StdEncoding.EncodeToString(kHash)
+	interfaces.SetSecurityProvider(shallow_security.NewShallowSecurityProvider(k, secret))
 }

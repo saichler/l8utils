@@ -3,7 +3,9 @@ package logger
 import (
 	"bytes"
 	"github.com/saichler/shared/go/share/string_utils"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -57,4 +59,31 @@ func intToString(i int) string {
 		return buff.String()
 	}
 	return s
+}
+
+func FileAndLine(path string) string {
+	filename, line := findFileAndLine(path)
+	buff := bytes.Buffer{}
+	buff.WriteString(" (")
+	buff.WriteString(filename)
+	buff.WriteString(".")
+	buff.WriteString(strconv.Itoa(line))
+	buff.WriteString(")")
+	return buff.String()
+}
+
+func findFileAndLine(path string) (string, int) {
+	index := 2
+	ok := true
+	filename := "/Unknown"
+	line := -1
+	for ok == true {
+		_, filename, line, ok = runtime.Caller(index)
+		if strings.Contains(filename, path) {
+			break
+		}
+		index++
+	}
+	index = strings.LastIndex(filename, "/")
+	return filename[index+1:], line
 }

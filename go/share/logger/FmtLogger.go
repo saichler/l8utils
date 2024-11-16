@@ -29,6 +29,7 @@ func (fmtLog *FmtLogger) Empty() bool {
 	return false
 }
 func (fmtLog *FmtLogger) Fail(t interface{}, args ...interface{}) {
+	args = append(args, FileAndLine("tests"))
 	fmtLog.Error(args...)
 	ts, ok := t.(*testing.T)
 	if ok {
