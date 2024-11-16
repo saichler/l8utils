@@ -29,7 +29,7 @@ func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string, config *types.MessagingConfig, salts ...interface{}) (string, error) {
+func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) (string, error) {
 	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, salts...)
 	if err != nil {
 		conn.Close()
@@ -47,7 +47,7 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, uuid string
 		return "", errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(uuid), config, salts...)
+	err = nets.WriteEncrypted(conn, []byte(config.Uuid), config, salts...)
 	if err != nil {
 		conn.Close()
 		return "", err

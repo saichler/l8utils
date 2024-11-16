@@ -22,7 +22,8 @@ func TestShalowSecurity(t *testing.T) {
 	}
 	conn = &MockConn{}
 	config := EdgeConfig()
-	_, err = sp.ValidateConnection(conn, "Test Validate Connection", config)
+	config.Uuid = "Test Validate Connection"
+	_, err = sp.ValidateConnection(conn, config)
 	if err != nil {
 		Fail(t, err)
 		return
