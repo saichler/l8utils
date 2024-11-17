@@ -3,6 +3,7 @@ package defaults
 import (
 	"crypto/md5"
 	"encoding/base64"
+	"github.com/saichler/overlayK8s/go/types"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/shared/go/share/service_points"
@@ -32,6 +33,8 @@ func initEdgeConfig() {
 
 func initRegistry() {
 	interfaces.SetStructRegistry(struct_registry.NewStructRegistry())
+	interfaces.StructRegistry().RegisterStruct(&types.EdgeInfos{})
+	interfaces.StructRegistry().RegisterStruct(&types.EdgeInfo{})
 }
 
 func initServicePoints() {
