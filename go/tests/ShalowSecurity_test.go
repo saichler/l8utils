@@ -24,7 +24,7 @@ func TestShalowSecurity(t *testing.T) {
 	config := EdgeConfig()
 	config.Uuid = "Test Validate Connection"
 
-	_, err = sp.ValidateConnection(conn, config)
+	err = sp.ValidateConnection(conn, config)
 	if err != nil {
 		Fail(t, err)
 		return
@@ -33,7 +33,7 @@ func TestShalowSecurity(t *testing.T) {
 		Fail(t, "This connection is adjucent.")
 		return
 	}
-	
+
 	sp.CanDo(types.Action_GET, "", "")
 	sp.CanView("", "", "")
 }

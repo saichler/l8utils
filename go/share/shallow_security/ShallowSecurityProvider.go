@@ -29,34 +29,34 @@ func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) (string, error) {
+func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) error {
 	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 
 	secret, err := nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 
 	if sp.secret != secret {
 		conn.Close()
-		return "", errors.New("incorrect Secret/Key, aborting connection")
+		return errors.New("incorrect Secret/Key, aborting connection")
 	}
 
 	err = nets.WriteEncrypted(conn, []byte(config.Uuid), config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 
-	zside, err := nets.ReadEncrypted(conn, config, salts...)
+	config.ZUuid, err = nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 
 	isSwitch := "false"
@@ -67,19 +67,19 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 	err = nets.WriteEncrypted(conn, []byte(isSwitch), config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 
 	isSwitch, err = nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return err
 	}
 	if isSwitch == "true" {
 		config.IsAdjacentASwitch = true
 	}
 
-	return zside, nil
+	return nil
 }
 
 func (sp *ShallowSecurityProvider) Encrypt(data []byte, salts ...interface{}) (string, error) {
