@@ -29,37 +29,58 @@ func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) (string, error) {
+func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) (string, bool, error) {
 	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return "", false, err
 	}
 
 	secret, err := nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return "", false, err
 	}
 
 	if sp.secret != secret {
 		conn.Close()
-		return "", errors.New("incorrect Secret/Key, aborting connection")
+		return "", false, errors.New("incorrect Secret/Key, aborting connection")
 	}
 
 	err = nets.WriteEncrypted(conn, []byte(config.Uuid), config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return "", false, err
 	}
 
 	zside, err := nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return "", false, err
 	}
 
-	return zside, nil
+	isSwitch := "false"
+	if config.IsSwitch {
+		isSwitch = "true"
+	}
+
+	err = nets.WriteEncrypted(conn, []byte(isSwitch), config, salts...)
+	if err != nil {
+		conn.Close()
+		return "", false, err
+	}
+
+	isSwitch, err = nets.ReadEncrypted(conn, config, salts...)
+	if err != nil {
+		conn.Close()
+		return "", false, err
+	}
+	isAdjucent := false
+	if isSwitch == "true" {
+		isAdjucent = true
+	}
+
+	return zside, isAdjucent, nil
 }
 
 func (sp *ShallowSecurityProvider) Encrypt(data []byte, salts ...interface{}) (string, error) {
