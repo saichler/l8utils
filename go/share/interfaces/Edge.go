@@ -7,8 +7,7 @@ import (
 
 type IEdge interface {
 	Start()
-	Addr() string
-	Uuid() string
+	Config() types.MessagingConfig
 	Send([]byte) error
 	Name() string
 	Do(*types.Request, string, proto.Message) error
