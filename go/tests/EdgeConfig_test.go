@@ -7,16 +7,16 @@ import (
 
 func TestEdgeConfig(t *testing.T) {
 	node := interfaces.EdgeConfig()
-	node.Uuid = "12345"
+	node.Local_Uuid = "12345"
 	sw := interfaces.SwitchConfig()
-	sw.Uuid = "54321"
-	if node.Uuid == sw.Uuid {
+	sw.Local_Uuid = "54321"
+	if node.Local_Uuid == sw.Local_Uuid {
 		t.Fail()
 		interfaces.Error("Expected uuid to be different")
 		return
 	}
 	swEdge := interfaces.EdgeSwitchConfig()
-	if swEdge.Uuid == node.Uuid {
+	if swEdge.Local_Uuid == node.Local_Uuid {
 		t.Fail()
 		interfaces.Error("Expected uuid to be different")
 		return

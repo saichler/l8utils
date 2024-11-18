@@ -47,20 +47,20 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 		return errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(config.Uuid), config, salts...)
+	err = nets.WriteEncrypted(conn, []byte(config.Local_Uuid), config, salts...)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	config.ZUuid, err = nets.ReadEncrypted(conn, config, salts...)
+	config.RemoteUuid, err = nets.ReadEncrypted(conn, config, salts...)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
 	isSwitch := "false"
-	if config.IsSwitch {
+	if config.IsSwitchSide {
 		isSwitch = "true"
 	}
 

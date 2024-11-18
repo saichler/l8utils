@@ -20,7 +20,7 @@ func TestNets(t *testing.T) {
 	conn := &MockConn{}
 	writeData := []byte("Testing Read/Write data to socket")
 	config := EdgeConfig()
-	config.Uuid = "abcde"
+	config.Local_Uuid = "abcde"
 
 	err := nets.Write(nil, nil, nil)
 	if err == nil {
