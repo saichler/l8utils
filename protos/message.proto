@@ -52,4 +52,9 @@ message MessagingConfig {
   string z_uuid = 9;
   // The local/remote address, depending on if this edge is the initiator of the connection
   string addr = 10;
+  // If we want to connect two switches in the same machine, this indicates to the
+  // receiver of the connection request that it's adjucent is a switch.
+  // Otherwise, because they are on the same machine, it will autodetect the adjacent as
+  // a regular edge as it has the same IP.
+  bool isAdjacentASwitch = 11;
 }

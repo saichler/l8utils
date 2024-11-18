@@ -23,16 +23,17 @@ func TestShalowSecurity(t *testing.T) {
 	conn = &MockConn{}
 	config := EdgeConfig()
 	config.Uuid = "Test Validate Connection"
-	isAdjucent := false
-	_, isAdjucent, err = sp.ValidateConnection(conn, config)
+
+	_, err = sp.ValidateConnection(conn, config)
 	if err != nil {
 		Fail(t, err)
 		return
 	}
-	if isAdjucent {
+	if config.IsAdjacentASwitch {
 		Fail(t, "This connection is adjucent.")
 		return
 	}
+	
 	sp.CanDo(types.Action_GET, "", "")
 	sp.CanView("", "", "")
 }
