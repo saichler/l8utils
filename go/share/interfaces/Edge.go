@@ -10,7 +10,7 @@ type IEdge interface {
 	Config() types.MessagingConfig
 	Send([]byte) error
 	Name() string
-	Do(*types.Request, string, proto.Message) error
+	Do(*types.Action, string, proto.Message) error
 	Shutdown()
 	CreatedAt() int64
 	PublishState()
@@ -30,15 +30,15 @@ func NewMessageConfig(maxDataSize uint64,
 	txQueueSize,
 	rxQueueSize uint64,
 	switchPort uint32,
-	sendStatusInfo bool,
-	sendStatusIntervalSeconds uint64) *types.MessagingConfig {
+	sendStateInfo bool,
+	sendStateIntervalSeconds uint64) *types.MessagingConfig {
 	mc := &types.MessagingConfig{
-		MaxDataSize:               maxDataSize,
-		TxQueueSize:               txQueueSize,
-		RxQueueSize:               rxQueueSize,
-		SwitchPort:                switchPort,
-		SendStatusInfo:            sendStatusInfo,
-		SendStatusIntervalSeconds: sendStatusIntervalSeconds,
+		MaxDataSize:              maxDataSize,
+		TxQueueSize:              txQueueSize,
+		RxQueueSize:              rxQueueSize,
+		SwitchPort:               switchPort,
+		SendStateInfo:            sendStateInfo,
+		SendStateIntervalSeconds: sendStateIntervalSeconds,
 	}
 	return mc
 }

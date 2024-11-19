@@ -7,7 +7,27 @@ option java_outer_classname = "Types";
 option java_package = "com.shared.types";
 option go_package = "./types";
 
-import "request.proto";
+// The action the message will invoke on the handler
+enum Action {
+  Invalid_Action = 0;
+  POST = 1;
+  PUT = 2;
+  PATCH = 3;
+  DELETE = 4;
+  GET = 5;
+}
+
+// The priority of the message
+enum Priority {
+  P0 = 0;
+  P1 = 1;
+  P2 = 2;
+  P3 = 3;
+  P4 = 4;
+  P5 = 5;
+  P6 = 6;
+  P7 = 7;
+}
 
 /*
   Message is to transmit a piece of data, securely, from one process to one or more processes via
@@ -21,13 +41,15 @@ message Message {
   // To uniquely identify the source message, the sender process maintain a sequence number.
   int32 sequence = 3;
   // Priority of this Message for the handler callback.
-  int32 priority = 4;
+  Priority priority = 4;
   // The protobuf marshaled data, encoded to base64 string
   string data = 5;
   // The type name of the serialized data
   string type = 6;
   // Action to invoke with this data on the service point
-  types.Request request = 7;
+  Action request = 7;
+  // timeout when request/reply
+  int64 timeout = 8;
 }
 
 // A config for the messages limitation and data size
@@ -41,9 +63,9 @@ message MessagingConfig {
   // What is the switch port for this configuration
   uint32 switch_port = 4;
   // Send Status Info
-  bool send_status_info = 5;
+  bool send_state_info = 5;
   // Send Status Info Interval in seconds
-  uint64 send_status_interval_seconds = 6;
+  uint64 send_state_interval_seconds = 6;
   // The Edge Uuid
   string local_Uuid = 7;
   // The zSideUuid
