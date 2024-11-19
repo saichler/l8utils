@@ -36,20 +36,22 @@ enum Priority {
 message Message {
   // The source uuid identifier of the message sender
   string source_uuid = 1;
+  // The source uuid identifier of the message sender switch
+  string source_switch_uuid = 2;
   // The destination uuid/or multicast group name of the message receiver.
-  string destination = 2;
+  string destination = 3;
   // To uniquely identify the source message, the sender process maintain a sequence number.
-  int32 sequence = 3;
+  int32 sequence = 4;
   // Priority of this Message for the handler callback.
-  Priority priority = 4;
+  Priority priority = 5;
   // The protobuf marshaled data, encoded to base64 string
-  string data = 5;
+  string data = 6;
   // The type name of the serialized data
-  string type = 6;
+  string type = 7;
   // Action to invoke with this data on the service point
-  Action action = 7;
+  Action action = 8;
   // timeout when request/reply
-  int64 timeout = 8;
+  int64 timeout = 9;
 }
 
 // A config for the messages limitation and data size
