@@ -31,7 +31,7 @@ func NewMessageConfig(maxDataSize uint64,
 	rxQueueSize uint64,
 	switchPort uint32,
 	sendStateInfo bool,
-	sendStateIntervalSeconds uint64) *types.MessagingConfig {
+	sendStateIntervalSeconds int64) *types.MessagingConfig {
 	mc := &types.MessagingConfig{
 		MaxDataSize:              maxDataSize,
 		TxQueueSize:              txQueueSize,
