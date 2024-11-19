@@ -47,7 +47,7 @@ message Message {
   // The type name of the serialized data
   string type = 6;
   // Action to invoke with this data on the service point
-  Action request = 7;
+  Action action = 7;
   // timeout when request/reply
   int64 timeout = 8;
 }
