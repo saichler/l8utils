@@ -65,7 +65,7 @@ message MessagingConfig {
   // Send Status Info
   bool send_state_info = 5;
   // Send Status Info Interval in seconds
-  uint64 send_state_interval_seconds = 6;
+  int64 send_state_interval_seconds = 6;
   // The Edge Uuid
   string local_Uuid = 7;
   // The zSideUuid
