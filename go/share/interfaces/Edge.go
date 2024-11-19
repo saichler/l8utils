@@ -10,7 +10,7 @@ type IEdge interface {
 	Config() types.MessagingConfig
 	Send([]byte) error
 	Name() string
-	Do(*types.Action, string, proto.Message) error
+	Do(types.Action, string, proto.Message) error
 	Shutdown()
 	CreatedAt() int64
 	PublishState()
