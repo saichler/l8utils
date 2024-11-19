@@ -14,6 +14,7 @@ type IEdge interface {
 	Shutdown()
 	CreatedAt() int64
 	PublishState()
+	RegisterTopic(string)
 }
 
 type IDatatListener interface {
