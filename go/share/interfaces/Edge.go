@@ -13,6 +13,7 @@ type IEdge interface {
 	Do(*types.Request, string, proto.Message) error
 	Shutdown()
 	CreatedAt() int64
+	PublishState()
 }
 
 type IDatatListener interface {

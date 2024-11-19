@@ -17,6 +17,7 @@ type IServicePointHandler interface {
 	Delete(proto.Message, IEdge) (proto.Message, error)
 	Get(proto.Message, IEdge) (proto.Message, error)
 	EndPoint() string
+	Topic() string
 }
 
 var servicePoints IServicePoints
