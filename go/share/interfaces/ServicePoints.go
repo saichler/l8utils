@@ -8,6 +8,7 @@ import (
 type IServicePoints interface {
 	RegisterServicePoint(proto.Message, IServicePointHandler, IStructRegistry) error
 	Handle(proto.Message, types.Action, IEdge) (proto.Message, error)
+	ServicePointHandler(string) (IServicePointHandler, bool)
 }
 
 type IServicePointHandler interface {
