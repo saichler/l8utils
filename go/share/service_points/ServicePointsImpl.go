@@ -1,7 +1,6 @@
 package service_points
 
 import (
-	"github.com/saichler/my.simple/go/utils/logs"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
@@ -20,11 +19,11 @@ func NewServicePoints() interfaces.IServicePoints {
 
 func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler, registry interfaces.IStructRegistry) error {
 	if pb == nil {
-		return logs.Error("cannot register handler with nil proto")
+		return interfaces.Error("cannot register handler with nil proto")
 	}
 	typ := reflect.ValueOf(pb).Elem().Type()
 	if handler == nil {
-		return logs.Error("cannot register nil handler for type ", typ.Name())
+		return interfaces.Error("cannot register nil handler for type ", typ.Name())
 	}
 	registry.RegisterStructType(typ)
 	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
@@ -49,7 +48,7 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 	case types.Action_GET:
 		return h.Get(pb, edge)
 	case types.Action_Invalid_Action:
-		return nil, logs.Error("Invalid Action, ignoring")
+		return nil, interfaces.Error("Invalid Action, ignoring")
 	}
 	panic("Unknown Action:" + action.String())
 }
