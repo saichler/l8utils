@@ -35,7 +35,7 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {
-		return nil, logs.Error("Cannot find handler for type ", tName)
+		return nil, interfaces.Error("Cannot find handler for type ", tName)
 	}
 	switch action {
 	case types.Action_POST:
