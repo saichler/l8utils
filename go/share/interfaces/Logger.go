@@ -8,6 +8,11 @@ type ILogger interface {
 	Error(...interface{}) error
 	Empty() bool
 	Fail(interface{}, ...interface{})
+
+	IsTraceEnabled() bool
+	IsDebugEnabled() bool
+	IsInfoEnabled() bool
+	IsWarningEnabled() bool
 }
 
 var logger ILogger
@@ -21,19 +26,27 @@ func Logger() ILogger {
 }
 
 func Trace(args ...interface{}) {
-	logger.Trace(args...)
+	if logger.IsTraceEnabled() {
+		logger.Trace(args...)
+	}
 }
 
 func Debug(args ...interface{}) {
-	logger.Debug(args...)
+	if logger.IsDebugEnabled() {
+		logger.Debug(args...)
+	}
 }
 
 func Info(args ...interface{}) {
-	logger.Info(args...)
+	if logger.IsInfoEnabled() {
+		logger.Info(args...)
+	}
 }
 
 func Warning(args ...interface{}) {
-	logger.Warning(args...)
+	if logger.IsWarningEnabled() {
+		logger.Warning(args...)
+	}
 }
 
 func Error(args ...interface{}) error {

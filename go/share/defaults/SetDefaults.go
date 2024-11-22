@@ -21,7 +21,7 @@ func init() {
 }
 
 func initLogger() {
-	interfaces.SetLogger(&logger.FmtLogger{})
+	interfaces.SetLogger(logger.NewFmtLogger(false, false, true, true))
 }
 
 func initEdgeConfig() {

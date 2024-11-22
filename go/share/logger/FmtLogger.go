@@ -6,19 +6,41 @@ import (
 	"testing"
 )
 
-type FmtLogger struct{}
+type FmtLogger struct {
+	isTraceEnabled   bool
+	isDebugEnabled   bool
+	isInfoEnabled    bool
+	isWarningEnabled bool
+}
+
+func NewFmtLogger(isTraceEnabled, isDebugEnabled, isInfoEnabled, isWarningEnabled bool) *FmtLogger {
+	fmtLogger := &FmtLogger{}
+	fmtLogger.isTraceEnabled = isTraceEnabled
+	fmtLogger.isDebugEnabled = isDebugEnabled
+	fmtLogger.isInfoEnabled = isInfoEnabled
+	fmtLogger.isWarningEnabled = isWarningEnabled
+	return fmtLogger
+}
 
 func (fmtLog *FmtLogger) Trace(args ...interface{}) {
-	fmt.Println(FormatLog(Trace, args...))
+	if fmtLog.isTraceEnabled {
+		fmt.Println(FormatLog(Trace, args...))
+	}
 }
 func (fmtLog *FmtLogger) Debug(args ...interface{}) {
-	fmt.Println(FormatLog(Debug, args...))
+	if fmtLog.isDebugEnabled {
+		fmt.Println(FormatLog(Debug, args...))
+	}
 }
 func (fmtLog *FmtLogger) Info(args ...interface{}) {
-	fmt.Println(FormatLog(Info, args...))
+	if fmtLog.isInfoEnabled {
+		fmt.Println(FormatLog(Info, args...))
+	}
 }
 func (fmtLog *FmtLogger) Warning(args ...interface{}) {
-	fmt.Println(FormatLog(Warning, args...))
+	if fmtLog.isWarningEnabled {
+		fmt.Println(FormatLog(Warning, args...))
+	}
 }
 func (fmtLog *FmtLogger) Error(args ...interface{}) error {
 	msg := FormatLog(Error, args...)
@@ -35,4 +57,17 @@ func (fmtLog *FmtLogger) Fail(t interface{}, args ...interface{}) {
 	if ok {
 		ts.Fail()
 	}
+}
+
+func (fmtLog *FmtLogger) IsTraceEnabled() bool {
+	return fmtLog.isTraceEnabled
+}
+func (fmtLog *FmtLogger) IsDebugEnabled() bool {
+	return fmtLog.isDebugEnabled
+}
+func (fmtLog *FmtLogger) IsInfoEnabled() bool {
+	return fmtLog.isInfoEnabled
+}
+func (fmtLog *FmtLogger) IsWarningEnabled() bool {
+	return fmtLog.isWarningEnabled
 }
