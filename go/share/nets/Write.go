@@ -5,6 +5,7 @@ import (
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/types"
 	"net"
+	"time"
 )
 
 // Write data to socket
@@ -31,6 +32,7 @@ func Write(data []byte, conn net.Conn, config *types.MessagingConfig) error {
 	}
 	// Write the actual data
 	_, e = conn.Write(data)
+	time.Sleep(time.Millisecond * 1)
 	return e
 }
 
