@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/saichler/my.simple/go/utils/queues"
 	"github.com/saichler/shared/go/share/interfaces"
+	"sync"
 	"testing"
 	"time"
 )
@@ -16,6 +17,8 @@ type LoggerImpl struct {
 	queue      *queues.Queue
 	logMethods []ILogMethod
 	logLevel   interfaces.LogLevel
+	mtx        *sync.Mutex
+	enableMtx  bool
 }
 
 type LoggerEntry struct {
@@ -28,6 +31,7 @@ func NewLoggerImpl(logMethods ...ILogMethod) *LoggerImpl {
 	logImpl := &LoggerImpl{}
 	logImpl.logMethods = logMethods
 	logImpl.queue = queues.NewQueue("Logger Queue", 50000)
+	logImpl.mtx = &sync.Mutex{}
 	go logImpl.processQueue()
 	return logImpl
 }
@@ -106,4 +110,18 @@ func (loggerImpl *LoggerImpl) Fail(t interface{}, args ...interface{}) {
 
 func (loggerImpl *LoggerImpl) SetLogLevel(level interfaces.LogLevel) {
 	loggerImpl.logLevel = level
+}
+
+func (loggerImpl *LoggerImpl) LoggerLock() {
+	if loggerImpl.enableMtx {
+		loggerImpl.mtx.Lock()
+	}
+}
+func (loggerImpl *LoggerImpl) LoggerUnlock() {
+	if loggerImpl.enableMtx {
+		loggerImpl.mtx.Unlock()
+	}
+}
+func (loggerImpl *LoggerImpl) EnableLoggerSync(enable bool) {
+	loggerImpl.enableMtx = enable
 }

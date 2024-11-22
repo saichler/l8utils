@@ -14,9 +14,9 @@ func TestFmtLogger(t *testing.T) {
 	interfaces.Info("my info message: ", err)
 	interfaces.Warning("my warning message: ", err)
 	err = interfaces.Error("my error message: ", err)
-	if !strings.Contains(err.Error(), "(  Error) - my error message: Sample Error") {
+	if !strings.Contains(err.Error(), "(Error) - my error message: Sample Error") {
 		t.Fail()
-		interfaces.Error("Expected a formatted error message")
+		interfaces.Error("Expected a formatted error message:", err.Error())
 		return
 	}
 	interfaces.Empty()

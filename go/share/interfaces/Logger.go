@@ -34,7 +34,10 @@ type ILogger interface {
 	Error(...interface{}) error
 	Empty() bool
 	Fail(interface{}, ...interface{})
-	SetLogLevel(level LogLevel)
+	SetLogLevel(LogLevel)
+	LoggerLock()
+	LoggerUnlock()
+	EnableLoggerSync(bool)
 }
 
 var logger ILogger
