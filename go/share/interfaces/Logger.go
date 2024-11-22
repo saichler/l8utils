@@ -13,15 +13,15 @@ const (
 func (l LogLevel) String() string {
 	switch l {
 	case Trace_Level:
-		return "(  Trace)"
+		return "(Trace)"
 	case Debug_Level:
-		return "(  Debug)"
+		return "(Debug)"
 	case Info_Level:
-		return "(  Info)"
+		return "(Info) "
 	case Warning_Level:
-		return "(  Warning)"
+		return "(Warn )"
 	case Error_Level:
-		return "(  Error)"
+		return "(Error)"
 	}
 	return ""
 }
