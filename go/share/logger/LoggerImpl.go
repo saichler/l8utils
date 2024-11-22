@@ -2,8 +2,8 @@ package logger
 
 import (
 	"errors"
-	"github.com/saichler/my.simple/go/utils/queues"
 	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/shared/go/share/queues"
 	"sync"
 	"testing"
 	"time"
