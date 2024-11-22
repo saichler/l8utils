@@ -25,27 +25,27 @@ func NewTestServicePointHandler(name string) *TestServicePointHandler {
 }
 
 func (tsp *TestServicePointHandler) Post(pb proto.Message, edge interfaces.IEdge) (proto.Message, error) {
-	interfaces.Logger().Debug("Post Test callback")
+	interfaces.Logger().Debug("Post -", tsp.Name, "- Test callback")
 	tsp.PostNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) Put(pb proto.Message, edge interfaces.IEdge) (proto.Message, error) {
-	interfaces.Logger().Debug("Put Test callback")
+	interfaces.Logger().Debug("Put -", tsp.Name, "- Test callback")
 	tsp.PutNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) Patch(pb proto.Message, edge interfaces.IEdge) (proto.Message, error) {
-	interfaces.Logger().Debug("Patch Test callback")
+	interfaces.Logger().Debug("Patch -", tsp.Name, "- Test callback")
 	tsp.PatchNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) Delete(pb proto.Message, edge interfaces.IEdge) (proto.Message, error) {
-	interfaces.Logger().Debug("Delete Test callback")
+	interfaces.Logger().Debug("Delete -", tsp.Name, "- Test callback")
 	tsp.DeleteNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) Get(pb proto.Message, edge interfaces.IEdge) (proto.Message, error) {
-	interfaces.Logger().Debug("Get Test callback")
+	interfaces.Logger().Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	return nil, nil
 }
