@@ -2,6 +2,7 @@ package logger
 
 import (
 	"bytes"
+	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/string_utils"
 	"runtime"
 	"strconv"
@@ -9,19 +10,9 @@ import (
 	"time"
 )
 
-type LogLevel string
-
-const (
-	Trace   LogLevel = "(  Trace)"
-	Debug   LogLevel = "(  Debug)"
-	Info    LogLevel = "(   Info)"
-	Warning LogLevel = "(Warning)"
-	Error   LogLevel = "(  Error)"
-)
-
-func FormatLog(level LogLevel, args ...interface{}) string {
+func FormatLog(level interfaces.LogLevel, t int64, args ...interface{}) string {
 	str := string_utils.New()
-	str.Add(LogTimeFormat(time.Now().Unix(), level))
+	str.Add(LogTimeFormat(t, level))
 	if args != nil {
 		for _, arg := range args {
 			str.Add(str.StringOf(arg))
@@ -30,7 +21,7 @@ func FormatLog(level LogLevel, args ...interface{}) string {
 	return str.String()
 }
 
-func LogTimeFormat(epochSeconds int64, level LogLevel) string {
+func LogTimeFormat(epochSeconds int64, level interfaces.LogLevel) string {
 	t := time.Unix(epochSeconds, 0)
 	buff := bytes.Buffer{}
 	buff.WriteString(strconv.Itoa(t.Year()))
@@ -45,7 +36,7 @@ func LogTimeFormat(epochSeconds int64, level LogLevel) string {
 	buff.WriteString(":")
 	buff.WriteString(intToString(t.Second()))
 	buff.WriteString(" ")
-	buff.WriteString(string(level))
+	buff.WriteString(level.String())
 	buff.WriteString(" - ")
 	return buff.String()
 }

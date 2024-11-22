@@ -1,5 +1,31 @@
 package interfaces
 
+type LogLevel int
+
+const (
+	Trace_Level   LogLevel = 1
+	Debug_Level   LogLevel = 2
+	Info_Level    LogLevel = 3
+	Warning_Level LogLevel = 4
+	Error_Level   LogLevel = 5
+)
+
+func (l LogLevel) String() string {
+	switch l {
+	case Trace_Level:
+		return "(  Trace)"
+	case Debug_Level:
+		return "(  Debug)"
+	case Info_Level:
+		return "(  Info)"
+	case Warning_Level:
+		return "(  Warning)"
+	case Error_Level:
+		return "(  Error)"
+	}
+	return ""
+}
+
 type ILogger interface {
 	Trace(...interface{})
 	Debug(...interface{})
@@ -8,11 +34,7 @@ type ILogger interface {
 	Error(...interface{}) error
 	Empty() bool
 	Fail(interface{}, ...interface{})
-
-	IsTraceEnabled() bool
-	IsDebugEnabled() bool
-	IsInfoEnabled() bool
-	IsWarningEnabled() bool
+	SetLogLevel(level LogLevel)
 }
 
 var logger ILogger
@@ -26,27 +48,19 @@ func Logger() ILogger {
 }
 
 func Trace(args ...interface{}) {
-	if logger.IsTraceEnabled() {
-		logger.Trace(args...)
-	}
+	logger.Trace(args...)
 }
 
 func Debug(args ...interface{}) {
-	if logger.IsDebugEnabled() {
-		logger.Debug(args...)
-	}
+	logger.Debug(args...)
 }
 
 func Info(args ...interface{}) {
-	if logger.IsInfoEnabled() {
-		logger.Info(args...)
-	}
+	logger.Info(args...)
 }
 
 func Warning(args ...interface{}) {
-	if logger.IsWarningEnabled() {
-		logger.Warning(args...)
-	}
+	logger.Warning(args...)
 }
 
 func Error(args ...interface{}) error {
