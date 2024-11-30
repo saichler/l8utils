@@ -12,6 +12,13 @@ import (
 
 func LoadDefaultImplementations() {}
 
+const (
+	DEFAULT_MAX_DATA_SIZE     = 1024 * 1024
+	DEFAULT_EDGE_QUEUE_SIZE   = 10000
+	DEFAULT_SWITCH_QUEUE_SIZE = 50000
+	DEFAULT_SWITCH_PORT       = 50000
+)
+
 func init() {
 	initLogger()
 	initEdgeConfig()
@@ -25,9 +32,9 @@ func initLogger() {
 }
 
 func initEdgeConfig() {
-	interfaces.SetEdgeConfig(interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, true, 30))
-	interfaces.SetEdgeSwitchConfig(interfaces.NewMessageConfig(1024*1024, 1000, 1000, 50000, false, 0))
-	interfaces.SetSwitchConfig(interfaces.NewMessageConfig(1024*1024, 5000, 5000, 50000, true, 30))
+	interfaces.SetEdgeConfig(interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_SWITCH_PORT, true, 30))
+	interfaces.SetEdgeSwitchConfig(interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_SWITCH_PORT, false, 0))
+	interfaces.SetSwitchConfig(interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_SWITCH_QUEUE_SIZE, DEFAULT_SWITCH_QUEUE_SIZE, DEFAULT_SWITCH_PORT, true, 30))
 }
 
 func initRegistry() {
