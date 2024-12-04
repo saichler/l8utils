@@ -9,13 +9,13 @@ func TestStructRegistry(t *testing.T) {
 	protoName := "TestProto"
 	unknowProtoName := "UnknowProto"
 
-	StructRegistry().RegisterStruct(&TestProto{})
-	ok := StructRegistry().RegisterStruct(TestProto{})
+	StructRegistry().RegisterStruct(&TestProto{}, nil)
+	ok := StructRegistry().RegisterStruct(TestProto{}, nil)
 	if ok {
 		Fail(t, "Type should have already been registered")
 		return
 	}
-	typ, err := StructRegistry().TypeByName(protoName)
+	typ, _, err := StructRegistry().TypeByName(protoName)
 	if err != nil {
 		Fail(t, "Failed to get type by name", err.Error())
 		return
@@ -24,13 +24,13 @@ func TestStructRegistry(t *testing.T) {
 		Fail(t, "Wrong type by name")
 		return
 	}
-	_, err = StructRegistry().TypeByName(unknowProtoName)
+	_, _, err = StructRegistry().TypeByName(unknowProtoName)
 	if err == nil {
 		Fail(t, "Expected an error")
 		return
 	}
 
-	ins, err := StructRegistry().NewInstance(protoName)
+	ins, _, err := StructRegistry().NewInstance(protoName)
 	if err != nil {
 		Fail(t, "Failed to create instance", err.Error())
 		return
@@ -40,13 +40,13 @@ func TestStructRegistry(t *testing.T) {
 		Fail(t, "Failed to cast instance")
 		return
 	}
-	_, err = StructRegistry().NewInstance(unknowProtoName)
+	_, _, err = StructRegistry().NewInstance(unknowProtoName)
 	if err == nil {
 		Fail(t, "Expected an error")
 		return
 	}
 
-	pb, err := StructRegistry().NewProtobufInstance(protoName)
+	pb, _, err := StructRegistry().NewInstance(protoName)
 	if err != nil {
 		Fail(t, "Failed to create protobuf instance", err.Error())
 		return
@@ -56,19 +56,12 @@ func TestStructRegistry(t *testing.T) {
 		Fail(t, "Failed to cast protobuf instance")
 		return
 	}
-	_, err = StructRegistry().NewProtobufInstance(unknowProtoName)
+	_, _, err = StructRegistry().NewInstance(unknowProtoName)
 	if err == nil {
 		Fail(t, "Expected an error")
 		return
 	}
-	_, err = StructRegistry().NewProtobufInstance("")
-	if err == nil {
-		Fail(t, "Expected an error")
-		return
-	}
-	type TT struct{}
-	StructRegistry().RegisterStruct(TT{})
-	_, err = StructRegistry().NewProtobufInstance("TT")
+	_, _, err = StructRegistry().NewInstance("")
 	if err == nil {
 		Fail(t, "Expected an error")
 		return

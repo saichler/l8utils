@@ -283,7 +283,7 @@ func structFromString(str string, kinds []reflect.Kind) reflect.Value {
 	if str == "<Nil>" {
 		return reflect.ValueOf(nil)
 	}
-	v, e := Registry.NewInstance(str)
+	v, _, e := Registry.NewInstance(str)
 	if e != nil {
 		panic("Failed to instantiate struct " + str + ", please check that you registered it in the registry. " + e.Error())
 	}

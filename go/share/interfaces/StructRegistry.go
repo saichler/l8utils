@@ -1,16 +1,16 @@
 package interfaces
 
 import (
-	"google.golang.org/protobuf/proto"
 	"reflect"
 )
 
 type IStructRegistry interface {
-	RegisterStruct(interface{}) bool
-	RegisterStructType(reflect.Type) bool
-	NewProtobufInstance(string) (proto.Message, error)
-	NewInstance(string) (interface{}, error)
-	TypeByName(string) (reflect.Type, error)
+	RegisterStruct(interface{}, Serializer) bool
+	RegisterStructType(reflect.Type, Serializer) bool
+	NewInstance(string) (interface{}, Serializer, error)
+	TypeByName(string) (reflect.Type, Serializer, error)
+	Marshal(interface{}) ([]byte, error)
+	Unmarshal(string, []byte) (interface{}, error)
 }
 
 var registry IStructRegistry

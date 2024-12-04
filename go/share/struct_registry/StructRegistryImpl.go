@@ -2,80 +2,66 @@ package struct_registry
 
 import (
 	"errors"
-	logs "github.com/saichler/shared/go/share/interfaces"
-	"github.com/saichler/shared/go/share/maps"
-	"google.golang.org/protobuf/proto"
+	"github.com/saichler/shared/go/share/interfaces"
 	"reflect"
 )
 
 type StructRegistryImpl struct {
-	structName2Type *maps.String2TypeMap
+	types *TypesMap
 }
 
 func NewStructRegistry() *StructRegistryImpl {
 	sr := &StructRegistryImpl{}
-	sr.structName2Type = maps.NewString2TypeMao()
+	sr.types = NewTypesMap()
 	sr.registerPrimitives()
 	return sr
 }
 
 func (r *StructRegistryImpl) registerPrimitives() {
-	r.RegisterStructType(reflect.TypeOf(int8(0)))
-	r.RegisterStructType(reflect.TypeOf(int16(0)))
-	r.RegisterStructType(reflect.TypeOf(int32(0)))
-	r.RegisterStructType(reflect.TypeOf(int64(0)))
-	r.RegisterStructType(reflect.TypeOf(""))
-	r.RegisterStructType(reflect.TypeOf(true))
-	r.RegisterStructType(reflect.TypeOf(float32(0)))
-	r.RegisterStructType(reflect.TypeOf(float64(0)))
+	r.RegisterStructType(reflect.TypeOf(int8(0)), nil)
+	r.RegisterStructType(reflect.TypeOf(int16(0)), nil)
+	r.RegisterStructType(reflect.TypeOf(int32(0)), nil)
+	r.RegisterStructType(reflect.TypeOf(int64(0)), nil)
+	r.RegisterStructType(reflect.TypeOf(""), nil)
+	r.RegisterStructType(reflect.TypeOf(true), nil)
+	r.RegisterStructType(reflect.TypeOf(float32(0)), nil)
+	r.RegisterStructType(reflect.TypeOf(float64(0)), nil)
 }
 
-func (r *StructRegistryImpl) RegisterStruct(any interface{}) bool {
+func (r *StructRegistryImpl) RegisterStruct(any interface{}, serializer interfaces.Serializer) bool {
 	v := reflect.ValueOf(any)
 	if v.Kind() == reflect.Ptr {
-		return r.RegisterStructType(v.Elem().Type())
+		return r.RegisterStructType(v.Elem().Type(), serializer)
 	}
-	return r.RegisterStructType(v.Type())
+	return r.RegisterStructType(v.Type(), serializer)
 }
 
-func (r *StructRegistryImpl) RegisterStructType(t reflect.Type) bool {
+func (r *StructRegistryImpl) RegisterStructType(t reflect.Type, serializer interfaces.Serializer) bool {
 	if t.Name() == "rtype" {
 		return false
 	}
-	return r.structName2Type.Put(t.Name(), t)
+	return r.types.Put(t.Name(), t, serializer)
 }
 
-func (r *StructRegistryImpl) TypeByName(name string) (reflect.Type, error) {
-	value, ok := r.structName2Type.Get(name)
+func (r *StructRegistryImpl) TypeByName(name string) (reflect.Type, interfaces.Serializer, error) {
+	typ, ser, ok := r.types.Get(name)
 	if !ok {
-		return nil, errors.New("Unknown Struct Type: " + name)
+		return nil, nil, errors.New("Unknown Struct Type: " + name)
 	}
-	return value, nil
+	return typ, ser, nil
 }
 
-func (r *StructRegistryImpl) NewProtobufInstance(t string) (proto.Message, error) {
-	if t == "" {
-		return nil, logs.Error("cannot create a new protobuf instance from blank type name")
+func (r *StructRegistryImpl) NewInstance(typeName string) (interface{}, interfaces.Serializer, error) {
+	if typeName == "" {
+		return nil, nil, interfaces.Error("cannot create a new struct instance from blank type name")
 	}
-	typ, ok := r.structName2Type.Get(t)
+	typ, ser, ok := r.types.Get(typeName)
 	if !ok {
-		return nil, logs.Error("Struct Type ", t, " is not registered")
+		return nil, nil, interfaces.Error("Struct Type ", typeName, " is not registered")
 	}
 	n := reflect.New(typ)
 	if !n.IsValid() {
-		return nil, logs.Error("Was not able to create new instance of type ", t)
+		return nil, nil, interfaces.Error("Was not able to create new instance of type ", typeName)
 	}
-	pb, ok := n.Interface().(proto.Message)
-	if !ok {
-		return nil, logs.Error("Type ", t, " is not a protobuf")
-	}
-	return pb, nil
-}
-
-func (r *StructRegistryImpl) NewInstance(name string) (interface{}, error) {
-	typ, ok := r.structName2Type.Get(name)
-	if !ok {
-		return nil, errors.New("Unknown Struct Type: " + name)
-	}
-	return reflect.New(typ).Interface(), nil
+	return n.Interface(), ser, nil
 }
