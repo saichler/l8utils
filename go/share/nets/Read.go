@@ -57,14 +57,15 @@ func ReadSize(size int, conn net.Conn, config *types.MessagingConfig) ([]byte, e
 	return data, nil
 }
 
-func ReadEncrypted(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) (string, error) {
+func ReadEncrypted(conn net.Conn, config *types.MessagingConfig,
+	securityProvider interfaces.ISecurityProvider) (string, error) {
 	inData, err := Read(conn, config)
 	if err != nil {
 		conn.Close()
 		return "", err
 	}
 
-	decData, err := interfaces.SecurityProvider().Decrypt(string(inData), salts...)
+	decData, err := securityProvider.Decrypt(string(inData))
 	if err != nil {
 		conn.Close()
 		return "", err

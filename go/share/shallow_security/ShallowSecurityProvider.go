@@ -12,31 +12,33 @@ import (
 type ShallowSecurityProvider struct {
 	secret string
 	key    string
+	salts  []string
 }
 
-func NewShallowSecurityProvider(key, secret string) *ShallowSecurityProvider {
+func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSecurityProvider {
 	sp := &ShallowSecurityProvider{}
 	sp.key = key
 	sp.secret = secret
+	sp.salts = salts
 	return sp
 }
 
-func (sp *ShallowSecurityProvider) CanDial(host string, port uint32, salts ...interface{}) (net.Conn, error) {
+func (sp *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
 	return net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 }
 
-func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn, salts ...interface{}) error {
+func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig, salts ...interface{}) error {
-	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, salts...)
+func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig) error {
+	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, sp)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	secret, err := nets.ReadEncrypted(conn, config, salts...)
+	secret, err := nets.ReadEncrypted(conn, config, sp)
 	if err != nil {
 		conn.Close()
 		return err
@@ -47,13 +49,13 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 		return errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(config.Local_Uuid), config, salts...)
+	err = nets.WriteEncrypted(conn, []byte(config.Local_Uuid), config, sp)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	config.RemoteUuid, err = nets.ReadEncrypted(conn, config, salts...)
+	config.RemoteUuid, err = nets.ReadEncrypted(conn, config, sp)
 	if err != nil {
 		conn.Close()
 		return err
@@ -64,13 +66,13 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 		isSwitch = "true"
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(isSwitch), config, salts...)
+	err = nets.WriteEncrypted(conn, []byte(isSwitch), config, sp)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	isSwitch, err = nets.ReadEncrypted(conn, config, salts...)
+	isSwitch, err = nets.ReadEncrypted(conn, config, sp)
 	if err != nil {
 		conn.Close()
 		return err
@@ -82,17 +84,17 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) Encrypt(data []byte, salts ...interface{}) (string, error) {
+func (sp *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {
 	return aes.Encrypt(data, sp.key)
 }
 
-func (sp *ShallowSecurityProvider) Decrypt(data string, salts ...interface{}) ([]byte, error) {
+func (sp *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, sp.key)
 }
 
-func (sp *ShallowSecurityProvider) CanDo(action types.Action, endpoint string, token string, salts ...interface{}) error {
+func (sp *ShallowSecurityProvider) CanDo(action types.Action, endpoint string, token string) error {
 	return nil
 }
-func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string, salts ...interface{}) error {
+func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string) error {
 	return nil
 }

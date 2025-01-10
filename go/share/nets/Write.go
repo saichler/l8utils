@@ -34,8 +34,9 @@ func Write(data []byte, conn net.Conn, config *types.MessagingConfig) error {
 	return e
 }
 
-func WriteEncrypted(conn net.Conn, data []byte, config *types.MessagingConfig, salts ...interface{}) error {
-	encData, err := interfaces.SecurityProvider().Encrypt(data, salts...)
+func WriteEncrypted(conn net.Conn, data []byte, config *types.MessagingConfig,
+	securityProvider interfaces.ISecurityProvider) error {
+	encData, err := securityProvider.Encrypt(data)
 	if err != nil {
 		return err
 	}

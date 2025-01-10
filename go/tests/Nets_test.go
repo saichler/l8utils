@@ -2,6 +2,7 @@ package tests
 
 import (
 	"bytes"
+	"github.com/saichler/shared/go/share/defaults"
 	. "github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/nets"
 	"net"
@@ -77,12 +78,12 @@ func TestNets(t *testing.T) {
 		return
 	}
 
-	err = nets.WriteEncrypted(conn, writeData, config)
+	err = nets.WriteEncrypted(conn, writeData, config, defaults.DefaultSecurityProvider)
 	if err != nil {
 		Fail(t, err)
 		return
 	}
-	readStr, err := nets.ReadEncrypted(conn, config)
+	readStr, err := nets.ReadEncrypted(conn, config, defaults.DefaultSecurityProvider)
 	if err != nil {
 		Fail(t, err)
 		return

@@ -20,13 +20,3 @@ type IServicePointHandler interface {
 	EndPoint() string
 	Topic() string
 }
-
-var servicePoints IServicePoints
-
-func ServicePoints() IServicePoints {
-	return servicePoints
-}
-
-func SetServicePoints(sp IServicePoints) {
-	servicePoints = sp
-}
