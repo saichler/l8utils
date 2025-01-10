@@ -10,5 +10,5 @@ const (
 type Serializer interface {
 	Mode() SerializerMode
 	Marshal(interface{}, ITypeRegistry) ([]byte, error)
-	Unmarshal([]byte, ITypeRegistry) (interface{}, error)
+	Unmarshal([]byte, string, ITypeRegistry) (interface{}, error)
 }
