@@ -17,7 +17,7 @@ func NewServicePoints() interfaces.IServicePoints {
 	return sp
 }
 
-func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler, registry interfaces.IStructRegistry) error {
+func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler, registry interfaces.ITypeRegistry) error {
 	if pb == nil {
 		return interfaces.Error("cannot register handler with nil proto")
 	}
@@ -25,7 +25,7 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 	if handler == nil {
 		return interfaces.Error("cannot register nil handler for type ", typ.Name())
 	}
-	registry.RegisterStructType(typ, nil)
+	registry.Register(typ)
 	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
 	return nil
 }

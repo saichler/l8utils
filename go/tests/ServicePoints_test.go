@@ -10,17 +10,17 @@ import (
 func TestServicePoints(t *testing.T) {
 	testsp := infra.NewTestServicePointHandler("testsp")
 	pb := &TestProto{}
-	err := interfaces.ServicePoints().RegisterServicePoint(nil, testsp, interfaces.StructRegistry())
+	err := interfaces.ServicePoints().RegisterServicePoint(nil, testsp, interfaces.TypeRegistry())
 	if err == nil {
 		interfaces.Fail("Expected an error")
 		return
 	}
-	err = interfaces.ServicePoints().RegisterServicePoint(pb, nil, interfaces.StructRegistry())
+	err = interfaces.ServicePoints().RegisterServicePoint(pb, nil, interfaces.TypeRegistry())
 	if err == nil {
 		interfaces.Fail("Expected an error")
 		return
 	}
-	err = interfaces.ServicePoints().RegisterServicePoint(pb, testsp, interfaces.StructRegistry())
+	err = interfaces.ServicePoints().RegisterServicePoint(pb, testsp, interfaces.TypeRegistry())
 	if err != nil {
 		interfaces.Fail(t, err)
 		return

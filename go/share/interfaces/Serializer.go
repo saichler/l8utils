@@ -1,6 +1,14 @@
 package interfaces
 
+type SerializerMode int
+
+const (
+	BINARY SerializerMode = 1
+	JSON   SerializerMode = 2
+)
+
 type Serializer interface {
-	Add(interface{}, IStructRegistry) ([]byte, int)
-	Get([]byte, int, IStructRegistry) (interface{}, int)
+	Mode() SerializerMode
+	Marshal(interface{}, ITypeRegistry) []byte
+	Unmarshal([]byte, ITypeRegistry) interface{}
 }

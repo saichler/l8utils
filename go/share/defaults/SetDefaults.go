@@ -7,7 +7,7 @@ import (
 	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/shared/go/share/service_points"
 	"github.com/saichler/shared/go/share/shallow_security"
-	"github.com/saichler/shared/go/share/struct_registry"
+	"github.com/saichler/shared/go/share/type_registry"
 )
 
 func LoadDefaultImplementations() {}
@@ -38,7 +38,7 @@ func initEdgeConfig() {
 }
 
 func initRegistry() {
-	interfaces.SetStructRegistry(struct_registry.NewStructRegistry())
+	interfaces.SetTypeRegistry(type_registry.NewTypeRegistry())
 }
 
 func initServicePoints() {

@@ -15,7 +15,7 @@ const (
 	errorValue = "Failed to convert string to instance:"
 )
 
-var Registry interfaces.IStructRegistry
+var Registry interfaces.ITypeRegistry
 
 // initialize the map
 func init() {
@@ -283,9 +283,16 @@ func structFromString(str string, kinds []reflect.Kind) reflect.Value {
 	if str == "<Nil>" {
 		return reflect.ValueOf(nil)
 	}
-	v, _, e := Registry.NewInstance(str)
+	typeInfo, e := Registry.TypeInfo(str)
 	if e != nil {
-		panic("Failed to instantiate struct " + str + ", please check that you registered it in the registry. " + e.Error())
+		New(e.Error()).LogError()
+		return reflect.ValueOf(nil)
+	}
+
+	v, e := typeInfo.NewInstance()
+	if e != nil {
+		New(e.Error()).LogError()
+		return reflect.ValueOf(nil)
 	}
 	return reflect.ValueOf(v)
 }

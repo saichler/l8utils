@@ -78,6 +78,6 @@ func (s *String) AddBytes(bytes []byte) {
 	s.buff.Write(bytes)
 }
 
-func (s *String) LogError() {
-	interfaces.Logger().Error(s.buff.String())
+func (s *String) LogError() error {
+	return interfaces.Logger().Error(s.buff.String())
 }
