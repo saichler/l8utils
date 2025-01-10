@@ -25,7 +25,7 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 	if handler == nil {
 		return interfaces.Error("cannot register nil handler for type ", typ.Name())
 	}
-	registry.Register(typ)
+	registry.RegisterType(typ)
 	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
 	return nil
 }
