@@ -2,7 +2,6 @@ package tests
 
 import (
 	"bytes"
-	"github.com/saichler/shared/go/share/defaults"
 	. "github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/nets"
 	"net"
@@ -20,7 +19,8 @@ type MockAddr struct{}
 func TestNets(t *testing.T) {
 	conn := &MockConn{}
 	writeData := []byte("Testing Read/Write data to socket")
-	config := EdgeConfig()
+	c := providers.EdgeConfig()
+	config := &c
 	config.Local_Uuid = "abcde"
 
 	err := nets.Write(nil, nil, nil)
@@ -78,12 +78,12 @@ func TestNets(t *testing.T) {
 		return
 	}
 
-	err = nets.WriteEncrypted(conn, writeData, config, defaults.DefaultSecurityProvider)
+	err = nets.WriteEncrypted(conn, writeData, config, providers.Security())
 	if err != nil {
 		Fail(t, err)
 		return
 	}
-	readStr, err := nets.ReadEncrypted(conn, config, defaults.DefaultSecurityProvider)
+	readStr, err := nets.ReadEncrypted(conn, config, providers.Security())
 	if err != nil {
 		Fail(t, err)
 		return

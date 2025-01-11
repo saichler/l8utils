@@ -8,7 +8,7 @@ import (
 )
 
 func TestShalowSecurity(t *testing.T) {
-	sp := SecurityProvider()
+	sp := providers.Security()
 	conn, err := sp.CanDial("127.0.0.1", 8910)
 	if err != nil && !strings.Contains(err.Error(), "connection refused") {
 
@@ -21,7 +21,8 @@ func TestShalowSecurity(t *testing.T) {
 		return
 	}
 	conn = &MockConn{}
-	config := EdgeConfig()
+	c := providers.EdgeConfig()
+	config := &c
 	config.Local_Uuid = "Test Validate Connection"
 
 	err = sp.ValidateConnection(conn, config)

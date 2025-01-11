@@ -1,13 +1,6 @@
 package defaults
 
-import (
-	"crypto/md5"
-	"encoding/base64"
-	"github.com/saichler/shared/go/share/interfaces"
-	"github.com/saichler/shared/go/share/logger"
-	"github.com/saichler/shared/go/share/shallow_security"
-)
-
+/*
 func LoadDefaultImplementations() {}
 
 const (
@@ -43,3 +36,4 @@ func initSecurityProvider() {
 	k := base64.StdEncoding.EncodeToString(kHash)
 	DefaultSecurityProvider = shallow_security.NewShallowSecurityProvider(k, secret)
 }
+*/

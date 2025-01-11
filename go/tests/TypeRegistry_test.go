@@ -9,13 +9,13 @@ func TestTypeRegistry(t *testing.T) {
 	protoName := "TestProto"
 	unknowProtoName := "UnknowProto"
 
-	TypeRegistry().Register(&TestProto{})
-	ok := TypeRegistry().Register(TestProto{})
+	providers.Registry().Register(&TestProto{})
+	ok := providers.Registry().Register(TestProto{})
 	if ok {
 		Fail(t, "Type should have already been registered")
 		return
 	}
-	typ, err := TypeRegistry().TypeInfo(protoName)
+	typ, err := providers.Registry().TypeInfo(protoName)
 	if err != nil {
 		Fail(t, "Failed to get type by name", err.Error())
 		return
@@ -24,12 +24,12 @@ func TestTypeRegistry(t *testing.T) {
 		Fail(t, "Wrong type by name")
 		return
 	}
-	_, err = TypeRegistry().TypeInfo(unknowProtoName)
+	_, err = providers.Registry().TypeInfo(unknowProtoName)
 	if err == nil {
 		Fail(t, "Expected an error")
 		return
 	}
-	info, err := TypeRegistry().TypeInfo(protoName)
+	info, err := providers.Registry().TypeInfo(protoName)
 	if err != nil {
 		Fail(t, "Failed to get type by name", err.Error())
 		return
@@ -44,13 +44,13 @@ func TestTypeRegistry(t *testing.T) {
 		Fail(t, "Failed to cast instance")
 		return
 	}
-	_, err = TypeRegistry().TypeInfo(unknowProtoName)
+	_, err = providers.Registry().TypeInfo(unknowProtoName)
 	if err == nil {
 		Fail(t, "Expected an error")
 		return
 	}
 
-	info, err = TypeRegistry().TypeInfo(protoName)
+	info, err = providers.Registry().TypeInfo(protoName)
 	if err != nil {
 		Fail(t, "Failed to get type by name", err.Error())
 		return

@@ -10,33 +10,33 @@ import (
 func TestServicePoints(t *testing.T) {
 	testsp := infra.NewTestServicePointHandler("testsp")
 	pb := &TestProto{}
-	err := interfaces.ServicePoints().RegisterServicePoint(nil, testsp, interfaces.TypeRegistry())
+	err := providers.ServicePoints().RegisterServicePoint(nil, testsp, providers.Registry())
 	if err == nil {
 		interfaces.Fail("Expected an error")
 		return
 	}
-	err = interfaces.ServicePoints().RegisterServicePoint(pb, nil, interfaces.TypeRegistry())
+	err = providers.ServicePoints().RegisterServicePoint(pb, nil, providers.Registry())
 	if err == nil {
 		interfaces.Fail("Expected an error")
 		return
 	}
-	err = interfaces.ServicePoints().RegisterServicePoint(pb, testsp, interfaces.TypeRegistry())
+	err = providers.ServicePoints().RegisterServicePoint(pb, testsp, providers.Registry())
 	if err != nil {
 		interfaces.Fail(t, err)
 		return
 	}
-	sp, ok := interfaces.ServicePoints().ServicePointHandler("TestProto")
+	sp, ok := providers.ServicePoints().ServicePointHandler("TestProto")
 	if !ok {
 		interfaces.Fail(t, "Service Point Not Found")
 		return
 	}
 	sp.Topic()
-	interfaces.ServicePoints().Handle(pb, types.Action_POST, nil)
-	interfaces.ServicePoints().Handle(pb, types.Action_PUT, nil)
-	interfaces.ServicePoints().Handle(pb, types.Action_DELETE, nil)
-	interfaces.ServicePoints().Handle(pb, types.Action_GET, nil)
-	interfaces.ServicePoints().Handle(pb, types.Action_PATCH, nil)
-	interfaces.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil)
+	providers.ServicePoints().Handle(pb, types.Action_POST, nil)
+	providers.ServicePoints().Handle(pb, types.Action_PUT, nil)
+	providers.ServicePoints().Handle(pb, types.Action_DELETE, nil)
+	providers.ServicePoints().Handle(pb, types.Action_GET, nil)
+	providers.ServicePoints().Handle(pb, types.Action_PATCH, nil)
+	providers.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil)
 	if testsp.PostNumber != 1 {
 		interfaces.Fail(t, "Post is not 1")
 	}

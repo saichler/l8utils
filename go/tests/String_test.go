@@ -97,7 +97,7 @@ func TestToString(t *testing.T) {
 		return
 	}
 	type test struct{}
-	TypeRegistry().Register(&test{})
+	providers.Registry().Register(&test{})
 	if ok := checkToString(&test{}, "{22,25}test", t); !ok {
 		return
 	}

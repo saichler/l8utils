@@ -26,4 +26,3 @@ go.work.sum
 .idea
 vendor
 tests.pb.go
-cover.html

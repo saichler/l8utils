@@ -3,11 +3,13 @@ package tests
 import (
 	"errors"
 	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/shared/go/share/logger"
 	"strings"
 	"testing"
 )
 
 func TestFmtLogger(t *testing.T) {
+	interfaces.SetLogger(logger.NewLoggerImpl(&logger.FmtLogMethod{}))
 	err := errors.New("Sample Error")
 	interfaces.Trace("my trace message: ", err)
 	interfaces.Debug("my debug message: ", err)
