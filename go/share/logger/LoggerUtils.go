@@ -70,7 +70,9 @@ func findFileAndLine(path string) (string, int) {
 	line := -1
 	for ok == true {
 		_, filename, line, ok = runtime.Caller(index)
-		if strings.Contains(filename, path) && !strings.Contains(filename, "logger") {
+		if strings.Contains(filename, path) &&
+			!strings.Contains(filename, "logger") &&
+			!strings.Contains(filename, "Logger") {
 			break
 		}
 		index++
