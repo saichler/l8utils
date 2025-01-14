@@ -94,14 +94,14 @@ func (loggerImpl *LoggerImpl) Warning(anys ...interface{}) {
 }
 
 func (loggerImpl *LoggerImpl) Error(anys ...interface{}) error {
-	anys = append(anys, FileAndLine(".go"))
+	anys = append(anys, FileAndLine(".go", false))
 	loggerImpl.queue.Add(newEntry(interfaces.Error_Level, anys...))
 	err := FormatLog(interfaces.Error_Level, time.Now().Unix(), anys...)
 	return errors.New(err)
 }
 
 func (loggerImpl *LoggerImpl) Fail(t interface{}, args ...interface{}) {
-	args = append(args, FileAndLine("tests"))
+	args = append(args, FileAndLine("tests", true))
 	loggerImpl.Error(args...)
 	ts, ok := t.(*testing.T)
 	if ok {

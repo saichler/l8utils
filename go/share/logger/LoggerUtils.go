@@ -52,8 +52,8 @@ func intToString(i int) string {
 	return s
 }
 
-func FileAndLine(path string) string {
-	filename, line := findFileAndLine(path)
+func FileAndLine(path string, trimPath bool) string {
+	filename, line := findFileAndLine(path, trimPath)
 	buff := bytes.Buffer{}
 	buff.WriteString(" (")
 	buff.WriteString(filename)
@@ -63,7 +63,7 @@ func FileAndLine(path string) string {
 	return buff.String()
 }
 
-func findFileAndLine(path string) (string, int) {
+func findFileAndLine(path string, trimPath bool) (string, int) {
 	index := 2
 	ok := true
 	filename := "/Unknown"
@@ -77,6 +77,9 @@ func findFileAndLine(path string) (string, int) {
 		}
 		index++
 	}
-	index = strings.LastIndex(filename, "/")
-	return filename[index+1:], line
+	if trimPath {
+		index = strings.LastIndex(filename, "/")
+		return filename[index+1:], line
+	}
+	return filename, line
 }
