@@ -94,6 +94,7 @@ func (loggerImpl *LoggerImpl) Warning(anys ...interface{}) {
 }
 
 func (loggerImpl *LoggerImpl) Error(anys ...interface{}) error {
+	anys = append(anys, FileAndLine(".go"))
 	loggerImpl.queue.Add(newEntry(interfaces.Error_Level, anys...))
 	err := FormatLog(interfaces.Error_Level, time.Now().Unix(), anys...)
 	return errors.New(err)
