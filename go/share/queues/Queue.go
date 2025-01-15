@@ -55,18 +55,18 @@ func (queue *Queue) Add(any interface{}) {
 // Next retrieve the next element in the queue, if the queue is empty this is a blocking queue
 func (queue *Queue) Next() interface{} {
 	for queue.active {
-		var any interface{}
+		var item interface{}
 		queue.mtx.L.Lock()
 		if len(queue.queue) == 0 {
 			queue.mtx.Wait()
 		} else {
-			any = queue.queue[0]
+			item = queue.queue[0]
 			queue.queue = queue.queue[1:]
 
 		}
 		queue.mtx.L.Unlock()
-		if any != nil {
-			return any
+		if item != nil {
+			return item
 		}
 	}
 	return nil
@@ -80,7 +80,10 @@ func (queue *Queue) Active() bool {
 // Shutdown the queue should unblock and shutdown
 func (queue *Queue) Shutdown() {
 	queue.active = false
-	queue.mtx.Broadcast()
+	queue.Clear()
+	for i := 0; i < 100; i++ {
+		queue.mtx.Broadcast()
+	}
 }
 
 // Clear all the content of the queue and return it
