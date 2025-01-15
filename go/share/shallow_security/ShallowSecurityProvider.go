@@ -7,6 +7,7 @@ import (
 	"github.com/saichler/shared/go/types"
 	"net"
 	"strconv"
+	"strings"
 )
 
 type ShallowSecurityProvider struct {
@@ -24,6 +25,9 @@ func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSec
 }
 
 func (sp *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
+	if strings.Contains(host, ":") {
+		host = "[" + host + "]"
+	}
 	return net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 }
 
