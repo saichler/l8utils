@@ -52,8 +52,7 @@ func toString(value reflect.Value) string {
 	}
 	tostring := tostrings[value.Kind()]
 	if tostring == nil {
-		New("No ToString for kind:", value.Kind().String(), value.String()).LogError(Logger)
-		return ""
+		return New("No ToString for kind:", value.Kind().String(), value.String()).String()
 	}
 	return tostring(value)
 }

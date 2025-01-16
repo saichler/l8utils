@@ -2,8 +2,6 @@ package string_utils
 
 import (
 	"bytes"
-	"errors"
-	"github.com/saichler/shared/go/share/interfaces"
 )
 
 // String is a wrapper over buff.bytes to make it seamless to concatenate strings
@@ -11,7 +9,6 @@ type String struct {
 	buff               *bytes.Buffer
 	TypesPrefix        bool
 	AddSpaceWhenAdding bool
-	resources          interfaces.IResources
 }
 
 // New construct a new String instance and initialize the buff with the input string
@@ -24,10 +21,6 @@ func New(anys ...interface{}) *String {
 		}
 	}
 	return s
-}
-
-func (s *String) SetResources(resources interfaces.IResources) {
-	s.resources = resources
 }
 
 // init initialize the buff if needed
@@ -85,12 +78,4 @@ func (s *String) Bytes() []byte {
 func (s *String) AddBytes(bytes []byte) {
 	s.init()
 	s.buff.Write(bytes)
-}
-
-func (s *String) LogError(logger interfaces.ILogger) error {
-	s.init()
-	if logger != nil {
-		return logger.Error(s.buff.String())
-	}
-	return errors.New(s.buff.String())
 }

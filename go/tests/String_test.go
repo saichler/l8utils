@@ -27,7 +27,7 @@ func checkToString(any interface{}, ex string, t *testing.T) bool {
 
 func checkToFromString(any interface{}, ex, ex2 string, t *testing.T) bool {
 	s := Str.StringOf(any)
-	fs := InstanceOf(s)
+	fs := InstanceOf(s, globals.Registry())
 	reflect.DeepEqual(any, fs)
 	// Until struct is implemented, skip it
 	if !reflect.DeepEqual(any, fs) && !strings.Contains(s, ",25") {
@@ -126,7 +126,7 @@ func TestToString(t *testing.T) {
 }
 
 func TestFromStringPtr(t *testing.T) {
-	s := InstanceOf("{22,24}test")
+	s := InstanceOf("{22,24}test", globals.Registry())
 	s1 := *s.(*string)
 	if s1 != "test" {
 		log.Fail(t, "Expected value to be test but got ", s1)
@@ -135,44 +135,44 @@ func TestFromStringPtr(t *testing.T) {
 }
 
 func TestFromStringInt(t *testing.T) {
-	v := InstanceOf("{2}5")
+	v := InstanceOf("{2}5", globals.Registry())
 	r := v.(int)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int {
 		log.Fail(t, "From string failed for int")
 		return
 	}
-	v = InstanceOf("{2}5a")
+	v = InstanceOf("{2}5a", globals.Registry())
 }
 
 func TestFromStringInt8(t *testing.T) {
-	v := InstanceOf("{3}5")
+	v := InstanceOf("{3}5", globals.Registry())
 	r := v.(int8)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int8 {
 		log.Fail(t, "From string failed for int8")
 		return
 	}
-	v = InstanceOf("{3}5b")
+	v = InstanceOf("{3}5b", globals.Registry())
 }
 
 func TestFromStringInt16(t *testing.T) {
-	v := InstanceOf("{4}5")
+	v := InstanceOf("{4}5", globals.Registry())
 	r := v.(int16)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int16 {
 		log.Fail(t, "From string failed for int16")
 		return
 	}
-	v = InstanceOf("{4}5c")
+	v = InstanceOf("{4}5c", globals.Registry())
 }
 
 func TestFromStringInt32(t *testing.T) {
-	v := InstanceOf("{5}5")
+	v := InstanceOf("{5}5", globals.Registry())
 	r := v.(int32)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int32 {
 		log.Fail(t, "From string failed for int32")
 		return
 	}
-	v = InstanceOf("{5}5a")
-	v = InstanceOf("{5}")
+	v = InstanceOf("{5}5a", globals.Registry())
+	v = InstanceOf("{5}", globals.Registry())
 	r = v.(int32)
 	if r != 0 {
 		log.Fail(t, "From string failed for int32 blank")
@@ -181,78 +181,78 @@ func TestFromStringInt32(t *testing.T) {
 }
 
 func TestFromStringInt64(t *testing.T) {
-	v := InstanceOf("{6}5")
+	v := InstanceOf("{6}5", globals.Registry())
 	r := v.(int64)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int64 {
 		log.Fail(t, "From string failed for int64")
 		return
 	}
-	v = InstanceOf("{6}5a")
+	v = InstanceOf("{6}5a", globals.Registry())
 }
 
 func TestFromStringUInt(t *testing.T) {
-	v := InstanceOf("{7}5")
+	v := InstanceOf("{7}5", globals.Registry())
 	r := v.(uint)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint {
 		log.Fail(t, "From string failed for Uint")
 		return
 	}
-	v = InstanceOf("{7}5a")
+	v = InstanceOf("{7}5a", globals.Registry())
 }
 
 func TestFromStringUInt8(t *testing.T) {
-	v := InstanceOf("{8}5")
+	v := InstanceOf("{8}5", globals.Registry())
 	r := v.([]uint8)[0]
 	//53 is the byte value of character 5
 	if r != 53 || reflect.ValueOf(r).Kind() != reflect.Uint8 {
 		log.Fail(t, "From string failed for Uint8")
 		return
 	}
-	v = InstanceOf("{8}5a")
+	v = InstanceOf("{8}5a", globals.Registry())
 }
 
 func TestFromStringUInt16(t *testing.T) {
-	v := InstanceOf("{9}5")
+	v := InstanceOf("{9}5", globals.Registry())
 	r := v.(uint16)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint16 {
 		log.Fail(t, "From string failed for Uint16")
 		return
 	}
-	v = InstanceOf("{9}5a")
+	v = InstanceOf("{9}5a", globals.Registry())
 }
 
 func TestFromStringUInt32(t *testing.T) {
-	v := InstanceOf("{10}5")
+	v := InstanceOf("{10}5", globals.Registry())
 	r := v.(uint32)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint32 {
 		log.Fail(t, "From string failed for Uint32")
 		return
 	}
-	v = InstanceOf("{10}5a")
+	v = InstanceOf("{10}5a", globals.Registry())
 }
 
 func TestFromStringUInt64(t *testing.T) {
-	v := InstanceOf("{11}5")
+	v := InstanceOf("{11}5", globals.Registry())
 	r := v.(uint64)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint64 {
 		log.Fail(t, "From string failed for Uint64")
 		return
 	}
-	v = InstanceOf("{11}5a")
+	v = InstanceOf("{11}5a", globals.Registry())
 }
 
 func TestFromStringFloat32(t *testing.T) {
-	v := InstanceOf("{13}5.8")
+	v := InstanceOf("{13}5.8", globals.Registry())
 	r := v.(float32)
 	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
 		log.Fail(t, "From string failed for float32")
 		return
 	}
-	v = InstanceOf("{13}5.8d")
+	v = InstanceOf("{13}5.8d", globals.Registry())
 }
 
 func TestFromStringSlice(t *testing.T) {
-	s := InstanceOf("{23,24}[a,b]")
+	s := InstanceOf("{23,24}[a,b]", globals.Registry())
 	s1 := s.([]string)
 	if s1[0] != "a" {
 		log.Fail(t, "value for index 0 was not equale to a")
@@ -265,7 +265,7 @@ func TestFromStringSlice(t *testing.T) {
 }
 
 func TestFromStringInterface(t *testing.T) {
-	v := InstanceOf("{20,13}5.8")
+	v := InstanceOf("{20,13}5.8", globals.Registry())
 	r := v.(float32)
 	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
 		log.Fail(t, "From string failed for float32 interface")
@@ -274,7 +274,7 @@ func TestFromStringInterface(t *testing.T) {
 }
 
 func TestFromStringMap(t *testing.T) {
-	s := InstanceOf("{21,24,2}[a=1,b=2]")
+	s := InstanceOf("{21,24,2}[a=1,b=2]", globals.Registry())
 	s1 := s.(map[string]int)
 	if s1["a"] != 1 {
 		log.Fail(t, "value for key 'a' was not found or not equale to 1")
@@ -308,5 +308,4 @@ func TestAppendSpace(t *testing.T) {
 		log.Fail("Expected lenght of 3")
 		return
 	}
-	s.LogError(log)
 }

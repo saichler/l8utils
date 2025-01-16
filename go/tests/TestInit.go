@@ -4,7 +4,6 @@ import (
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/shared/go/share/resources"
-	"github.com/saichler/shared/go/share/string_utils"
 	"github.com/saichler/shared/go/tests/infra"
 )
 
@@ -15,6 +14,4 @@ func init() {
 	log = logger.NewLoggerImpl(&logger.FmtLogMethod{})
 	infra.Log = log
 	globals = resources.NewDefaultResources(log)
-	string_utils.Registry = globals.Registry()
-	string_utils.Logger = globals.Logger()
 }

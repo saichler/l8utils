@@ -2,6 +2,7 @@ package string_utils
 
 import (
 	"errors"
+	"fmt"
 	"github.com/saichler/shared/go/share/interfaces"
 	"reflect"
 	"strconv"
@@ -9,14 +10,11 @@ import (
 )
 
 // Global map that map a type/kind to a method that converts string to that type
-var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind) reflect.Value)
+var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind, interfaces.IRegistry) reflect.Value)
 
 const (
 	errorValue = "Failed to convert string to instance:"
 )
-
-var Registry interfaces.IRegistry
-var Logger interfaces.ILogger
 
 // initialize the map
 func init() {
@@ -42,72 +40,72 @@ func init() {
 }
 
 // Comvert string to string
-func stringFromString(str string, kinds []reflect.Kind) reflect.Value {
+func stringFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	return reflect.ValueOf(str)
 }
 
 // Convert string to int
-func intFromString(str string, kinds []reflect.Kind) reflect.Value {
+func intFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	if str == "" {
 		return reflect.ValueOf(0)
 	}
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "int")
+		printError(err, "int")
 	}
 	return reflect.ValueOf(i)
 }
 
 // Convert string to int8
-func int8FromString(str string, kinds []reflect.Kind) reflect.Value {
+func int8FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "int8")
+		printError(err, "int8")
 	}
 	return reflect.ValueOf(int8(i))
 }
 
 // Convert string to int16
-func int16FromString(str string, kinds []reflect.Kind) reflect.Value {
+func int16FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "int16")
+		printError(err, "int16")
 	}
 	return reflect.ValueOf(int16(i))
 }
 
 // Convert string to int32
-func int32FromString(str string, kinds []reflect.Kind) reflect.Value {
+func int32FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	if str == "" {
 		return reflect.ValueOf(int32(0))
 	}
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "int32")
+		printError(err, "int32")
 	}
 	return reflect.ValueOf(int32(i))
 }
 
 // Convert string to int64
-func int64FromString(str string, kinds []reflect.Kind) reflect.Value {
+func int64FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "int64")
+		printError(err, "int64")
 	}
 	return reflect.ValueOf(int64(i))
 }
 
 // Convert string to uint
-func uintFromString(str string, kinds []reflect.Kind) reflect.Value {
+func uintFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "uint")
+		printError(err, "uint")
 	}
 	return reflect.ValueOf(uint(i))
 }
 
 // Convert string to uint8
-func uint8FromString(str string, kinds []reflect.Kind) reflect.Value {
+func uint8FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	if str == "" {
 		return reflect.ValueOf(byte(0))
 	}
@@ -115,64 +113,64 @@ func uint8FromString(str string, kinds []reflect.Kind) reflect.Value {
 }
 
 // Convert string to uint16
-func uint16FromString(str string, kinds []reflect.Kind) reflect.Value {
+func uint16FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "uint16")
+		printError(err, "uint16")
 	}
 	return reflect.ValueOf(uint16(i))
 }
 
 // Convert string to uint32
-func uint32FromString(str string, kinds []reflect.Kind) reflect.Value {
+func uint32FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "uint32")
+		printError(err, "uint32")
 	}
 	return reflect.ValueOf(uint32(i))
 }
 
 // Convert string to uint64
-func uint64FromString(str string, kinds []reflect.Kind) reflect.Value {
+func uint64FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.Atoi(str)
 	if err != nil {
-		er(err, "uint64")
+		printError(err, "uint64")
 	}
 	return reflect.ValueOf(uint64(i))
 }
 
 // Convert string to bool
-func boolFromString(str string, kinds []reflect.Kind) reflect.Value {
+func boolFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	i, err := strconv.ParseBool(str)
 	if err != nil {
-		er(err, "bool")
+		printError(err, "bool")
 	}
 	return reflect.ValueOf(i)
 }
 
 // Convert string to float32
-func float32FromString(str string, kinds []reflect.Kind) reflect.Value {
+func float32FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	f, err := strconv.ParseFloat(str, 32)
 	if err != nil {
-		er(err, "float32")
+		printError(err, "float32")
 	}
 	return reflect.ValueOf(float32(f))
 }
 
 // Convert string to float64
-func float64FromString(str string, kinds []reflect.Kind) reflect.Value {
+func float64FromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	f, err := strconv.ParseFloat(str, 64)
 	if err != nil {
-		er(err, "float64")
+		printError(err, "float64")
 	}
 	return reflect.ValueOf(float64(f))
 }
 
 // Convert string to pointer
-func ptrFromString(str string, kinds []reflect.Kind) reflect.Value {
+func ptrFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	f := fromstrings[kinds[0]]
 	if f != nil {
-		v := f(str, kinds[1:])
+		v := f(str, kinds[1:], registry)
 		if !v.IsValid() {
 			return v
 		}
@@ -180,25 +178,25 @@ func ptrFromString(str string, kinds []reflect.Kind) reflect.Value {
 		newPtr.Elem().Set(v)
 		return newPtr
 	}
-	er(errors.New("Pointer cloud not be created for kind "+kinds[0].String()), "ptr")
+	printError(errors.New("Pointer cloud not be created for kind "+kinds[0].String()), "ptr")
 	return reflect.ValueOf(nil)
 }
 
 // Convert string to interface
-func interfaceFromString(str string, kinds []reflect.Kind) reflect.Value {
+func interfaceFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	f := fromstrings[kinds[0]]
 	if f != nil {
-		v := f(str, kinds[1:])
+		v := f(str, kinds[1:], registry)
 		newVal := reflect.New(v.Type())
 		newVal.Elem().Set(v)
 		return newVal.Elem()
 	}
-	er(errors.New("Pointer cloud not be created for kind "+kinds[0].String()), "interface")
+	printError(errors.New("Pointer cloud not be created for kind "+kinds[0].String()), "interface")
 	return reflect.ValueOf(nil)
 }
 
 // Convert string to map
-func mapFromString(str string, kinds []reflect.Kind) reflect.Value {
+func mapFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	str = strings.TrimSpace(str)
 	str = str[1 : len(str)-1]
 	items := strings.Split(str, ",")
@@ -206,7 +204,7 @@ func mapFromString(str string, kinds []reflect.Kind) reflect.Value {
 	for _, item := range items {
 		index := strings.Index(item, "=")
 		if index == -1 {
-			er(errors.New("Item '"+item+"' does not contain a '=' sign"), "map")
+			printError(errors.New("Item '"+item+"' does not contain a '=' sign"), "map")
 			continue
 		}
 		keyStr := strings.TrimSpace(item[0:index])
@@ -214,11 +212,11 @@ func mapFromString(str string, kinds []reflect.Kind) reflect.Value {
 		keyF := fromstrings[kinds[0]]
 		valueF := fromstrings[kinds[1]]
 		if keyF == nil || valueF == nil {
-			er(errors.New("Item '"+item+"' cannot find either the key type or the value type converter"), "map")
+			printError(errors.New("Item '"+item+"' cannot find either the key type or the value type converter"), "map")
 			continue
 		}
-		keyV := keyF(keyStr, kinds[2:])
-		valueV := valueF(valueStr, kinds[2:])
+		keyV := keyF(keyStr, kinds[2:], registry)
+		valueV := valueF(valueStr, kinds[2:], registry)
 		if newMap == nil {
 			m := reflect.MakeMap(reflect.MapOf(keyV.Type(), valueV.Type()))
 			newMap = &m
@@ -229,7 +227,7 @@ func mapFromString(str string, kinds []reflect.Kind) reflect.Value {
 }
 
 // Convert string to slice
-func sliceFromString(str string, kinds []reflect.Kind) reflect.Value {
+func sliceFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
 	str = strings.TrimSpace(str)
 	// if it is byte array, it will not have square brackets
 	if len(str) > 1 && str[0] == '[' {
@@ -239,11 +237,11 @@ func sliceFromString(str string, kinds []reflect.Kind) reflect.Value {
 
 	itemF := fromstrings[kinds[0]]
 	if itemF == nil {
-		er(errors.New("Cannot find converter item kind "+kinds[0].String()), "slice")
+		printError(errors.New("Cannot find converter item kind "+kinds[0].String()), "slice")
 		return reflect.ValueOf(nil)
 	}
 
-	defaultValue := itemF("", kinds[1:])
+	defaultValue := itemF("", kinds[1:], registry)
 
 	if str == "" {
 		return reflect.MakeSlice(reflect.SliceOf(defaultValue.Type()), 0, 0)
@@ -261,70 +259,63 @@ func sliceFromString(str string, kinds []reflect.Kind) reflect.Value {
 	newSlice := reflect.MakeSlice(reflect.SliceOf(defaultValue.Type()), len(items), len(items))
 
 	for i, item := range items {
-		v := itemF(item, kinds[1:])
+		v := itemF(item, kinds[1:], registry)
 		newSlice.Index(i).Set(v)
 	}
 	return newSlice
 }
 
 // Convert string to an instance
-func InstanceOf(str string) interface{} {
-	v := FromString(str)
+func InstanceOf(str string, registry interfaces.IRegistry) interface{} {
+	v := FromString(str, registry)
 	if v.IsValid() {
 		return v.Interface()
 	}
 	return nil
 }
 
-func structFromString(str string, kinds []reflect.Kind) reflect.Value {
-	if Registry == nil {
-		New("No struct instantiation provider available to instantiate ", str).LogError(Logger)
+func structFromString(str string, kinds []reflect.Kind, registry interfaces.IRegistry) reflect.Value {
+	if registry == nil {
 		return reflect.ValueOf(nil)
 	}
 	if str == "<Nil>" {
 		return reflect.ValueOf(nil)
 	}
-	typeInfo, e := Registry.Info(str)
+	typeInfo, e := registry.Info(str)
 	if e != nil {
-		New(e.Error()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 
 	v, e := typeInfo.NewInstance()
 	if e != nil {
-		New(e.Error()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 	return reflect.ValueOf(v)
 }
 
 // Conver string to a reflect.value
-func FromString(str string) reflect.Value {
+func FromString(str string, registry interfaces.IRegistry) reflect.Value {
 	if str == "" || str == "{0}" {
 		return reflect.ValueOf(nil)
 	}
 	v, k := parseStringForKinds(str)
 	f := fromstrings[k[0]]
 	if f == nil {
-		New("no converter was found for kind ", k[0].String()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
-	return f(v, k[1:])
+	return f(v, k[1:], registry)
 }
 
 // Extract the kinds from the prefix of the string
 func parseStringForKinds(str string) (string, []reflect.Kind) {
 	if len(str) < 3 {
-		New("'", str, "'lenght is less than 3, which means it is not in the correct format of {kind}...").LogError(Logger)
 		return "", nil
 	}
 	if str[0] != '{' {
-		New("'", str, "' does not start with '{'").LogError(Logger)
 		return "", nil
 	}
 	index := strings.Index(str, "}")
 	if index == -1 {
-		New("'", str, "'does not have a closing '}'").LogError(Logger)
 		return "", nil
 	}
 	types := str[1:index]
@@ -340,7 +331,6 @@ func parseKinds(types string) []reflect.Kind {
 	for i, v := range split {
 		k, e := strconv.Atoi(v)
 		if e != nil {
-			New("Error parsing kind:", v).LogError(Logger)
 			return []reflect.Kind{}
 		}
 		kinds[i] = reflect.Kind(k)
@@ -348,6 +338,6 @@ func parseKinds(types string) []reflect.Kind {
 	return kinds
 }
 
-func er(err error, tag string) {
-	Logger.Error(errorValue, tag, ":", err)
+func printError(err error, tag string) {
+	fmt.Println(errorValue, tag, ":", err)
 }
