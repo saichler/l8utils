@@ -11,10 +11,8 @@ import (
 )
 
 const (
-	DEFAULT_MAX_DATA_SIZE     = 1024 * 1024
-	DEFAULT_EDGE_QUEUE_SIZE   = 10000
-	DEFAULT_SWITCH_QUEUE_SIZE = 50000
-	DEFAULT_SWITCH_PORT       = 50000
+	DEFAULT_MAX_DATA_SIZE = 1024 * 1024
+	DEFAULT_QUEUE_SIZE    = 10000
 )
 
 type Resources struct {
@@ -24,7 +22,7 @@ type Resources struct {
 	dataListener  interfaces.IDatatListener
 	logger        interfaces.ILogger
 	serializers   map[interfaces.SerializerMode]interfaces.ISerializer
-	configs       map[interfaces.ConfigType]*types.MessagingConfig
+	config        *types.VNicConfig
 }
 
 func NewDefaultResources(logger interfaces.ILogger) interfaces.IResources {
@@ -40,8 +38,8 @@ func NewResources(registry interfaces.IRegistry,
 	r.security = security
 	r.logger = logger
 	r.serializers = make(map[interfaces.SerializerMode]interfaces.ISerializer)
-	r.configs = make(map[interfaces.ConfigType]*types.MessagingConfig)
-	r.createConfigs()
+	r.config = &types.VNicConfig{MaxDataSize: DEFAULT_MAX_DATA_SIZE,
+		RxQueueSize: DEFAULT_QUEUE_SIZE, TxQueueSize: DEFAULT_QUEUE_SIZE}
 	return r
 }
 
@@ -63,22 +61,9 @@ func (this *Resources) Serializer(mode interfaces.SerializerMode) interfaces.ISe
 func (this *Resources) Logger() interfaces.ILogger {
 	return this.logger
 }
-func (this *Resources) Config(configType interfaces.ConfigType) types.MessagingConfig {
-	return *this.configs[configType]
+func (this *Resources) Config() *types.VNicConfig {
+	return this.config
 }
-
-func (this *Resources) createConfigs() {
-	edgeConfig := interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_EDGE_QUEUE_SIZE,
-		DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_SWITCH_PORT, true, 30)
-	edgeSwitchConfig := interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_EDGE_QUEUE_SIZE,
-		DEFAULT_EDGE_QUEUE_SIZE, DEFAULT_SWITCH_PORT, false, 0)
-	switchConfig := interfaces.NewMessageConfig(DEFAULT_MAX_DATA_SIZE, DEFAULT_SWITCH_QUEUE_SIZE,
-		DEFAULT_SWITCH_QUEUE_SIZE, DEFAULT_SWITCH_PORT, true, 30)
-	this.configs[interfaces.EdgeConfig] = edgeConfig
-	this.configs[interfaces.SwitchConfig] = switchConfig
-	this.configs[interfaces.EdgeSwitchConfig] = edgeSwitchConfig
-}
-
 func createSecurityProvider() interfaces.ISecurityProvider {
 	hash := md5.New()
 	secret := "Default Security Provider"

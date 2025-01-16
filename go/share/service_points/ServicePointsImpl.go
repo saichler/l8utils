@@ -36,7 +36,7 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 	return nil
 }
 
-func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, edge interfaces.IEdge) (proto.Message, error) {
+func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {
@@ -44,15 +44,15 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 	}
 	switch action {
 	case types.Action_POST:
-		return h.Post(pb, edge)
+		return h.Post(pb, vnic)
 	case types.Action_PUT:
-		return h.Put(pb, edge)
+		return h.Put(pb, vnic)
 	case types.Action_PATCH:
-		return h.Patch(pb, edge)
+		return h.Patch(pb, vnic)
 	case types.Action_DELETE:
-		return h.Delete(pb, edge)
+		return h.Delete(pb, vnic)
 	case types.Action_GET:
-		return h.Get(pb, edge)
+		return h.Get(pb, vnic)
 	case types.Action_Invalid_Action:
 		return nil, errors.New("Invalid Action, ignoring")
 	}

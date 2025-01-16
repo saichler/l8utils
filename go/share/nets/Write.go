@@ -8,7 +8,7 @@ import (
 )
 
 // Write data to socket
-func Write(data []byte, conn net.Conn, config *types.MessagingConfig) error {
+func Write(data []byte, conn net.Conn, config *types.VNicConfig) error {
 	// If the connection is nil, return an error
 	if conn == nil {
 		return errors.New("no Connection Available")
@@ -34,7 +34,7 @@ func Write(data []byte, conn net.Conn, config *types.MessagingConfig) error {
 	return e
 }
 
-func WriteEncrypted(conn net.Conn, data []byte, config *types.MessagingConfig,
+func WriteEncrypted(conn net.Conn, data []byte, config *types.VNicConfig,
 	securityProvider interfaces.ISecurityProvider) error {
 	encData, err := securityProvider.Encrypt(data)
 	if err != nil {

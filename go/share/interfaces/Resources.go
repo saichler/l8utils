@@ -9,5 +9,5 @@ type IResources interface {
 	DataListener() IDatatListener
 	Serializer(SerializerMode) ISerializer
 	Logger() ILogger
-	Config(configType ConfigType) types.MessagingConfig
+	Config() *types.VNicConfig
 }

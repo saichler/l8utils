@@ -9,7 +9,7 @@ import (
 )
 
 // Read data from socket
-func Read(conn net.Conn, config *types.MessagingConfig) ([]byte, error) {
+func Read(conn net.Conn, config *types.VNicConfig) ([]byte, error) {
 	// If the connection is nil, return an error
 	if conn == nil {
 		return nil, errors.New("no Connection Available")
@@ -36,7 +36,7 @@ func Read(conn net.Conn, config *types.MessagingConfig) ([]byte, error) {
 	return data, err
 }
 
-func ReadSize(size int, conn net.Conn, config *types.MessagingConfig) ([]byte, error) {
+func ReadSize(size int, conn net.Conn, config *types.VNicConfig) ([]byte, error) {
 	data := make([]byte, size)
 	n, e := conn.Read(data)
 	if e != nil {
@@ -57,7 +57,7 @@ func ReadSize(size int, conn net.Conn, config *types.MessagingConfig) ([]byte, e
 	return data, nil
 }
 
-func ReadEncrypted(conn net.Conn, config *types.MessagingConfig,
+func ReadEncrypted(conn net.Conn, config *types.VNicConfig,
 	securityProvider interfaces.ISecurityProvider) (string, error) {
 	inData, err := Read(conn, config)
 	if err != nil {

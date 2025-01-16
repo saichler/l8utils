@@ -8,7 +8,7 @@ import (
 type ISecurityProvider interface {
 	CanDial(string, uint32) (net.Conn, error)
 	CanAccept(net.Conn) error
-	ValidateConnection(net.Conn, *types.MessagingConfig) error
+	ValidateConnection(net.Conn, *types.VNicConfig) error
 
 	Encrypt([]byte) (string, error)
 	Decrypt(string) ([]byte, error)

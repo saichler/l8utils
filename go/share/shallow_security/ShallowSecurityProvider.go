@@ -35,7 +35,7 @@ func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.MessagingConfig) error {
+func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.VNicConfig) error {
 	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, sp)
 	if err != nil {
 		conn.Close()
@@ -65,24 +65,24 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 		return err
 	}
 
-	isSwitch := "false"
-	if config.IsSwitchSide {
-		isSwitch = "true"
+	forceExternal := "false"
+	if config.ForceExternal {
+		forceExternal = "true"
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(isSwitch), config, sp)
+	err = nets.WriteEncrypted(conn, []byte(forceExternal), config, sp)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	isSwitch, err = nets.ReadEncrypted(conn, config, sp)
+	forceExternal, err = nets.ReadEncrypted(conn, config, sp)
 	if err != nil {
 		conn.Close()
 		return err
 	}
-	if isSwitch == "true" {
-		config.IsAdjacentASwitch = true
+	if forceExternal == "true" {
+		config.ForceExternal = true
 	}
 
 	return nil

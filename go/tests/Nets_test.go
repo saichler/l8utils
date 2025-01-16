@@ -2,7 +2,6 @@ package tests
 
 import (
 	"bytes"
-	. "github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/nets"
 	"net"
 	"sync"
@@ -19,8 +18,7 @@ type MockAddr struct{}
 func TestNets(t *testing.T) {
 	conn := &MockConn{}
 	writeData := []byte("Testing Read/Write data to socket")
-	c := globals.Config(EdgeConfig)
-	config := &c
+	config := globals.Config()
 	config.Local_Uuid = "abcde"
 
 	err := nets.Write(nil, nil, nil)

@@ -1,7 +1,6 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/types"
 	"strings"
 	"testing"
@@ -21,8 +20,7 @@ func TestShalowSecurity(t *testing.T) {
 		return
 	}
 	conn = &MockConn{}
-	c := globals.Config(EdgeConfig)
-	config := &c
+	config := globals.Config()
 	config.Local_Uuid = "Test Validate Connection"
 
 	err = sp.ValidateConnection(conn, config)
@@ -30,7 +28,7 @@ func TestShalowSecurity(t *testing.T) {
 		log.Fail(t, err)
 		return
 	}
-	if config.IsAdjacentASwitch {
+	if config.ForceExternal {
 		log.Fail(t, "This connection is adjucent.")
 		return
 	}
