@@ -1,4 +1,4 @@
-package type_registry
+package registry
 
 import (
 	"github.com/saichler/shared/go/share/maps"
@@ -15,14 +15,18 @@ func NewTypesMap() *TypesMap {
 	return s2t
 }
 
-func (m *TypesMap) Put(key string, value reflect.Type) bool {
-	return m.impl.Put(key, NewTypeInfo(value))
+func (m *TypesMap) Put(key string, value reflect.Type) (bool, error) {
+	info, err := NewInfo(value)
+	if err != nil {
+		return false, err
+	}
+	return m.impl.Put(key, info), err
 }
 
-func (m *TypesMap) Get(key string) (*TypeInfo, bool) {
+func (m *TypesMap) Get(key string) (*Info, bool) {
 	value, ok := m.impl.Get(key)
 	if value != nil {
-		info := value.(*TypeInfo)
+		info := value.(*Info)
 		return info, ok
 	}
 	return nil, ok

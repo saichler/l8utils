@@ -35,45 +35,4 @@ type ILogger interface {
 	Empty() bool
 	Fail(interface{}, ...interface{})
 	SetLogLevel(LogLevel)
-	LoggerLock()
-	LoggerUnlock()
-	EnableLoggerSync(bool)
-}
-
-var logger ILogger
-
-func SetLogger(l ILogger) {
-	logger = l
-}
-
-func Logger() ILogger {
-	return logger
-}
-
-func Trace(args ...interface{}) {
-	logger.Trace(args...)
-}
-
-func Debug(args ...interface{}) {
-	logger.Debug(args...)
-}
-
-func Info(args ...interface{}) {
-	logger.Info(args...)
-}
-
-func Warning(args ...interface{}) {
-	logger.Warning(args...)
-}
-
-func Error(args ...interface{}) error {
-	return logger.Error(args...)
-}
-
-func Empty() bool {
-	return logger.Empty()
-}
-
-func Fail(t interface{}, args ...interface{}) {
-	logger.Fail(t, args...)
 }

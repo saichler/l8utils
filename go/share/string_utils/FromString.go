@@ -15,7 +15,8 @@ const (
 	errorValue = "Failed to convert string to instance:"
 )
 
-var Registry interfaces.ITypeRegistry
+var Registry interfaces.IRegistry
+var Logger interfaces.ILogger
 
 // initialize the map
 func init() {
@@ -277,21 +278,21 @@ func InstanceOf(str string) interface{} {
 
 func structFromString(str string, kinds []reflect.Kind) reflect.Value {
 	if Registry == nil {
-		New("No struct instantiation provider available to instantiate ", str).LogError()
+		New("No struct instantiation provider available to instantiate ", str).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 	if str == "<Nil>" {
 		return reflect.ValueOf(nil)
 	}
-	typeInfo, e := Registry.TypeInfo(str)
+	typeInfo, e := Registry.Info(str)
 	if e != nil {
-		New(e.Error()).LogError()
+		New(e.Error()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 
 	v, e := typeInfo.NewInstance()
 	if e != nil {
-		New(e.Error()).LogError()
+		New(e.Error()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 	return reflect.ValueOf(v)
@@ -305,7 +306,7 @@ func FromString(str string) reflect.Value {
 	v, k := parseStringForKinds(str)
 	f := fromstrings[k[0]]
 	if f == nil {
-		New("no converter was found for kind ", k[0].String()).LogError()
+		New("no converter was found for kind ", k[0].String()).LogError(Logger)
 		return reflect.ValueOf(nil)
 	}
 	return f(v, k[1:])
@@ -314,16 +315,16 @@ func FromString(str string) reflect.Value {
 // Extract the kinds from the prefix of the string
 func parseStringForKinds(str string) (string, []reflect.Kind) {
 	if len(str) < 3 {
-		New("'", str, "'lenght is less than 3, which means it is not in the correct format of {kind}...").LogError()
+		New("'", str, "'lenght is less than 3, which means it is not in the correct format of {kind}...").LogError(Logger)
 		return "", nil
 	}
 	if str[0] != '{' {
-		New("'", str, "' does not start with '{'").LogError()
+		New("'", str, "' does not start with '{'").LogError(Logger)
 		return "", nil
 	}
 	index := strings.Index(str, "}")
 	if index == -1 {
-		New("'", str, "'does not have a closing '}'").LogError()
+		New("'", str, "'does not have a closing '}'").LogError(Logger)
 		return "", nil
 	}
 	types := str[1:index]
@@ -339,7 +340,7 @@ func parseKinds(types string) []reflect.Kind {
 	for i, v := range split {
 		k, e := strconv.Atoi(v)
 		if e != nil {
-			New("Error parsing kind:", v).LogError()
+			New("Error parsing kind:", v).LogError(Logger)
 			return []reflect.Kind{}
 		}
 		kinds[i] = reflect.Kind(k)
@@ -348,5 +349,5 @@ func parseKinds(types string) []reflect.Kind {
 }
 
 func er(err error, tag string) {
-	interfaces.Error(errorValue, tag, ":", err)
+	Logger.Error(errorValue, tag, ":", err)
 }

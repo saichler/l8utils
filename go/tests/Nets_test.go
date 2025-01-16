@@ -19,31 +19,31 @@ type MockAddr struct{}
 func TestNets(t *testing.T) {
 	conn := &MockConn{}
 	writeData := []byte("Testing Read/Write data to socket")
-	c := providers.EdgeConfig()
+	c := globals.Config(EdgeConfig)
 	config := &c
 	config.Local_Uuid = "abcde"
 
 	err := nets.Write(nil, nil, nil)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(nil, conn, nil)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(nil, conn, config)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(make([]byte, config.MaxDataSize+1), conn, config)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
@@ -51,45 +51,45 @@ func TestNets(t *testing.T) {
 		time.Sleep(time.Millisecond * 500)
 		err = nets.Write(writeData, conn, config)
 		if err != nil {
-			Fail(t, err)
+			log.Fail(t, err)
 			return
 		}
 	}()
 
 	_, err = nets.Read(nil, nil)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
 	_, err = nets.Read(conn, nil)
 	if err == nil {
-		Fail(t, "Error is nil")
+		log.Fail(t, "Error is nil")
 		return
 	}
 
 	readData, err := nets.Read(conn, config)
 	if err != nil {
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
 	if bytes.Compare(writeData, readData) != 0 {
-		Fail(t, "Write Data & Read Date do not match")
+		log.Fail(t, "Write Data & Read Date do not match")
 		return
 	}
 
-	err = nets.WriteEncrypted(conn, writeData, config, providers.Security())
+	err = nets.WriteEncrypted(conn, writeData, config, globals.Security())
 	if err != nil {
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
-	readStr, err := nets.ReadEncrypted(conn, config, providers.Security())
+	readStr, err := nets.ReadEncrypted(conn, config, globals.Security())
 	if err != nil {
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
 	if readStr != string(writeData) {
-		Fail(t, "Write Data do not match read data")
+		log.Fail(t, "Write Data do not match read data")
 		return
 	}
 }

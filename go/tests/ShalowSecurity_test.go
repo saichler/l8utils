@@ -8,30 +8,30 @@ import (
 )
 
 func TestShalowSecurity(t *testing.T) {
-	sp := providers.Security()
+	sp := globals.Security()
 	conn, err := sp.CanDial("127.0.0.1", 8910)
 	if err != nil && !strings.Contains(err.Error(), "connection refused") {
 
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
 	err = sp.CanAccept(conn)
 	if err != nil {
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
 	conn = &MockConn{}
-	c := providers.EdgeConfig()
+	c := globals.Config(EdgeConfig)
 	config := &c
 	config.Local_Uuid = "Test Validate Connection"
 
 	err = sp.ValidateConnection(conn, config)
 	if err != nil {
-		Fail(t, err)
+		log.Fail(t, err)
 		return
 	}
 	if config.IsAdjacentASwitch {
-		Fail(t, "This connection is adjucent.")
+		log.Fail(t, "This connection is adjucent.")
 		return
 	}
 

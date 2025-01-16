@@ -5,16 +5,22 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+type ConfigType int
+
+const (
+	EdgeConfig       ConfigType = 1
+	EdgeSwitchConfig ConfigType = 2
+	SwitchConfig     ConfigType = 3
+)
+
 type IEdge interface {
 	Start()
+	Shutdown()
+	Name() string
 	Config() types.MessagingConfig
 	Send([]byte) error
-	Name() string
 	Do(types.Action, string, proto.Message) error
-	Shutdown()
-	CreatedAt() int64
-	PublishState()
-	RegisterTopic(string)
+	Resources() IResources
 }
 
 type IDatatListener interface {

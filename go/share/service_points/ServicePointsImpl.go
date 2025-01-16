@@ -1,6 +1,7 @@
 package service_points
 
 import (
+	"errors"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
@@ -9,23 +10,28 @@ import (
 
 type ServicePointsImpl struct {
 	structName2ServicePoint *String2ServicePointMap
+	resources               interfaces.IResources
 }
 
-func NewServicePoints() interfaces.IServicePoints {
+func NewServicePoints(resources interfaces.IResources) interfaces.IServicePoints {
 	sp := &ServicePointsImpl{}
 	sp.structName2ServicePoint = NewString2ServicePointMap()
+	sp.resources = resources
 	return sp
 }
 
-func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler, registry interfaces.ITypeRegistry) error {
+func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, handler interfaces.IServicePointHandler) error {
 	if pb == nil {
-		return interfaces.Error("cannot register handler with nil proto")
+		return errors.New("cannot register handler with nil proto")
 	}
 	typ := reflect.ValueOf(pb).Elem().Type()
 	if handler == nil {
-		return interfaces.Error("cannot register nil handler for type ", typ.Name())
+		return errors.New("cannot register nil handler for type " + typ.Name())
 	}
-	registry.RegisterType(typ)
+	_, err := servicePoints.resources.Registry().RegisterType(typ)
+	if err != nil {
+		return err
+	}
 	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
 	return nil
 }
@@ -34,7 +40,7 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {
-		return nil, interfaces.Error("Cannot find handler for type ", tName)
+		return nil, errors.New("Cannot find handler for type " + tName)
 	}
 	switch action {
 	case types.Action_POST:
@@ -48,7 +54,7 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 	case types.Action_GET:
 		return h.Get(pb, edge)
 	case types.Action_Invalid_Action:
-		return nil, interfaces.Error("Invalid Action, ignoring")
+		return nil, errors.New("Invalid Action, ignoring")
 	}
 	panic("Unknown Action:" + action.String())
 }

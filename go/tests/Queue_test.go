@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/queues"
 	"testing"
 )
@@ -12,12 +11,12 @@ func TestQueue(t *testing.T) {
 	popFromQueue(q, t)
 	q.Add("g")
 	if q.Size() != 1 {
-		interfaces.Fail(t, "Expected queue size to be 1")
+		log.Fail(t, "Expected queue size to be 1")
 		return
 	}
 	q.Clear()
 	if q.Size() != 0 {
-		interfaces.Fail(t, "Expected queue size to be 0")
+		log.Fail(t, "Expected queue size to be 0")
 		return
 	}
 	if q.Active() {
@@ -26,7 +25,7 @@ func TestQueue(t *testing.T) {
 	q.Add("s")
 	s := q.Next()
 	if s != nil {
-		interfaces.Fail(t, "Expected nil")
+		log.Fail(t, "Expected nil")
 		return
 	}
 }
@@ -45,13 +44,13 @@ func popFromQueue(q *queues.Queue, t *testing.T) {
 	}
 
 	if q.Size() != 3 {
-		interfaces.Fail(t, "Expected queue size to be 3 per the limit")
+		log.Fail(t, "Expected queue size to be 3 per the limit")
 		return
 	}
 
 	for i := 0; i < 5; i++ {
 		nxt := q.Next()
-		interfaces.Debug(nxt)
+		log.Debug(nxt)
 	}
 }
 
@@ -60,7 +59,7 @@ func TestByteQueue(t *testing.T) {
 	bq.Add([]byte{50, 51, 51})
 	b := bq.Next()
 	if b[0] != 50 || b[1] != 51 || b[2] != 51 {
-		interfaces.Fail(t, "Expected byte slice to be 50 51 51")
+		log.Fail(t, "Expected byte slice to be 50 51 51")
 		return
 	}
 	bq.Shutdown()
