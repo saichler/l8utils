@@ -73,4 +73,10 @@ message VNicConfig {
   // force external mode in case two switches are on the same machine
   // woth different ports
   bool force_external = 8;
+  // Custom local alias for this vnic
+  string local_alias = 9;
+  // Custom remote alias for this vnic
+  string remote_alias = 10;
+  // supported service topics
+  map<string, bool> topics = 11;
 }

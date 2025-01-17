@@ -13,5 +13,5 @@ var log interfaces.ILogger
 func init() {
 	log = logger.NewLoggerImpl(&logger.FmtLogMethod{})
 	infra.Log = log
-	globals = resources.NewDefaultResources(log)
+	globals = resources.NewDefaultResources(log, "tests")
 }

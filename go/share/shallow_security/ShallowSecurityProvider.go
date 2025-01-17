@@ -1,6 +1,7 @@
 package shallow_security
 
 import (
+	"bytes"
 	"errors"
 	"github.com/saichler/shared/go/share/aes"
 	"github.com/saichler/shared/go/share/nets"
@@ -85,7 +86,52 @@ func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *typ
 		config.ForceExternal = true
 	}
 
+	err = nets.WriteEncrypted(conn, []byte(config.LocalAlias), config, sp)
+	if err != nil {
+		conn.Close()
+		return err
+	}
+
+	remoteAlias, err := nets.ReadEncrypted(conn, config, sp)
+	if err != nil {
+		conn.Close()
+		return err
+	}
+	config.RemoteAlias = remoteAlias
+
+	err = nets.WriteEncrypted(conn, []byte(topics(config.Topics)), config, sp)
+	if err != nil {
+		conn.Close()
+		return err
+	}
+
+	t, err := nets.ReadEncrypted(conn, config, sp)
+	if err != nil {
+		conn.Close()
+		return err
+	}
+
+	if t != "" {
+		tokens := strings.Split(t, ",")
+		for _, token := range tokens {
+			config.Topics[token] = true
+		}
+	}
+
 	return nil
+}
+
+func topics(topics map[string]bool) string {
+	buff := bytes.Buffer{}
+	first := true
+	for topic, _ := range topics {
+		if !first {
+			buff.WriteString(",")
+		}
+		buff.WriteString(topic)
+		first = false
+	}
+	return buff.String()
 }
 
 func (sp *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {

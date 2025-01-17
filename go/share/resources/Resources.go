@@ -25,14 +25,15 @@ type Resources struct {
 	config        *types.VNicConfig
 }
 
-func NewDefaultResources(logger interfaces.ILogger) interfaces.IResources {
-	return NewResources(registry.NewRegistry(), createSecurityProvider(), nil, logger)
+func NewDefaultResources(logger interfaces.ILogger, alias string) interfaces.IResources {
+	return NewResources(registry.NewRegistry(), createSecurityProvider(), nil, logger, alias)
 }
 
 func NewResources(registry interfaces.IRegistry,
 	security interfaces.ISecurityProvider,
 	servicePoints interfaces.IServicePoints,
-	logger interfaces.ILogger) interfaces.IResources {
+	logger interfaces.ILogger,
+	alias string) interfaces.IResources {
 	r := &Resources{}
 	r.registry = registry
 	r.servicePoints = servicePoints
@@ -43,8 +44,15 @@ func NewResources(registry interfaces.IRegistry,
 	r.logger = logger
 	r.serializers = make(map[interfaces.SerializerMode]interfaces.ISerializer)
 	r.config = &types.VNicConfig{MaxDataSize: DEFAULT_MAX_DATA_SIZE,
-		RxQueueSize: DEFAULT_QUEUE_SIZE, TxQueueSize: DEFAULT_QUEUE_SIZE}
+		RxQueueSize: DEFAULT_QUEUE_SIZE,
+		TxQueueSize: DEFAULT_QUEUE_SIZE,
+		LocalAlias:  alias,
+		Topics:      map[string]bool{}}
 	return r
+}
+
+func (this *Resources) AddTopic(topic string) {
+	this.config.Topics[topic] = true
 }
 
 func (this *Resources) Registry() interfaces.IRegistry {
