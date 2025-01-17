@@ -65,5 +65,5 @@ func (servicePoints *ServicePointsImpl) ServicePointHandler(topic string) (inter
 }
 
 func (servicePoints *ServicePointsImpl) Topics() map[string]bool {
-	servicePoints.structName2ServicePoint
+	return servicePoints.structName2ServicePoint.Topics()
 }
