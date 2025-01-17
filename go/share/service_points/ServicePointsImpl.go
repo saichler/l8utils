@@ -33,6 +33,7 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 		return err
 	}
 	servicePoints.structName2ServicePoint.Put(typ.Name(), handler)
+	servicePoints.resources.Config().Topics[typ.Name()] = true
 	return nil
 }
 
@@ -61,4 +62,8 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 
 func (servicePoints *ServicePointsImpl) ServicePointHandler(topic string) (interfaces.IServicePointHandler, bool) {
 	return servicePoints.structName2ServicePoint.Get(topic)
+}
+
+func (servicePoints *ServicePointsImpl) Topics() map[string]bool {
+	servicePoints.structName2ServicePoint
 }

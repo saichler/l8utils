@@ -3,6 +3,7 @@ package service_points
 import (
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/maps"
+	"reflect"
 )
 
 type String2ServicePointMap struct {
@@ -29,4 +30,13 @@ func (mp *String2ServicePointMap) Get(key string) (interfaces.IServicePointHandl
 
 func (mp *String2ServicePointMap) Contains(key string) bool {
 	return mp.impl.Contains(key)
+}
+
+func (mp *String2ServicePointMap) Topics() map[string]bool {
+	tops := mp.impl.KeysAsList(reflect.TypeOf(""), nil).([]string)
+	result := make(map[string]bool)
+	for _, topic := range tops {
+		result[topic] = true
+	}
+	return result
 }
