@@ -15,7 +15,7 @@ type IVirtualNetworkInterface interface {
 }
 
 type IDatatListener interface {
-	Shutdown(IVirtualNetworkInterface)
+	ShutdownVNic(IVirtualNetworkInterface)
 	HandleData([]byte, IVirtualNetworkInterface)
 }
 
