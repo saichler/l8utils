@@ -26,15 +26,19 @@ type Resources struct {
 }
 
 func NewDefaultResources(logger interfaces.ILogger) interfaces.IResources {
-	return NewResources(registry.NewRegistry(), createSecurityProvider(), logger)
+	return NewResources(registry.NewRegistry(), createSecurityProvider(), nil, logger)
 }
 
 func NewResources(registry interfaces.IRegistry,
 	security interfaces.ISecurityProvider,
+	servicePoints interfaces.IServicePoints,
 	logger interfaces.ILogger) interfaces.IResources {
 	r := &Resources{}
 	r.registry = registry
-	r.servicePoints = service_points.NewServicePoints(r)
+	r.servicePoints = servicePoints
+	if r.servicePoints == nil {
+		r.servicePoints = service_points.NewServicePoints(r)
+	}
 	r.security = security
 	r.logger = logger
 	r.serializers = make(map[interfaces.SerializerMode]interfaces.ISerializer)
