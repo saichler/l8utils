@@ -10,4 +10,6 @@ type IResources interface {
 	Serializer(SerializerMode) ISerializer
 	Logger() ILogger
 	Config() *types.VNicConfig
+	SetDataListener(IDatatListener)
+	SetSerializer(SerializerMode, ISerializer)
 }

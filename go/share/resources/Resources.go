@@ -64,8 +64,14 @@ func (this *Resources) ServicePoints() interfaces.IServicePoints {
 func (this *Resources) Security() interfaces.ISecurityProvider {
 	return this.security
 }
+func (this *Resources) SetDataListener(l interfaces.IDatatListener) {
+	this.dataListener = l
+}
 func (this *Resources) DataListener() interfaces.IDatatListener {
 	return this.dataListener
+}
+func (this *Resources) SetSerializer(mode interfaces.SerializerMode, serializer interfaces.ISerializer) {
+	this.serializers[mode] = serializer
 }
 func (this *Resources) Serializer(mode interfaces.SerializerMode) interfaces.ISerializer {
 	return this.serializers[mode]
