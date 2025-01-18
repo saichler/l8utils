@@ -17,7 +17,7 @@ type TestServicePointHandler struct {
 }
 
 const (
-	TEST_TOPIC = "Tests"
+	TEST_TOPIC = "TestProto"
 )
 
 func NewTestServicePointHandler(name string) *TestServicePointHandler {

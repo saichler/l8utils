@@ -1,7 +1,6 @@
 package shallow_security
 
 import (
-	"bytes"
 	"errors"
 	"github.com/saichler/shared/go/share/aes"
 	"github.com/saichler/shared/go/share/nets"
@@ -25,126 +24,49 @@ func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSec
 	return sp
 }
 
-func (sp *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
+func (this *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
 	if strings.Contains(host, ":") {
 		host = "[" + host + "]"
 	}
 	return net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 }
 
-func (sp *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
+func (this *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (sp *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.VNicConfig) error {
-	err := nets.WriteEncrypted(conn, []byte(sp.secret), config, sp)
+func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.VNicConfig) error {
+	err := nets.WriteEncrypted(conn, []byte(this.secret), config, this)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	secret, err := nets.ReadEncrypted(conn, config, sp)
+	secret, err := nets.ReadEncrypted(conn, config, this)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	if sp.secret != secret {
+	if this.secret != secret {
 		conn.Close()
 		return errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	err = nets.WriteEncrypted(conn, []byte(config.Local_Uuid), config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
+	return nets.ExecuteProtocol(conn, config, this)
+}
 
-	config.RemoteUuid, err = nets.ReadEncrypted(conn, config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
+func (this *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {
+	return aes.Encrypt(data, this.key)
+}
 
-	forceExternal := "false"
-	if config.ForceExternal {
-		forceExternal = "true"
-	}
+func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
+	return aes.Decrypt(data, this.key)
+}
 
-	err = nets.WriteEncrypted(conn, []byte(forceExternal), config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-
-	forceExternal, err = nets.ReadEncrypted(conn, config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-	if forceExternal == "true" {
-		config.ForceExternal = true
-	}
-
-	err = nets.WriteEncrypted(conn, []byte(config.LocalAlias), config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-
-	remoteAlias, err := nets.ReadEncrypted(conn, config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-	config.RemoteAlias = remoteAlias
-
-	err = nets.WriteEncrypted(conn, []byte(topics(config.Topics)), config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-
-	t, err := nets.ReadEncrypted(conn, config, sp)
-	if err != nil {
-		conn.Close()
-		return err
-	}
-
-	if t != "" {
-		tokens := strings.Split(t, ",")
-		for _, token := range tokens {
-			config.Topics[token] = true
-		}
-	}
-
+func (this *ShallowSecurityProvider) CanDo(action types.Action, endpoint string, token string) error {
 	return nil
 }
-
-func topics(topics map[string]bool) string {
-	buff := bytes.Buffer{}
-	first := true
-	for topic, _ := range topics {
-		if !first {
-			buff.WriteString(",")
-		}
-		buff.WriteString(topic)
-		first = false
-	}
-	return buff.String()
-}
-
-func (sp *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {
-	return aes.Encrypt(data, sp.key)
-}
-
-func (sp *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
-	return aes.Decrypt(data, sp.key)
-}
-
-func (sp *ShallowSecurityProvider) CanDo(action types.Action, endpoint string, token string) error {
-	return nil
-}
-func (sp *ShallowSecurityProvider) CanView(typ string, attrName string, token string) error {
+func (this *ShallowSecurityProvider) CanView(typ string, attrName string, token string) error {
 	return nil
 }
