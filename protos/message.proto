@@ -80,6 +80,8 @@ message VNicConfig {
   string remote_alias = 10;
   // supported service topics
   map<string, bool> topics = 11;
+  //If this a fail notification, what is the failing info
+  FailInfo fail_info = 12;
 }
 
 message FailInfo {
