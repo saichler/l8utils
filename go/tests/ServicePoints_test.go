@@ -35,7 +35,7 @@ func TestServicePoints(t *testing.T) {
 	globals.ServicePoints().Handle(pb, types.Action_DELETE, nil, nil)
 	globals.ServicePoints().Handle(pb, types.Action_GET, nil, nil)
 	globals.ServicePoints().Handle(pb, types.Action_PATCH, nil, nil)
-	globals.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil, &types.FailInfo{})
+	globals.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil, nil)
 	if testsp.PostNumber != 1 {
 		log.Fail(t, "Post is not 1")
 	}

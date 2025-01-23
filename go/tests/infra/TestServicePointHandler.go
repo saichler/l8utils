@@ -53,8 +53,8 @@ func (tsp *TestServicePointHandler) Get(pb proto.Message, edge interfaces.IVirtu
 	tsp.GetNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Failed(pb proto.Message, edge interfaces.IVirtualNetworkInterface, info *types.FailInfo) (proto.Message, error) {
-	Log.Debug("Unreachable -", tsp.Name, "- Test callback")
+func (tsp *TestServicePointHandler) Failed(pb proto.Message, edge interfaces.IVirtualNetworkInterface, info *types.Message) (proto.Message, error) {
+	Log.Debug("Failed -", tsp.Name, "- Test callback")
 	tsp.FailedNumber++
 	return nil, nil
 }

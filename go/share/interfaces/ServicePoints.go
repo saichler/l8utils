@@ -7,7 +7,7 @@ import (
 
 type IServicePoints interface {
 	RegisterServicePoint(proto.Message, IServicePointHandler) error
-	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.FailInfo) (proto.Message, error)
+	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	ServicePointHandler(string) (IServicePointHandler, bool)
 	Topics() map[string]bool
 }
@@ -18,7 +18,7 @@ type IServicePointHandler interface {
 	Patch(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Delete(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Get(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Failed(proto.Message, IVirtualNetworkInterface, *types.FailInfo) (proto.Message, error)
+	Failed(proto.Message, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	EndPoint() string
 	Topic() string
 }

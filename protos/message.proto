@@ -15,7 +15,6 @@ enum Action {
   PATCH = 3;
   DELETE = 4;
   GET = 5;
-  Failed = 6;
 }
 
 // The priority of the message
@@ -54,7 +53,7 @@ message Message {
   // timeout when request/reply
   int64 timeout = 9;
   //If this a fail notification, what is the failing info
-  FailInfo fail_info = 10;
+  string fail_msg = 10;
 }
 
 // A config for the messages limitation and data size
@@ -82,9 +81,4 @@ message VNicConfig {
   string remote_alias = 10;
   // supported service topics
   map<string, bool> topics = 11;
-}
-
-message FailInfo {
-  string uuid = 1;
-  string msg = 2;
 }

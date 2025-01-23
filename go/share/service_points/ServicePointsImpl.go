@@ -37,11 +37,14 @@ func (servicePoints *ServicePointsImpl) RegisterServicePoint(pb proto.Message, h
 	return nil
 }
 
-func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, vnic interfaces.IVirtualNetworkInterface, failInfo *types.FailInfo) (proto.Message, error) {
+func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Action, vnic interfaces.IVirtualNetworkInterface, msg *types.Message) (proto.Message, error) {
 	tName := reflect.ValueOf(pb).Elem().Type().Name()
 	h, ok := servicePoints.structName2ServicePoint.Get(tName)
 	if !ok {
 		return nil, errors.New("Cannot find handler for type " + tName)
+	}
+	if msg != nil && msg.FailMsg != "" {
+		return h.Failed(pb, vnic, msg)
 	}
 	switch action {
 	case types.Action_POST:
@@ -54,8 +57,6 @@ func (servicePoints *ServicePointsImpl) Handle(pb proto.Message, action types.Ac
 		return h.Delete(pb, vnic)
 	case types.Action_GET:
 		return h.Get(pb, vnic)
-	case types.Action_Failed:
-		return h.Failed(pb, vnic, failInfo)
 	default:
 		return nil, errors.New("invalid action, ignoring")
 	}
