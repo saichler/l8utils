@@ -15,6 +15,7 @@ enum Action {
   PATCH = 3;
   DELETE = 4;
   GET = 5;
+  Unreachable = 6;
 }
 
 // The priority of the message
@@ -65,7 +66,7 @@ message VNicConfig {
   // What is the switch port for this configuration
   uint32 switch_port = 4;
   // The local uuid
-  string local_Uuid = 5;
+  string local_uuid = 5;
   // The remote uuid
   string remote_uuid = 6;
   // The address of the connection initiator, regardless of the side.

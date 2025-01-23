@@ -18,6 +18,7 @@ type IServicePointHandler interface {
 	Patch(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Delete(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Get(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
+	Unreachable(proto.Message, IVirtualNetworkInterface, string) (proto.Message, error)
 	EndPoint() string
 	Topic() string
 }
