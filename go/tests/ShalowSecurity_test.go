@@ -21,7 +21,7 @@ func TestShalowSecurity(t *testing.T) {
 	}
 	conn = &MockConn{}
 	config := globals.Config()
-	config.Local_Uuid = "Test Validate Connection"
+	config.LocalUuid = "Test Validate Connection"
 
 	err = sp.ValidateConnection(conn, config)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 func ExecuteProtocol(conn net.Conn, config *types.VNicConfig, security interfaces.ISecurityProvider) error {
-	err := WriteEncrypted(conn, []byte(config.Local_Uuid), config, security)
+	err := WriteEncrypted(conn, []byte(config.LocalUuid), config, security)
 	if err != nil {
 		conn.Close()
 		return err

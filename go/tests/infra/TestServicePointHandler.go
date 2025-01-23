@@ -8,12 +8,13 @@ import (
 var Log interfaces.ILogger
 
 type TestServicePointHandler struct {
-	Name         string
-	PostNumber   int
-	PutNumber    int
-	PatchNumber  int
-	DeleteNumber int
-	GetNumber    int
+	Name              string
+	PostNumber        int
+	PutNumber         int
+	PatchNumber       int
+	DeleteNumber      int
+	GetNumber         int
+	UnreachableNumber int
 }
 
 const (
@@ -49,6 +50,11 @@ func (tsp *TestServicePointHandler) Delete(pb proto.Message, edge interfaces.IVi
 func (tsp *TestServicePointHandler) Get(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
+	return nil, nil
+}
+func (tsp *TestServicePointHandler) Unreachable(pb proto.Message, edge interfaces.IVirtualNetworkInterface, source string) (proto.Message, error) {
+	Log.Debug("Unreachable -", tsp.Name, "- Test callback")
+	tsp.UnreachableNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) EndPoint() string {
