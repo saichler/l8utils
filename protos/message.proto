@@ -15,7 +15,7 @@ enum Action {
   PATCH = 3;
   DELETE = 4;
   GET = 5;
-  Unreachable = 6;
+  Failed = 6;
 }
 
 // The priority of the message
@@ -80,4 +80,9 @@ message VNicConfig {
   string remote_alias = 10;
   // supported service topics
   map<string, bool> topics = 11;
+}
+
+message FailInfo {
+  string uuid = 1;
+  string msg = 2;
 }

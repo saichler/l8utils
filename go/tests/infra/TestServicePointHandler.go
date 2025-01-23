@@ -2,19 +2,20 @@ package infra
 
 import (
 	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/shared/go/types"
 	"google.golang.org/protobuf/proto"
 )
 
 var Log interfaces.ILogger
 
 type TestServicePointHandler struct {
-	Name              string
-	PostNumber        int
-	PutNumber         int
-	PatchNumber       int
-	DeleteNumber      int
-	GetNumber         int
-	UnreachableNumber int
+	Name         string
+	PostNumber   int
+	PutNumber    int
+	PatchNumber  int
+	DeleteNumber int
+	GetNumber    int
+	FailedNumber int
 }
 
 const (
@@ -52,9 +53,9 @@ func (tsp *TestServicePointHandler) Get(pb proto.Message, edge interfaces.IVirtu
 	tsp.GetNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Unreachable(pb proto.Message, edge interfaces.IVirtualNetworkInterface, source string) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Failed(pb proto.Message, edge interfaces.IVirtualNetworkInterface, info *types.FailInfo) (proto.Message, error) {
 	Log.Debug("Unreachable -", tsp.Name, "- Test callback")
-	tsp.UnreachableNumber++
+	tsp.FailedNumber++
 	return nil, nil
 }
 func (tsp *TestServicePointHandler) EndPoint() string {

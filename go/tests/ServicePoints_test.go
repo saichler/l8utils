@@ -30,12 +30,12 @@ func TestServicePoints(t *testing.T) {
 		return
 	}
 	sp.Topic()
-	globals.ServicePoints().Handle(pb, types.Action_POST, nil, "")
-	globals.ServicePoints().Handle(pb, types.Action_PUT, nil, "")
-	globals.ServicePoints().Handle(pb, types.Action_DELETE, nil, "")
-	globals.ServicePoints().Handle(pb, types.Action_GET, nil, "")
-	globals.ServicePoints().Handle(pb, types.Action_PATCH, nil, "")
-	globals.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil, "source")
+	globals.ServicePoints().Handle(pb, types.Action_POST, nil, nil)
+	globals.ServicePoints().Handle(pb, types.Action_PUT, nil, nil)
+	globals.ServicePoints().Handle(pb, types.Action_DELETE, nil, nil)
+	globals.ServicePoints().Handle(pb, types.Action_GET, nil, nil)
+	globals.ServicePoints().Handle(pb, types.Action_PATCH, nil, nil)
+	globals.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil, &types.FailInfo{})
 	if testsp.PostNumber != 1 {
 		log.Fail(t, "Post is not 1")
 	}
