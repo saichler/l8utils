@@ -17,6 +17,7 @@ type IVirtualNetworkInterface interface {
 type IDatatListener interface {
 	ShutdownVNic(IVirtualNetworkInterface)
 	HandleData([]byte, IVirtualNetworkInterface)
+	Failed([]byte, IVirtualNetworkInterface)
 }
 
 func NewVNicConfig(maxDataSize uint64, txQueueSize, rxQueueSize uint64, switchPort uint32) *types.VNicConfig {
