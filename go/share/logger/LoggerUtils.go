@@ -81,5 +81,9 @@ func findFileAndLine(path string, trimPath bool) (string, int) {
 		index = strings.LastIndex(filename, "/")
 		return filename[index+1:], line
 	}
+	index = strings.LastIndex(filename, "github")
+	if index != -1 {
+		return filename[index:], line
+	}
 	return filename, line
 }
