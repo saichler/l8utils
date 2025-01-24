@@ -36,6 +36,10 @@ func TestServicePoints(t *testing.T) {
 	globals.ServicePoints().Handle(pb, types.Action_GET, nil, nil)
 	globals.ServicePoints().Handle(pb, types.Action_PATCH, nil, nil)
 	globals.ServicePoints().Handle(pb, types.Action_Invalid_Action, nil, nil)
+	msg := &types.Message{}
+	msg.FailMsg = "The failed message"
+	msg.SourceUuid = "The source uuid"
+	globals.ServicePoints().Handle(pb, types.Action_POST, nil, msg)
 	if testsp.PostNumber != 1 {
 		log.Fail(t, "Post is not 1")
 	}

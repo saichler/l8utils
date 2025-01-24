@@ -28,33 +28,40 @@ func NewTestServicePointHandler(name string) *TestServicePointHandler {
 	return tsp
 }
 
-func (tsp *TestServicePointHandler) Post(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Post(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Post -", tsp.Name, "- Test callback")
 	tsp.PostNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Put(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Put(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Put -", tsp.Name, "- Test callback")
 	tsp.PutNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Patch(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Patch(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Patch -", tsp.Name, "- Test callback")
 	tsp.PatchNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Delete(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Delete(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Delete -", tsp.Name, "- Test callback")
 	tsp.DeleteNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Get(pb proto.Message, edge interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Get(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	return nil, nil
 }
-func (tsp *TestServicePointHandler) Failed(pb proto.Message, edge interfaces.IVirtualNetworkInterface, info *types.Message) (proto.Message, error) {
-	Log.Debug("Failed -", tsp.Name, "- Test callback")
+func (tsp *TestServicePointHandler) Failed(pb proto.Message, vnic interfaces.IVirtualNetworkInterface, info *types.Message) (proto.Message, error) {
+	dest := "n/a"
+	msg := "n/a"
+	if info != nil {
+		dest = info.SourceUuid
+		msg = info.FailMsg
+	}
+	Log.Debug("Failed -", tsp.Name, " to ", dest, "- Test callback")
+	Log.Debug("Failed Reason is ", msg)
 	tsp.FailedNumber++
 	return nil, nil
 }
