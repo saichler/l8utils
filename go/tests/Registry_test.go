@@ -121,7 +121,7 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 
-	b, e = globals.Registry().RegisterType(reflect.ValueOf(reflect.TypeOf(5)).Type().Elem()szc)
+	b, e = globals.Registry().RegisterType(reflect.ValueOf(reflect.TypeOf(5)).Type().Elem())
 	if e != nil {
 		log.Fail(t, "Did not expect an error")
 		return
