@@ -8,6 +8,22 @@ option java_package = "com.shared.tests";
 option go_package = "./tests";
 
 message TestProto {
-  string String = 1;
-  int32 Int32 = 2;
+  string myString = 1;
+  int32 myInt32 = 2;
+  int64 myInt64 = 3;
+  float myFloat32 = 4;
+  double myFloat64 = 5;
+  TestProtoSub mySingle = 6;
+  repeated string myStringSlice = 7;
+  repeated int32 myInt32Slice = 8;
+  repeated TestProtoSub myModelSlice = 9;
+  map<string, string> MyString2StringMap = 10;
+  map<int32, int64> MyInt32ToInt64Map = 11;
+  map<string, TestProtoSub> MyString2ModelMap = 12;
+  bool myBool = 13;
+}
+
+message TestProtoSub {
+  string myString = 1;
+  int64 myInt64 = 2;
 }
