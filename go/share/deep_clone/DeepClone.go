@@ -10,7 +10,7 @@ type Cloner struct {
 	cloners map[reflect.Kind]func(reflect.Value, string, map[string]reflect.Value) reflect.Value
 }
 
-func newCloner() *Cloner {
+func NewCloner() *Cloner {
 	cloner := &Cloner{}
 	cloner.initCloners()
 	return cloner
