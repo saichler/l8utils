@@ -3,7 +3,7 @@ package logger
 import (
 	"bytes"
 	"github.com/saichler/shared/go/share/interfaces"
-	"github.com/saichler/shared/go/share/string_utils"
+	su "github.com/saichler/shared/go/share/strings"
 	"runtime"
 	"strconv"
 	"strings"
@@ -11,7 +11,7 @@ import (
 )
 
 func FormatLog(level interfaces.LogLevel, t int64, args ...interface{}) string {
-	str := string_utils.New()
+	str := su.New()
 	str.Add(LogTimeFormat(t, level))
 	if args != nil {
 		for _, arg := range args {

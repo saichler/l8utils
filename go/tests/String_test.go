@@ -1,7 +1,7 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/share/string_utils"
+	. "github.com/saichler/shared/go/share/strings"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,6 +11,18 @@ var Str = New("")
 
 func init() {
 	Str.TypesPrefix = true
+}
+
+func instanceOf(t *testing.T, str string, expectError bool) (interface{}, bool) {
+	v, e := InstanceOf(str, globals.Registry())
+	if e != nil && !expectError {
+		log.Fail(t, "Did not expect an error for str:", str)
+		return nil, false
+	} else if e == nil && expectError {
+		log.Fail(t, "Did expect an error for str:", str)
+		return nil, false
+	}
+	return v, true
 }
 
 func checkString(s *String, ex string, t *testing.T) bool {
@@ -27,7 +39,11 @@ func checkToString(any interface{}, ex string, t *testing.T) bool {
 
 func checkToFromString(any interface{}, ex, ex2 string, t *testing.T) bool {
 	s := Str.StringOf(any)
-	fs := InstanceOf(s, globals.Registry())
+	fs, err := InstanceOf(s, globals.Registry())
+	if err != nil {
+		log.Fail(t, "Did not expect an error: ", err.Error())
+		return false
+	}
 	reflect.DeepEqual(any, fs)
 	// Until struct is implemented, skip it
 	if !reflect.DeepEqual(any, fs) && !strings.Contains(s, ",25") {
@@ -126,7 +142,10 @@ func TestToString(t *testing.T) {
 }
 
 func TestFromStringPtr(t *testing.T) {
-	s := InstanceOf("{22,24}test", globals.Registry())
+	s, e := InstanceOf("{22,24}test", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	s1 := *s.(*string)
 	if s1 != "test" {
 		log.Fail(t, "Expected value to be test but got ", s1)
@@ -135,44 +154,65 @@ func TestFromStringPtr(t *testing.T) {
 }
 
 func TestFromStringInt(t *testing.T) {
-	v := InstanceOf("{2}5", globals.Registry())
+	v, e := InstanceOf("{2}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(int)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int {
 		log.Fail(t, "From string failed for int")
 		return
 	}
-	v = InstanceOf("{2}5a", globals.Registry())
+	v, e = InstanceOf("{2}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringInt8(t *testing.T) {
-	v := InstanceOf("{3}5", globals.Registry())
+	v, e := InstanceOf("{3}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(int8)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int8 {
 		log.Fail(t, "From string failed for int8")
 		return
 	}
-	v = InstanceOf("{3}5b", globals.Registry())
+	v, e = InstanceOf("{3}5b", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringInt16(t *testing.T) {
-	v := InstanceOf("{4}5", globals.Registry())
+	v, e := InstanceOf("{4}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(int16)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int16 {
 		log.Fail(t, "From string failed for int16")
 		return
 	}
-	v = InstanceOf("{4}5c", globals.Registry())
+	v, e = InstanceOf("{4}5c", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringInt32(t *testing.T) {
-	v := InstanceOf("{5}5", globals.Registry())
+	v, e := InstanceOf("{5}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(int32)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int32 {
 		log.Fail(t, "From string failed for int32")
 		return
 	}
-	v = InstanceOf("{5}5a", globals.Registry())
-	v = InstanceOf("{5}", globals.Registry())
+	v, e = InstanceOf("{5}5a", globals.Registry())
+	v, e = InstanceOf("{5}", globals.Registry())
 	r = v.(int32)
 	if r != 0 {
 		log.Fail(t, "From string failed for int32 blank")
@@ -181,78 +221,119 @@ func TestFromStringInt32(t *testing.T) {
 }
 
 func TestFromStringInt64(t *testing.T) {
-	v := InstanceOf("{6}5", globals.Registry())
+	v, e := InstanceOf("{6}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(int64)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Int64 {
 		log.Fail(t, "From string failed for int64")
 		return
 	}
-	v = InstanceOf("{6}5a", globals.Registry())
+	v, e = InstanceOf("{6}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringUInt(t *testing.T) {
-	v := InstanceOf("{7}5", globals.Registry())
+	v, e := InstanceOf("{7}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(uint)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint {
 		log.Fail(t, "From string failed for Uint")
 		return
 	}
-	v = InstanceOf("{7}5a", globals.Registry())
+	v, e = InstanceOf("{7}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringUInt8(t *testing.T) {
-	v := InstanceOf("{8}5", globals.Registry())
+	v, e := InstanceOf("{8}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.([]uint8)[0]
 	//53 is the byte value of character 5
 	if r != 53 || reflect.ValueOf(r).Kind() != reflect.Uint8 {
 		log.Fail(t, "From string failed for Uint8")
 		return
 	}
-	v = InstanceOf("{8}5a", globals.Registry())
 }
 
 func TestFromStringUInt16(t *testing.T) {
-	v := InstanceOf("{9}5", globals.Registry())
+	v, e := InstanceOf("{9}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(uint16)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint16 {
 		log.Fail(t, "From string failed for Uint16")
 		return
 	}
-	v = InstanceOf("{9}5a", globals.Registry())
+	v, e = InstanceOf("{9}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringUInt32(t *testing.T) {
-	v := InstanceOf("{10}5", globals.Registry())
+	v, e := InstanceOf("{10}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(uint32)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint32 {
 		log.Fail(t, "From string failed for Uint32")
 		return
 	}
-	v = InstanceOf("{10}5a", globals.Registry())
+	v, e = InstanceOf("{10}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringUInt64(t *testing.T) {
-	v := InstanceOf("{11}5", globals.Registry())
+	v, e := InstanceOf("{11}5", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(uint64)
 	if r != 5 || reflect.ValueOf(r).Kind() != reflect.Uint64 {
 		log.Fail(t, "From string failed for Uint64")
 		return
 	}
-	v = InstanceOf("{11}5a", globals.Registry())
+	v, e = InstanceOf("{11}5a", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringFloat32(t *testing.T) {
-	v := InstanceOf("{13}5.8", globals.Registry())
+	v, e := InstanceOf("{13}5.8", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(float32)
 	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
 		log.Fail(t, "From string failed for float32")
 		return
 	}
-	v = InstanceOf("{13}5.8d", globals.Registry())
+	v, e = InstanceOf("{13}5.8d", globals.Registry())
+	if e == nil {
+		log.Fail(t, "Did expect an error")
+	}
 }
 
 func TestFromStringSlice(t *testing.T) {
-	s := InstanceOf("{23,24}[a,b]", globals.Registry())
+	s, e := InstanceOf("{23,24}[a,b]", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	s1 := s.([]string)
 	if s1[0] != "a" {
 		log.Fail(t, "value for index 0 was not equale to a")
@@ -265,7 +346,10 @@ func TestFromStringSlice(t *testing.T) {
 }
 
 func TestFromStringInterface(t *testing.T) {
-	v := InstanceOf("{20,13}5.8", globals.Registry())
+	v, e := InstanceOf("{20,13}5.8", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	r := v.(float32)
 	if r != 5.8 || reflect.ValueOf(r).Kind() != reflect.Float32 {
 		log.Fail(t, "From string failed for float32 interface")
@@ -274,7 +358,10 @@ func TestFromStringInterface(t *testing.T) {
 }
 
 func TestFromStringMap(t *testing.T) {
-	s := InstanceOf("{21,24,2}[a=1,b=2]", globals.Registry())
+	s, e := InstanceOf("{21,24,2}[a=1,b=2]", globals.Registry())
+	if e != nil {
+		log.Fail(t, "Did not expect an error")
+	}
 	s1 := s.(map[string]int)
 	if s1["a"] != 1 {
 		log.Fail(t, "value for key 'a' was not found or not equale to 1")
