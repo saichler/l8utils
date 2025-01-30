@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"errors"
 	"github.com/saichler/reflect/go/reflect/clone"
 	"github.com/saichler/reflect/go/reflect/common"
 	"github.com/saichler/reflect/go/reflect/updater"
@@ -47,7 +48,6 @@ func (this *Cache) Get(k string) interface{} {
 func (this *Cache) Put(k string, v interface{}) error {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
-
 	item, ok := this.cache[k]
 	//If the item does not exist in the cache
 	if !ok {
@@ -70,18 +70,17 @@ func (this *Cache) Put(k string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	//if there are changes, then nothing to do
 	changes := putUpdater.Changes()
 	if changes == nil {
 		return nil
 	}
-
 	//Apply the changes to the existing item
 	for _, change := range changes {
 		change.Apply(item)
 	}
-	defer func() {
+
+	go func() {
 		if this.listener != nil {
 			for _, change := range changes {
 				this.listener.PropertyChangeNotification(itemClone, change.PropertyId(), change.OldValue(), change.NewValue())
@@ -98,7 +97,7 @@ func (this *Cache) Patch(k string, v interface{}) error {
 	item, ok := this.cache[k]
 	//If the item does not exist in the cache
 	if !ok {
-		return nil
+		return errors.New("Key " + k + " not found")
 	}
 	//Clone the existing item
 	itemClone := this.cloner.Clone(item)
