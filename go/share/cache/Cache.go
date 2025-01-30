@@ -1,4 +1,4 @@
-package modelcache
+package cache
 
 import (
 	"github.com/saichler/reflect/go/reflect/clone"
@@ -7,33 +7,33 @@ import (
 	"sync"
 )
 
-type ModelCache struct {
+type Cache struct {
 	cache        map[string]interface{}
 	mtx          *sync.RWMutex
 	cond         *sync.Cond
-	listener     IModelCacheListener
+	listener     ICacheListener
 	cloner       *clone.Cloner
 	introspector common.IIntrospect
 }
 
-type IModelCacheListener interface {
+type ICacheListener interface {
 	ModelItemAdded(interface{})
 	ModelItemDeleted(interface{})
 	PropertyChangeNotification(interface{}, string, interface{}, interface{})
 }
 
-func NewModelCache(listener IModelCacheListener, introspector common.IIntrospect) *ModelCache {
-	mc := &ModelCache{}
-	mc.cache = make(map[string]interface{})
-	mc.mtx = &sync.RWMutex{}
-	mc.cond = sync.NewCond(mc.mtx)
-	mc.listener = listener
-	mc.cloner = clone.NewCloner()
-	mc.introspector = introspector
-	return mc
+func NewModelCache(listener ICacheListener, introspector common.IIntrospect) *Cache {
+	this := &Cache{}
+	this.cache = make(map[string]interface{})
+	this.mtx = &sync.RWMutex{}
+	this.cond = sync.NewCond(this.mtx)
+	this.listener = listener
+	this.cloner = clone.NewCloner()
+	this.introspector = introspector
+	return this
 }
 
-func (this *ModelCache) Get(k string) interface{} {
+func (this *Cache) Get(k string) interface{} {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
 	item, ok := this.cache[k]
@@ -44,7 +44,7 @@ func (this *ModelCache) Get(k string) interface{} {
 	return nil
 }
 
-func (this *ModelCache) Put(k string, v interface{}) error {
+func (this *Cache) Put(k string, v interface{}) error {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
 
@@ -91,7 +91,7 @@ func (this *ModelCache) Put(k string, v interface{}) error {
 	return nil
 }
 
-func (this *ModelCache) Patch(k string, v interface{}) error {
+func (this *Cache) Patch(k string, v interface{}) error {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
 
@@ -130,7 +130,7 @@ func (this *ModelCache) Patch(k string, v interface{}) error {
 	return nil
 }
 
-func (this *ModelCache) Delete(k string) {
+func (this *Cache) Delete(k string) {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
 	item, ok := this.cache[k]
@@ -143,7 +143,7 @@ func (this *ModelCache) Delete(k string) {
 	}
 }
 
-func (this *ModelCache) Attributes(f func(interface{}) interface{}) map[string]interface{} {
+func (this *Cache) Collect(f func(interface{}) interface{}) map[string]interface{} {
 	result := map[string]interface{}{}
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
