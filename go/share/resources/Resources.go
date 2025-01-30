@@ -26,7 +26,7 @@ func NewResources(registry interfaces.IRegistry,
 	logger interfaces.ILogger,
 	dataListener interfaces.IDatatListener,
 	serializer interfaces.ISerializer,
-	alias string) interfaces.IResources {
+	config *types.VNicConfig) interfaces.IResources {
 	r := &Resources{}
 	r.registry = registry
 	r.servicePoints = servicePoints
@@ -37,11 +37,7 @@ func NewResources(registry interfaces.IRegistry,
 	if serializer != nil {
 		r.serializers[serializer.Mode()] = serializer
 	}
-	r.config = &types.VNicConfig{MaxDataSize: DEFAULT_MAX_DATA_SIZE,
-		RxQueueSize: DEFAULT_QUEUE_SIZE,
-		TxQueueSize: DEFAULT_QUEUE_SIZE,
-		LocalAlias:  alias,
-		Topics:      map[string]bool{}}
+	r.config = config
 	return r
 }
 
