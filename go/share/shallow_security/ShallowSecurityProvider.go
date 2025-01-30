@@ -1,8 +1,11 @@
 package shallow_security
 
 import (
+	"crypto/md5"
+	"encoding/base64"
 	"errors"
 	"github.com/saichler/shared/go/share/aes"
+	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/nets"
 	"github.com/saichler/shared/go/types"
 	"net"
@@ -69,4 +72,13 @@ func (this *ShallowSecurityProvider) CanDo(action types.Action, endpoint string,
 }
 func (this *ShallowSecurityProvider) CanView(typ string, attrName string, token string) error {
 	return nil
+}
+
+func CreateShallowSecurityProvider() interfaces.ISecurityProvider {
+	hash := md5.New()
+	secret := "Default Security Provider"
+	hash.Write([]byte(secret))
+	kHash := hash.Sum(nil)
+	k := base64.StdEncoding.EncodeToString(kHash)
+	return NewShallowSecurityProvider(k, secret)
 }
