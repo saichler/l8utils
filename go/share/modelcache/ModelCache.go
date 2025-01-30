@@ -142,3 +142,13 @@ func (this *ModelCache) Delete(k string) {
 		go this.listener.ModelItemDeleted(item)
 	}
 }
+
+func (this *ModelCache) Attributes(f func(interface{}) interface{}) map[string]interface{} {
+	result := map[string]interface{}{}
+	this.mtx.RLock()
+	defer this.mtx.RUnlock()
+	for k, v := range this.cache {
+		result[k] = f(v)
+	}
+	return result
+}
