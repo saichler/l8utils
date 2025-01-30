@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/registry"
-	"github.com/saichler/shared/go/share/service_points"
 	"github.com/saichler/shared/go/share/shallow_security"
 	"github.com/saichler/shared/go/types"
 )
@@ -37,9 +36,6 @@ func NewResources(registry interfaces.IRegistry,
 	r := &Resources{}
 	r.registry = registry
 	r.servicePoints = servicePoints
-	if r.servicePoints == nil {
-		r.servicePoints = service_points.NewServicePoints(r)
-	}
 	r.security = security
 	r.logger = logger
 	r.serializers = make(map[interfaces.SerializerMode]interfaces.ISerializer)
