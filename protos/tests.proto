@@ -7,6 +7,12 @@ option java_outer_classname = "Tests";
 option java_package = "com.shared.tests";
 option go_package = "./tests";
 
+enum TestEnum {
+  ValueInvalid = 0;
+  ValueOne = 1;
+  ValueTwo = 2;
+}
+
 message TestProto {
   string myString = 1;
   int32 myInt32 = 2;
@@ -21,6 +27,7 @@ message TestProto {
   map<int32, int64> MyInt32ToInt64Map = 11;
   map<string, TestProtoSub> MyString2ModelMap = 12;
   bool myBool = 13;
+  TestEnum myEnum = 14;
 }
 
 message TestProtoSub {
