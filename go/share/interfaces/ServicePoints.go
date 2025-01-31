@@ -19,6 +19,7 @@ type IServicePointHandler interface {
 	Delete(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Get(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	Failed(proto.Message, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
+	Notify(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
 	EndPoint() string
 	Topic() string
 }

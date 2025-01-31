@@ -7,12 +7,21 @@ option java_outer_classname = "Types";
 option java_package = "com.shared.types";
 option go_package = "./types";
 
+enum NotificationType {
+  Invalid_Notify = 0;
+  Add = 1;
+  Replace = 2;
+  Update = 3;
+  Delete = 4;
+}
+
 message NotificationSet {
   string source = 1;
   int64 time = 2;
   uint32 sequence = 3;
-  string type = 4;
-  repeated Notification notifys = 5;
+  string type_name = 4;
+  NotificationType type = 5;
+  repeated Notification notification_list = 6;
 }
 
 message Notification {
