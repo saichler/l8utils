@@ -22,5 +22,5 @@ func init() {
 		LocalAlias:  "tests",
 		Topics:      map[string]bool{}}
 	globals = resources.NewResources(registry.NewRegistry(),
-		shallow_security.CreateShallowSecurityProvider(), nil, log, nil, nil, config)
+		shallow_security.CreateShallowSecurityProvider(), nil, log, nil, nil, config, nil)
 }

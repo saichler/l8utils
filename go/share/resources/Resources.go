@@ -18,6 +18,7 @@ type Resources struct {
 	dataListener  interfaces.IDatatListener
 	serializers   map[interfaces.SerializerMode]interfaces.ISerializer
 	config        *types.VNicConfig
+	introspector  interfaces.IIntrospector
 }
 
 func NewResources(registry interfaces.IRegistry,
@@ -26,7 +27,8 @@ func NewResources(registry interfaces.IRegistry,
 	logger interfaces.ILogger,
 	dataListener interfaces.IDatatListener,
 	serializer interfaces.ISerializer,
-	config *types.VNicConfig) interfaces.IResources {
+	config *types.VNicConfig,
+	introspector interfaces.IIntrospector) interfaces.IResources {
 	r := &Resources{}
 	r.registry = registry
 	r.servicePoints = servicePoints
@@ -38,6 +40,7 @@ func NewResources(registry interfaces.IRegistry,
 		r.serializers[serializer.Mode()] = serializer
 	}
 	r.config = config
+	r.introspector = introspector
 	return r
 }
 
@@ -54,21 +57,9 @@ func (this *Resources) ServicePoints() interfaces.IServicePoints {
 func (this *Resources) Security() interfaces.ISecurityProvider {
 	return this.security
 }
-
-/*
-	func (this *Resources) SetDataListener(l interfaces.IDatatListener) {
-		this.dataListener = l
-	}
-*/
 func (this *Resources) DataListener() interfaces.IDatatListener {
 	return this.dataListener
 }
-
-/*
-	func (this *Resources) SetSerializer(mode interfaces.SerializerMode, serializer interfaces.ISerializer) {
-		this.serializers[mode] = serializer
-	}
-*/
 func (this *Resources) Serializer(mode interfaces.SerializerMode) interfaces.ISerializer {
 	return this.serializers[mode]
 }
@@ -77,4 +68,7 @@ func (this *Resources) Logger() interfaces.ILogger {
 }
 func (this *Resources) Config() *types.VNicConfig {
 	return this.config
+}
+func (this *Resources) Introspector() interfaces.IIntrospector {
+	return this.introspector
 }

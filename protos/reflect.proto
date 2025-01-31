@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package types;
+
+option java_multiple_files = true;
+option java_outer_classname = "Types";
+option java_package = "com.shared.types";
+option go_package = "./types";
+
+message RNode {
+  // The type name, in case of a map, this is the value type.
+  string type_name = 1;
+  // In case this attribute is a cell in a map or a slice, this is the key type
+  string key_type_name = 2;
+  // The parent node, nil if root.
+  RNode parent = 3;
+  // The attribute name in the parent
+  string field_name = 4;
+  // In case this attribute is a struct, a map between the attribute name and the child registry node.
+  map<string, RNode> attributes = 5;
+  // If this attribute is a map
+  bool is_map = 6;
+  // If this attribute is a slice
+  bool is_slice = 7;
+  //The cached key so we won't need to calculate it all the time.
+  string cached_key = 8;
+  //Decorators
+  map<int32, string> decorators = 9;
+}
+
+message TableView {
+  RNode  table = 1;
+  repeated RNode columns = 2;
+  repeated RNode sub_tables = 3;
+}
+
+enum DecoratorType {
+  Invalid = 0;
+  Primary = 1;
+  Unique = 2;
+  NonUnique = 3;
+  Title = 4;
+  Editor = 5;
+  Deep = 6;
+  Ignore = 7;
+  IgnoreAttr = 8;
+}
