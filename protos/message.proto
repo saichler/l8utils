@@ -15,6 +15,7 @@ enum Action {
   PATCH = 3;
   DELETE = 4;
   GET = 5;
+  Notify = 6;
 }
 
 // The priority of the message
