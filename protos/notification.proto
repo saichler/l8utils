@@ -7,12 +7,16 @@ option java_outer_classname = "Types";
 option java_package = "com.shared.types";
 option go_package = "./types";
 
-message Notification {
+message NotificationSet {
   string source = 1;
   int64 time = 2;
   uint32 sequence = 3;
   string type = 4;
-  string property_id = 5;
-  bytes oldValue = 6;
-  bytes newValue = 7;
+  repeated Notification notifys = 5;
+}
+
+message Notification {
+  string property_id = 1;
+  bytes oldValue = 2;
+  bytes newValue = 3;
 }
