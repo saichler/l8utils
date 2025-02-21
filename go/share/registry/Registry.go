@@ -4,15 +4,19 @@ import (
 	"errors"
 	"github.com/saichler/shared/go/share/interfaces"
 	"reflect"
+	"sync"
 )
 
 type RegistryImpl struct {
 	types *TypesMap
+	enums map[string]int32
+	mtx   *sync.RWMutex
 }
 
 func NewRegistry() *RegistryImpl {
 	registry := &RegistryImpl{}
 	registry.types = NewTypesMap()
+	registry.enums = make(map[string]int32)
 	registry.registerPrimitives()
 	return registry
 }
@@ -55,4 +59,18 @@ func (this *RegistryImpl) Info(name string) (interfaces.IInfo, error) {
 		return nil, errors.New("Unknown Type: " + name)
 	}
 	return typ, nil
+}
+
+func (this *RegistryImpl) RegisterEnums(enums map[string]int32) {
+	this.mtx.Lock()
+	defer this.mtx.Unlock()
+	for name, value := range enums {
+		this.enums[name] = value
+	}
+}
+
+func (this *RegistryImpl) Enum(name string) int32 {
+	this.mtx.RLock()
+	defer this.mtx.RUnlock()
+	return this.enums[name]
 }

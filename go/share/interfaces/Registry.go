@@ -15,6 +15,10 @@ type IRegistry interface {
 	RegisterType(reflect.Type) (bool, error)
 	//Info Retrieve the registered entry for this type.
 	Info(string) (IInfo, error)
+	//Register Enum string to int32 values
+	RegisterEnums(map[string]int32)
+	//Get int32 value of an enum
+	Enum(string) int32
 }
 
 type IInfo interface {
