@@ -17,6 +17,7 @@ func NewRegistry() *RegistryImpl {
 	registry := &RegistryImpl{}
 	registry.types = NewTypesMap()
 	registry.enums = make(map[string]int32)
+	registry.mtx = new(sync.RWMutex)
 	registry.registerPrimitives()
 	return registry
 }
