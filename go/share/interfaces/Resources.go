@@ -11,4 +11,5 @@ type IResources interface {
 	Logger() ILogger
 	Config() *types.VNicConfig
 	Introspector() IIntrospector
+	AddTopic(int32, string)
 }

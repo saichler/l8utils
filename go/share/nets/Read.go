@@ -57,18 +57,24 @@ func ReadSize(size int, conn net.Conn, config *types.VNicConfig) ([]byte, error)
 	return data, nil
 }
 
-func ReadEncrypted(conn net.Conn, config *types.VNicConfig,
-	securityProvider interfaces.ISecurityProvider) (string, error) {
+func ReadEncryptedBytes(conn net.Conn, config *types.VNicConfig,
+	securityProvider interfaces.ISecurityProvider) ([]byte, error) {
 	inData, err := Read(conn, config)
 	if err != nil {
 		conn.Close()
-		return "", err
+		return []byte{}, err
 	}
 
 	decData, err := securityProvider.Decrypt(string(inData))
 	if err != nil {
 		conn.Close()
-		return "", err
+		return []byte{}, err
 	}
-	return string(decData), nil
+	return decData, nil
+}
+
+func ReadEncrypted(conn net.Conn, config *types.VNicConfig,
+	securityProvider interfaces.ISecurityProvider) (string, error) {
+	data, err := ReadEncryptedBytes(conn, config, securityProvider)
+	return string(data), err
 }

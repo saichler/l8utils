@@ -38,23 +38,27 @@ message Message {
   // The source uuid identifier of the message sender
   string source_uuid = 1;
   // The source uuid identifier of the message sender switch
-  string source_switch_uuid = 2;
-  // The destination uuid/or multicast group name of the message receiver.
+  string source_vnet_uuid = 2;
+  // The destination uuid identifier of the message, in case of a unicast
   string destination = 3;
+  // The area of the multicast
+  int32 area = 4;
+  // The topic of the multicast
+  string topic = 5;
   // To uniquely identify the source message, the sender process maintain a sequence number.
-  int32 sequence = 4;
+  int32 sequence = 6;
   // Priority of this Message for the handler callback.
-  Priority priority = 5;
+  Priority priority = 7;
   // The protobuf marshaled data, encoded to base64 string
-  string data = 6;
+  string data = 8;
   // The type name of the serialized data
-  string type = 7;
+  string type = 9;
   // Action to invoke with this data on the service point
-  Action action = 8;
+  Action action = 10;
   // timeout when request/reply
-  int64 timeout = 9;
+  int64 timeout = 11;
   //If this a fail notification, what is the failing info
-  string fail_msg = 10;
+  string fail_msg = 12;
 }
 
 // A config for the messages limitation and data size
@@ -80,6 +84,15 @@ message VNicConfig {
   string local_alias = 9;
   // Custom remote alias for this vnic
   string remote_alias = 10;
-  // supported service topics
-  map<string, bool> topics = 11;
+  // Service areas
+  Areas service_areas = 11;
+}
+
+message Areas {
+  map<int32, Area> areas_map = 11;
+}
+
+message Area {
+  int32 number = 1;
+  map<string, bool> topics = 2;
 }

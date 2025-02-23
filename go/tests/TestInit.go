@@ -19,8 +19,7 @@ func init() {
 	config := &types.VNicConfig{MaxDataSize: resources.DEFAULT_MAX_DATA_SIZE,
 		RxQueueSize: resources.DEFAULT_QUEUE_SIZE,
 		TxQueueSize: resources.DEFAULT_QUEUE_SIZE,
-		LocalAlias:  "tests",
-		Topics:      map[string]bool{}}
+		LocalAlias:  "tests"}
 	globals = resources.NewResources(registry.NewRegistry(),
 		shallow_security.CreateShallowSecurityProvider(), nil, log, nil, nil, config, nil)
 }

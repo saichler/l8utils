@@ -1,11 +1,10 @@
 package nets
 
 import (
-	"bytes"
 	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/types"
+	"google.golang.org/protobuf/proto"
 	"net"
-	"strings"
 )
 
 func ExecuteProtocol(conn net.Conn, config *types.VNicConfig, security interfaces.ISecurityProvider) error {
@@ -54,40 +53,35 @@ func ExecuteProtocol(conn net.Conn, config *types.VNicConfig, security interface
 	}
 	config.RemoteAlias = remoteAlias
 
-	err = WriteEncrypted(conn, []byte(SetToString(config.Topics)), config, security)
+	err = WriteEncrypted(conn, AreasToBytes(config.ServiceAreas), config, security)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	topics, err := ReadEncrypted(conn, config, security)
+	topics, err := ReadEncryptedBytes(conn, config, security)
 	if err != nil {
 		conn.Close()
 		return err
 	}
-	config.Topics = StringToSet(topics)
+	config.ServiceAreas = BytesToAreas(topics)
 
 	return nil
 }
 
-func SetToString(set map[string]bool) string {
-	buff := bytes.Buffer{}
-	first := true
-	for topic, _ := range set {
-		if !first {
-			buff.WriteString(",")
-		}
-		buff.WriteString(topic)
-		first = false
+func AreasToBytes(areas *types.Areas) []byte {
+	data, err := proto.Marshal(areas)
+	if err != nil {
+		return []byte{}
 	}
-	return buff.String()
+	return data
 }
 
-func StringToSet(str string) map[string]bool {
-	result := make(map[string]bool)
-	tokens := strings.Split(str, ",")
-	for _, token := range tokens {
-		result[token] = true
+func BytesToAreas(data []byte) *types.Areas {
+	areas := &types.Areas{}
+	err := proto.Unmarshal(data, areas)
+	if err != nil {
+		return nil
 	}
-	return result
+	return areas
 }

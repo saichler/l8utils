@@ -2,15 +2,15 @@ package interfaces
 
 import (
 	"github.com/saichler/shared/go/types"
-	"google.golang.org/protobuf/proto"
 )
 
 type IVirtualNetworkInterface interface {
 	Start()
 	Shutdown()
 	Name() string
-	Send([]byte) error
-	Do(types.Action, string, proto.Message) error
+	SendMessage([]byte) error
+	Unicast(types.Action, string, interface{}) error
+	Multicast(types.Action, uint32, string, interface{}) error
 	Resources() IResources
 }
 

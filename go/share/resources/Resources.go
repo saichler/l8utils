@@ -44,8 +44,21 @@ func NewResources(registry interfaces.IRegistry,
 	return r
 }
 
-func (this *Resources) AddTopic(topic string) {
-	this.config.Topics[topic] = true
+func (this *Resources) AddTopic(area int32, topic string) {
+	if this.config == nil {
+		return
+	}
+	if this.config.ServiceAreas == nil {
+		this.config.ServiceAreas = &types.Areas{}
+		this.config.ServiceAreas.AreasMap = make(map[int32]*types.Area)
+	}
+	_, ok := this.config.ServiceAreas.AreasMap[area]
+	if !ok {
+		this.config.ServiceAreas.AreasMap[area] = &types.Area{}
+		this.config.ServiceAreas.AreasMap[area].Number = area
+		this.config.ServiceAreas.AreasMap[area].Topics = make(map[string]bool)
+	}
+	this.config.ServiceAreas.AreasMap[area].Topics[topic] = true
 }
 
 func (this *Resources) Registry() interfaces.IRegistry {
