@@ -94,3 +94,18 @@ message Area {
   int32 number = 1;
   map<string, bool> topics = 2;
 }
+
+enum HealthState {
+  Invalid_State = 0;
+  Up = 1;
+  Down = 2;
+  Unreachable = 3;
+}
+
+message HealthPoint {
+  string a_uuid = 1;
+  string z_uuid = 2;
+  string alias = 3;
+  Areas serviceAreas = 4;
+  HealthState status = 5;
+}
