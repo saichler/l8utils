@@ -10,7 +10,7 @@ type IVirtualNetworkInterface interface {
 	Name() string
 	SendMessage([]byte) error
 	Unicast(types.Action, string, interface{}) error
-	Multicast(types.Action, uint32, string, interface{}) error
+	Multicast(types.Action, int32, string, interface{}) error
 	Resources() IResources
 }
 
