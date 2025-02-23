@@ -26,18 +26,18 @@ func Long2Bytes(s int64) []byte {
 }
 
 func Bytes2Int(data []byte) int32 {
-	v1 := int32(data[4]) << 24
-	v2 := int32(data[5]) << 16
-	v3 := int32(data[6]) << 8
-	v4 := int32(data[7])
+	v1 := int32(data[0]) << 24
+	v2 := int32(data[1]) << 16
+	v3 := int32(data[2]) << 8
+	v4 := int32(data[3])
 	return v1 + v2 + v3 + v4
 }
 
 func Int2Bytes(s int32) []byte {
 	size := make([]byte, 4)
-	size[7] = byte(s)
-	size[6] = byte(s >> 8)
-	size[5] = byte(s >> 16)
-	size[4] = byte(s >> 24)
+	size[3] = byte(s)
+	size[2] = byte(s >> 8)
+	size[1] = byte(s >> 16)
+	size[0] = byte(s >> 24)
 	return size
 }
