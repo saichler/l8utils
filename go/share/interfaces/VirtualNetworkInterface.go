@@ -20,12 +20,12 @@ type IDatatListener interface {
 	Failed([]byte, IVirtualNetworkInterface, string)
 }
 
-func NewVNicConfig(maxDataSize uint64, txQueueSize, rxQueueSize uint64, switchPort uint32) *types.VNicConfig {
+func NewVNicConfig(maxDataSize uint64, txQueueSize, rxQueueSize uint64, vNetPort uint32) *types.VNicConfig {
 	mc := &types.VNicConfig{
 		MaxDataSize: maxDataSize,
 		TxQueueSize: txQueueSize,
 		RxQueueSize: rxQueueSize,
-		SwitchPort:  switchPort,
+		VnetPort:    vNetPort,
 	}
 	return mc
 }

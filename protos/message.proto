@@ -70,7 +70,7 @@ message VNicConfig {
   // The received message queue size
   uint64 rx_queue_size = 3;
   // What is the switch port for this configuration
-  uint32 switch_port = 4;
+  uint32 vnet_port = 4;
   // The local uuid
   string local_uuid = 5;
   // The remote uuid
