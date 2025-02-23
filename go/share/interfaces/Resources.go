@@ -1,6 +1,7 @@
 package interfaces
 
 import "github.com/saichler/shared/go/types"
+import "github.com/google/uuid"
 
 type IResources interface {
 	Registry() IRegistry
@@ -32,6 +33,9 @@ func AddTopic(config *types.VNicConfig, area int32, topic string) {
 	if !ok {
 		config.ServiceAreas.AreasMap[area].Topics[topic] = &types.Addrs{}
 		config.ServiceAreas.AreasMap[area].Topics[topic].Uuids = make(map[string]bool)
+	}
+	if config.LocalUuid == "" {
+		config.LocalUuid = uuid.New().String()
 	}
 	config.ServiceAreas.AreasMap[area].Topics[topic].Uuids[config.LocalUuid] = true
 }
