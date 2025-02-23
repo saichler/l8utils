@@ -26,7 +26,12 @@ func AddTopic(config *types.VNicConfig, area int32, topic string) {
 	if !ok {
 		config.ServiceAreas.AreasMap[area] = &types.Area{}
 		config.ServiceAreas.AreasMap[area].Number = area
-		config.ServiceAreas.AreasMap[area].Topics = make(map[string]bool)
+		config.ServiceAreas.AreasMap[area].Topics = make(map[string]*types.Addrs)
 	}
-	config.ServiceAreas.AreasMap[area].Topics[topic] = true
+	_, ok = config.ServiceAreas.AreasMap[area].Topics[topic]
+	if !ok {
+		config.ServiceAreas.AreasMap[area].Topics[topic] = &types.Addrs{}
+		config.ServiceAreas.AreasMap[area].Topics[topic].Uuids = make(map[string]bool)
+	}
+	config.ServiceAreas.AreasMap[area].Topics[topic].Uuids[config.LocalUuid] = true
 }

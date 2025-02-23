@@ -92,7 +92,11 @@ message Areas {
 
 message Area {
   int32 number = 1;
-  map<string, bool> topics = 2;
+  map<string, Addrs> topics = 2;
+}
+
+message Addrs {
+  map<string, bool> uuids = 1;
 }
 
 enum HealthState {
