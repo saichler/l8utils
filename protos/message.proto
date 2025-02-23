@@ -84,6 +84,7 @@ message VNicConfig {
   string remote_alias = 10;
   // Service areas
   Areas service_areas = 11;
+  int32 area = 12;
 }
 
 message Areas {
