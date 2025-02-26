@@ -11,7 +11,7 @@ type IVirtualNetworkInterface interface {
 	SendMessage([]byte) error
 	Unicast(types.Action, string, interface{}) error
 	Multicast(types.CastMode, types.Action, int32, string, interface{}) error
-	Request(types.CastMode, types.Action, int32, string, interface{}) error
+	Request(types.CastMode, types.Action, int32, string, interface{}) (interface{}, error)
 	API(int32) API
 	Resources() IResources
 }
