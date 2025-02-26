@@ -59,6 +59,7 @@ message Message {
   string fail_msg = 11;
   //If this message needs a reply message
   bool need_reply = 12;
+  bool is_reply = 13;
 }
 
 // A config for the messages limitation and data size
