@@ -58,7 +58,7 @@ message Message {
   //If this a fail notification, what is the failing info
   string fail_msg = 11;
   //If this message needs a reply message
-  bool need_reply = 12;
+  bool is_request = 12;
   bool is_reply = 13;
 }
 
