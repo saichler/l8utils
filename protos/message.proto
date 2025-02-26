@@ -30,6 +30,14 @@ enum Priority {
   P7 = 7;
 }
 
+// Cast mode
+enum CastMode {
+  Invalid_Cast_mode = 0;
+  All = 1;
+  Single = 2;
+  Leader = 3;
+}
+
 /*
   Message is to transmit a piece of data, securely, from one process to one or more processes via
   Publish/Subscribe or Reuest/Reply

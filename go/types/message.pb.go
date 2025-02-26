@@ -147,6 +147,59 @@ func (Priority) EnumDescriptor() ([]byte, []int) {
 	return file_message_proto_rawDescGZIP(), []int{1}
 }
 
+// Cast mode
+type CastMode int32
+
+const (
+	CastMode_Invalid_Cast_mode CastMode = 0
+	CastMode_All               CastMode = 1
+	CastMode_Single            CastMode = 2
+	CastMode_Leader            CastMode = 3
+)
+
+// Enum value maps for CastMode.
+var (
+	CastMode_name = map[int32]string{
+		0: "Invalid_Cast_mode",
+		1: "All",
+		2: "Single",
+		3: "Leader",
+	}
+	CastMode_value = map[string]int32{
+		"Invalid_Cast_mode": 0,
+		"All":               1,
+		"Single":            2,
+		"Leader":            3,
+	}
+)
+
+func (x CastMode) Enum() *CastMode {
+	p := new(CastMode)
+	*p = x
+	return p
+}
+
+func (x CastMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CastMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_message_proto_enumTypes[2].Descriptor()
+}
+
+func (CastMode) Type() protoreflect.EnumType {
+	return &file_message_proto_enumTypes[2]
+}
+
+func (x CastMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CastMode.Descriptor instead.
+func (CastMode) EnumDescriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{2}
+}
+
 type HealthState int32
 
 const (
@@ -183,11 +236,11 @@ func (x HealthState) String() string {
 }
 
 func (HealthState) Descriptor() protoreflect.EnumDescriptor {
-	return file_message_proto_enumTypes[2].Descriptor()
+	return file_message_proto_enumTypes[3].Descriptor()
 }
 
 func (HealthState) Type() protoreflect.EnumType {
-	return &file_message_proto_enumTypes[2]
+	return &file_message_proto_enumTypes[3]
 }
 
 func (x HealthState) Number() protoreflect.EnumNumber {
@@ -196,7 +249,7 @@ func (x HealthState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use HealthState.Descriptor instead.
 func (HealthState) EnumDescriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{2}
+	return file_message_proto_rawDescGZIP(), []int{3}
 }
 
 // Message is to transmit a piece of data, securely, from one process to one or more processes via
@@ -853,14 +906,19 @@ var file_message_proto_rawDesc = []byte{
 	0x30, 0x10, 0x00, 0x12, 0x06, 0x0a, 0x02, 0x50, 0x31, 0x10, 0x01, 0x12, 0x06, 0x0a, 0x02, 0x50,
 	0x32, 0x10, 0x02, 0x12, 0x06, 0x0a, 0x02, 0x50, 0x33, 0x10, 0x03, 0x12, 0x06, 0x0a, 0x02, 0x50,
 	0x34, 0x10, 0x04, 0x12, 0x06, 0x0a, 0x02, 0x50, 0x35, 0x10, 0x05, 0x12, 0x06, 0x0a, 0x02, 0x50,
-	0x36, 0x10, 0x06, 0x12, 0x06, 0x0a, 0x02, 0x50, 0x37, 0x10, 0x07, 0x2a, 0x43, 0x0a, 0x0b, 0x48,
-	0x65, 0x61, 0x6c, 0x74, 0x68, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x49, 0x6e,
-	0x76, 0x61, 0x6c, 0x69, 0x64, 0x5f, 0x53, 0x74, 0x61, 0x74, 0x65, 0x10, 0x00, 0x12, 0x06, 0x0a,
-	0x02, 0x55, 0x70, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x6f, 0x77, 0x6e, 0x10, 0x02, 0x12,
-	0x0f, 0x0a, 0x0b, 0x55, 0x6e, 0x72, 0x65, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x10, 0x03,
-	0x42, 0x24, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x74,
-	0x79, 0x70, 0x65, 0x73, 0x42, 0x05, 0x54, 0x79, 0x70, 0x65, 0x73, 0x50, 0x01, 0x5a, 0x07, 0x2e,
-	0x2f, 0x74, 0x79, 0x70, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x36, 0x10, 0x06, 0x12, 0x06, 0x0a, 0x02, 0x50, 0x37, 0x10, 0x07, 0x2a, 0x42, 0x0a, 0x08, 0x43,
+	0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x15, 0x0a, 0x11, 0x49, 0x6e, 0x76, 0x61, 0x6c,
+	0x69, 0x64, 0x5f, 0x43, 0x61, 0x73, 0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x65, 0x10, 0x00, 0x12, 0x07,
+	0x0a, 0x03, 0x41, 0x6c, 0x6c, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x69, 0x6e, 0x67, 0x6c,
+	0x65, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x4c, 0x65, 0x61, 0x64, 0x65, 0x72, 0x10, 0x03, 0x2a,
+	0x43, 0x0a, 0x0b, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x11,
+	0x0a, 0x0d, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x5f, 0x53, 0x74, 0x61, 0x74, 0x65, 0x10,
+	0x00, 0x12, 0x06, 0x0a, 0x02, 0x55, 0x70, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x6f, 0x77,
+	0x6e, 0x10, 0x02, 0x12, 0x0f, 0x0a, 0x0b, 0x55, 0x6e, 0x72, 0x65, 0x61, 0x63, 0x68, 0x61, 0x62,
+	0x6c, 0x65, 0x10, 0x03, 0x42, 0x24, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x68, 0x61, 0x72,
+	0x65, 0x64, 0x2e, 0x74, 0x79, 0x70, 0x65, 0x73, 0x42, 0x05, 0x54, 0x79, 0x70, 0x65, 0x73, 0x50,
+	0x01, 0x5a, 0x07, 0x2e, 0x2f, 0x74, 0x79, 0x70, 0x65, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -875,33 +933,34 @@ func file_message_proto_rawDescGZIP() []byte {
 	return file_message_proto_rawDescData
 }
 
-var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
 var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_message_proto_goTypes = []interface{}{
 	(Action)(0),         // 0: types.Action
 	(Priority)(0),       // 1: types.Priority
-	(HealthState)(0),    // 2: types.HealthState
-	(*Message)(nil),     // 3: types.Message
-	(*VNicConfig)(nil),  // 4: types.VNicConfig
-	(*Areas)(nil),       // 5: types.Areas
-	(*Area)(nil),        // 6: types.Area
-	(*Addrs)(nil),       // 7: types.Addrs
-	(*HealthPoint)(nil), // 8: types.HealthPoint
-	nil,                 // 9: types.Areas.AreasMapEntry
-	nil,                 // 10: types.Area.TopicsEntry
-	nil,                 // 11: types.Addrs.UuidsEntry
+	(CastMode)(0),       // 2: types.CastMode
+	(HealthState)(0),    // 3: types.HealthState
+	(*Message)(nil),     // 4: types.Message
+	(*VNicConfig)(nil),  // 5: types.VNicConfig
+	(*Areas)(nil),       // 6: types.Areas
+	(*Area)(nil),        // 7: types.Area
+	(*Addrs)(nil),       // 8: types.Addrs
+	(*HealthPoint)(nil), // 9: types.HealthPoint
+	nil,                 // 10: types.Areas.AreasMapEntry
+	nil,                 // 11: types.Area.TopicsEntry
+	nil,                 // 12: types.Addrs.UuidsEntry
 }
 var file_message_proto_depIdxs = []int32{
 	1,  // 0: types.Message.priority:type_name -> types.Priority
 	0,  // 1: types.Message.action:type_name -> types.Action
-	5,  // 2: types.VNicConfig.service_areas:type_name -> types.Areas
-	9,  // 3: types.Areas.areas_map:type_name -> types.Areas.AreasMapEntry
-	10, // 4: types.Area.topics:type_name -> types.Area.TopicsEntry
-	11, // 5: types.Addrs.uuids:type_name -> types.Addrs.UuidsEntry
-	5,  // 6: types.HealthPoint.serviceAreas:type_name -> types.Areas
-	2,  // 7: types.HealthPoint.status:type_name -> types.HealthState
-	6,  // 8: types.Areas.AreasMapEntry.value:type_name -> types.Area
-	7,  // 9: types.Area.TopicsEntry.value:type_name -> types.Addrs
+	6,  // 2: types.VNicConfig.service_areas:type_name -> types.Areas
+	10, // 3: types.Areas.areas_map:type_name -> types.Areas.AreasMapEntry
+	11, // 4: types.Area.topics:type_name -> types.Area.TopicsEntry
+	12, // 5: types.Addrs.uuids:type_name -> types.Addrs.UuidsEntry
+	6,  // 6: types.HealthPoint.serviceAreas:type_name -> types.Areas
+	3,  // 7: types.HealthPoint.status:type_name -> types.HealthState
+	7,  // 8: types.Areas.AreasMapEntry.value:type_name -> types.Area
+	8,  // 9: types.Area.TopicsEntry.value:type_name -> types.Addrs
 	10, // [10:10] is the sub-list for method output_type
 	10, // [10:10] is the sub-list for method input_type
 	10, // [10:10] is the sub-list for extension type_name
@@ -993,7 +1052,7 @@ func file_message_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_message_proto_rawDesc,
-			NumEnums:      3,
+			NumEnums:      4,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
