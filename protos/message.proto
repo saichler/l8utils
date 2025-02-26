@@ -15,7 +15,6 @@ enum Action {
   PATCH = 3;
   DELETE = 4;
   GET = 5;
-  Notify = 6;
 }
 
 // The priority of the message
@@ -57,6 +56,8 @@ message Message {
   int64 timeout = 10;
   //If this a fail notification, what is the failing info
   string fail_msg = 11;
+  //If this message needs a reply message
+  bool need_reply = 12;
 }
 
 // A config for the messages limitation and data size
@@ -113,4 +114,6 @@ message HealthPoint {
   string alias = 3;
   Areas serviceAreas = 4;
   HealthState status = 5;
+  int64 started = 6;
+  int64 last_msg = 7;
 }
