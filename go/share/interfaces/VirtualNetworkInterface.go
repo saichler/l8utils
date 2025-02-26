@@ -10,8 +10,8 @@ type IVirtualNetworkInterface interface {
 	Name() string
 	SendMessage([]byte) error
 	Unicast(types.Action, string, interface{}) error
-	Multicast(MultiCastMode, types.Action, int32, string, interface{}) error
-	Request(types.Action, int32, string, interface{}) error
+	Multicast(CastMode, types.Action, int32, string, interface{}) error
+	Request(CastMode, types.Action, int32, string, interface{}) error
 	API(int32) API
 	Resources() IResources
 }
@@ -24,12 +24,12 @@ type API interface {
 	Get(string) (interface{}, error)
 }
 
-type MultiCastMode int
+type CastMode int
 
 const (
-	All    MultiCastMode = 0
-	Single MultiCastMode = 1
-	Leader MultiCastMode = 2
+	All    CastMode = 0
+	Single CastMode = 1
+	Leader CastMode = 2
 )
 
 type IDatatListener interface {
