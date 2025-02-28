@@ -28,32 +28,32 @@ func NewTestServicePointHandler(name string) *TestServicePointHandler {
 	return tsp
 }
 
-func (tsp *TestServicePointHandler) Post(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Post(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Post -", tsp.Name, "- Test callback")
 	tsp.PostNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Put(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Put(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Put -", tsp.Name, "- Test callback")
 	tsp.PutNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Patch(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Patch(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Patch -", tsp.Name, "- Test callback")
 	tsp.PatchNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Delete(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Delete(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Delete -", tsp.Name, "- Test callback")
 	tsp.DeleteNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Get(pb proto.Message, vnic interfaces.IVirtualNetworkInterface) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Get(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Failed(pb proto.Message, vnic interfaces.IVirtualNetworkInterface, info *types.Message) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Failed(pb proto.Message, resourcs interfaces.IResources, info *types.Message) (proto.Message, error) {
 	dest := "n/a"
 	msg := "n/a"
 	if info != nil {
