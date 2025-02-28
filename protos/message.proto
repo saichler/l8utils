@@ -103,7 +103,10 @@ message VNicConfig {
   string remote_alias = 10;
   // Service areas
   Areas service_areas = 11;
+  // Service area
   int32 area = 12;
+  //Keep Alive interval in Seconds
+  int64 keep_alive_interval_seconds = 13;
 }
 
 message Areas {
