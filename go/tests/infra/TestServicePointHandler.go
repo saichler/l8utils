@@ -16,6 +16,7 @@ type TestServicePointHandler struct {
 	DeleteNumber int
 	GetNumber    int
 	FailedNumber int
+	Tr           bool
 }
 
 const (
@@ -70,4 +71,7 @@ func (tsp *TestServicePointHandler) EndPoint() string {
 }
 func (tsp *TestServicePointHandler) Topic() string {
 	return TEST_TOPIC
+}
+func (tsp *TestServicePointHandler) Transactional() bool {
+	return tsp.Tr
 }
