@@ -22,4 +22,5 @@ type IServicePointHandler interface {
 	Failed(proto.Message, IResources, *types.Message) (proto.Message, error)
 	EndPoint() string
 	Topic() string
+	Transactional() bool
 }

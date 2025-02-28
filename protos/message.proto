@@ -69,6 +69,13 @@ message Message {
   //If this message needs a reply message
   bool is_request = 12;
   bool is_reply = 13;
+  Transaction tr = 14;
+}
+
+message Transaction {
+  string id = 1;
+  bool commit = 2;
+  bool rollback = 3;
 }
 
 // A config for the messages limitation and data size
