@@ -10,16 +10,16 @@ type IServicePoints interface {
 	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	Notify(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	ServicePointHandler(string) (IServicePointHandler, bool)
-	Areas() *types.Areas
+	ServiceAreas() *types.Areas
 }
 
 type IServicePointHandler interface {
-	Post(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Put(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Patch(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Delete(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Get(proto.Message, IVirtualNetworkInterface) (proto.Message, error)
-	Failed(proto.Message, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
+	Post(proto.Message, IResources) (proto.Message, error)
+	Put(proto.Message, IResources) (proto.Message, error)
+	Patch(proto.Message, IResources) (proto.Message, error)
+	Delete(proto.Message, IResources) (proto.Message, error)
+	Get(proto.Message, IResources) (proto.Message, error)
+	Failed(proto.Message, IResources, *types.Message) (proto.Message, error)
 	EndPoint() string
 	Topic() string
 }
