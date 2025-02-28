@@ -145,6 +145,6 @@ message HealthPointStats {
   int64 tx_data_count = 3;
   int64 rx_msg_count = 4;
   int64 rx_data_cont = 5;
-  int64 memory_usage = 6;
-  int64 cpu_usage = 7;
+  uint64 memory_usage = 6;
+  double cpu_usage = 7;
 }
