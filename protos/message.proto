@@ -101,25 +101,14 @@ message VNicConfig {
   string local_alias = 9;
   // Custom remote alias for this vnic
   string remote_alias = 10;
-  // Vlans
-  Vlans vlans = 11;
-  // vlan
-  int32 vlan = 12;
+  // Service Topics
+  Topics topics = 11;
   //Keep Alive interval in Seconds
-  int64 keep_alive_interval_seconds = 13;
+  int64 keep_alive_interval_seconds = 12;
 }
 
-message Vlans {
-  map<int32, Vlan> vlans = 11;
-}
-
-message Vlan {
-  int32 vlan = 1;
-  map<string, VlanMembers> members = 2;
-}
-
-message VlanMembers {
-  map<string, int64> member_to_join_time = 1;
+message Topics {
+  map<int32, string> vlan_to_topic = 11;
 }
 
 enum HealthState {
@@ -133,7 +122,7 @@ message HealthPoint {
   string a_uuid = 1;
   string z_uuid = 2;
   string alias = 3;
-  Vlans vlans = 4;
+  Topics topics = 4;
   HealthState status = 5;
   HealthPointStats stats = 6;
   int64 start_time = 7;

@@ -53,35 +53,35 @@ func ExecuteProtocol(conn net.Conn, config *types.VNicConfig, security interface
 	}
 	config.RemoteAlias = remoteAlias
 
-	err = WriteEncrypted(conn, VlansToBytes(config.Vlans), config, security)
+	err = WriteEncrypted(conn, TopicsToBytes(config.Topics), config, security)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	vlans, err := ReadEncryptedBytes(conn, config, security)
+	topics, err := ReadEncryptedBytes(conn, config, security)
 	if err != nil {
 		conn.Close()
 		return err
 	}
-	config.Vlans = BytesToVlans(vlans)
+	config.Topics = BytesToTopics(topics)
 
 	return nil
 }
 
-func VlansToBytes(vlans *types.Vlans) []byte {
-	data, err := proto.Marshal(vlans)
+func TopicsToBytes(topics *types.Topics) []byte {
+	data, err := proto.Marshal(topics)
 	if err != nil {
 		return []byte{}
 	}
 	return data
 }
 
-func BytesToVlans(data []byte) *types.Vlans {
-	vlans := &types.Vlans{}
-	err := proto.Unmarshal(data, vlans)
+func BytesToTopics(data []byte) *types.Topics {
+	topics := &types.Topics{}
+	err := proto.Unmarshal(data, topics)
 	if err != nil {
 		return nil
 	}
-	return vlans
+	return topics
 }
