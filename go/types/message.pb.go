@@ -637,7 +637,7 @@ type Topics struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	VlanToTopic map[int32]string `protobuf:"bytes,11,rep,name=vlan_to_topic,json=vlanToTopic,proto3" json:"vlan_to_topic,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TopicToVlan map[string]*Vlans `protobuf:"bytes,1,rep,name=topic_to_vlan,json=topicToVlan,proto3" json:"topic_to_vlan,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *Topics) Reset() {
@@ -672,9 +672,56 @@ func (*Topics) Descriptor() ([]byte, []int) {
 	return file_message_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Topics) GetVlanToTopic() map[int32]string {
+func (x *Topics) GetTopicToVlan() map[string]*Vlans {
 	if x != nil {
-		return x.VlanToTopic
+		return x.TopicToVlan
+	}
+	return nil
+}
+
+type Vlans struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vlans map[int32]bool `protobuf:"bytes,1,rep,name=vlans,proto3" json:"vlans,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+}
+
+func (x *Vlans) Reset() {
+	*x = Vlans{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_message_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Vlans) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Vlans) ProtoMessage() {}
+
+func (x *Vlans) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Vlans.ProtoReflect.Descriptor instead.
+func (*Vlans) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Vlans) GetVlans() map[int32]bool {
+	if x != nil {
+		return x.Vlans
 	}
 	return nil
 }
@@ -696,7 +743,7 @@ type HealthPoint struct {
 func (x *HealthPoint) Reset() {
 	*x = HealthPoint{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_message_proto_msgTypes[4]
+		mi := &file_message_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -709,7 +756,7 @@ func (x *HealthPoint) String() string {
 func (*HealthPoint) ProtoMessage() {}
 
 func (x *HealthPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[4]
+	mi := &file_message_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -722,7 +769,7 @@ func (x *HealthPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthPoint.ProtoReflect.Descriptor instead.
 func (*HealthPoint) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{4}
+	return file_message_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *HealthPoint) GetAUuid() string {
@@ -791,7 +838,7 @@ type HealthPointStats struct {
 func (x *HealthPointStats) Reset() {
 	*x = HealthPointStats{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_message_proto_msgTypes[5]
+		mi := &file_message_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -804,7 +851,7 @@ func (x *HealthPointStats) String() string {
 func (*HealthPointStats) ProtoMessage() {}
 
 func (x *HealthPointStats) ProtoReflect() protoreflect.Message {
-	mi := &file_message_proto_msgTypes[5]
+	mi := &file_message_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -817,7 +864,7 @@ func (x *HealthPointStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthPointStats.ProtoReflect.Descriptor instead.
 func (*HealthPointStats) Descriptor() ([]byte, []int) {
-	return file_message_proto_rawDescGZIP(), []int{5}
+	return file_message_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HealthPointStats) GetLastMsgTime() int64 {
@@ -933,15 +980,23 @@ var file_message_proto_rawDesc = []byte{
 	0x70, 0x5f, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c,
 	0x5f, 0x73, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x73, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x03, 0x52, 0x18,
 	0x6b, 0x65, 0x65, 0x70, 0x41, 0x6c, 0x69, 0x76, 0x65, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61,
-	0x6c, 0x53, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x73, 0x22, 0x8c, 0x01, 0x0a, 0x06, 0x54, 0x6f, 0x70,
-	0x69, 0x63, 0x73, 0x12, 0x42, 0x0a, 0x0d, 0x76, 0x6c, 0x61, 0x6e, 0x5f, 0x74, 0x6f, 0x5f, 0x74,
-	0x6f, 0x70, 0x69, 0x63, 0x18, 0x0b, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x74, 0x79, 0x70,
-	0x65, 0x73, 0x2e, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x73, 0x2e, 0x56, 0x6c, 0x61, 0x6e, 0x54, 0x6f,
-	0x54, 0x6f, 0x70, 0x69, 0x63, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b, 0x76, 0x6c, 0x61, 0x6e,
-	0x54, 0x6f, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x1a, 0x3e, 0x0a, 0x10, 0x56, 0x6c, 0x61, 0x6e, 0x54,
-	0x6f, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
+	0x6c, 0x53, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x73, 0x22, 0x9a, 0x01, 0x0a, 0x06, 0x54, 0x6f, 0x70,
+	0x69, 0x63, 0x73, 0x12, 0x42, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x69, 0x63, 0x5f, 0x74, 0x6f, 0x5f,
+	0x76, 0x6c, 0x61, 0x6e, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x74, 0x79, 0x70,
+	0x65, 0x73, 0x2e, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x73, 0x2e, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x54,
+	0x6f, 0x56, 0x6c, 0x61, 0x6e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b, 0x74, 0x6f, 0x70, 0x69,
+	0x63, 0x54, 0x6f, 0x56, 0x6c, 0x61, 0x6e, 0x1a, 0x4c, 0x0a, 0x10, 0x54, 0x6f, 0x70, 0x69, 0x63,
+	0x54, 0x6f, 0x56, 0x6c, 0x61, 0x6e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
+	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x22, 0x0a,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x74,
+	0x79, 0x70, 0x65, 0x73, 0x2e, 0x56, 0x6c, 0x61, 0x6e, 0x73, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x70, 0x0a, 0x05, 0x56, 0x6c, 0x61, 0x6e, 0x73, 0x12, 0x2d,
+	0x0a, 0x05, 0x76, 0x6c, 0x61, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e,
+	0x74, 0x79, 0x70, 0x65, 0x73, 0x2e, 0x56, 0x6c, 0x61, 0x6e, 0x73, 0x2e, 0x56, 0x6c, 0x61, 0x6e,
+	0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x05, 0x76, 0x6c, 0x61, 0x6e, 0x73, 0x1a, 0x38, 0x0a,
+	0x0a, 0x56, 0x6c, 0x61, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
 	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x76, 0x61,
 	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xf2, 0x01, 0x0a, 0x0b, 0x48, 0x65, 0x61, 0x6c,
 	0x74, 0x68, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x15, 0x0a, 0x06, 0x61, 0x5f, 0x75, 0x75, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x61, 0x55, 0x75, 0x69, 0x64, 0x12, 0x15,
@@ -1012,7 +1067,7 @@ func file_message_proto_rawDescGZIP() []byte {
 }
 
 var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_message_proto_goTypes = []interface{}{
 	(Action)(0),              // 0: types.Action
 	(Priority)(0),            // 1: types.Priority
@@ -1022,24 +1077,28 @@ var file_message_proto_goTypes = []interface{}{
 	(*Transaction)(nil),      // 5: types.Transaction
 	(*VNicConfig)(nil),       // 6: types.VNicConfig
 	(*Topics)(nil),           // 7: types.Topics
-	(*HealthPoint)(nil),      // 8: types.HealthPoint
-	(*HealthPointStats)(nil), // 9: types.HealthPointStats
-	nil,                      // 10: types.Topics.VlanToTopicEntry
+	(*Vlans)(nil),            // 8: types.Vlans
+	(*HealthPoint)(nil),      // 9: types.HealthPoint
+	(*HealthPointStats)(nil), // 10: types.HealthPointStats
+	nil,                      // 11: types.Topics.TopicToVlanEntry
+	nil,                      // 12: types.Vlans.VlansEntry
 }
 var file_message_proto_depIdxs = []int32{
 	1,  // 0: types.Message.priority:type_name -> types.Priority
 	0,  // 1: types.Message.action:type_name -> types.Action
 	5,  // 2: types.Message.tr:type_name -> types.Transaction
 	7,  // 3: types.VNicConfig.topics:type_name -> types.Topics
-	10, // 4: types.Topics.vlan_to_topic:type_name -> types.Topics.VlanToTopicEntry
-	7,  // 5: types.HealthPoint.topics:type_name -> types.Topics
-	3,  // 6: types.HealthPoint.status:type_name -> types.HealthState
-	9,  // 7: types.HealthPoint.stats:type_name -> types.HealthPointStats
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	11, // 4: types.Topics.topic_to_vlan:type_name -> types.Topics.TopicToVlanEntry
+	12, // 5: types.Vlans.vlans:type_name -> types.Vlans.VlansEntry
+	7,  // 6: types.HealthPoint.topics:type_name -> types.Topics
+	3,  // 7: types.HealthPoint.status:type_name -> types.HealthState
+	10, // 8: types.HealthPoint.stats:type_name -> types.HealthPointStats
+	8,  // 9: types.Topics.TopicToVlanEntry.value:type_name -> types.Vlans
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_message_proto_init() }
@@ -1097,7 +1156,7 @@ func file_message_proto_init() {
 			}
 		}
 		file_message_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HealthPoint); i {
+			switch v := v.(*Vlans); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1109,6 +1168,18 @@ func file_message_proto_init() {
 			}
 		}
 		file_message_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HealthPoint); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_message_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HealthPointStats); i {
 			case 0:
 				return &v.state
@@ -1127,7 +1198,7 @@ func file_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_message_proto_rawDesc,
 			NumEnums:      4,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

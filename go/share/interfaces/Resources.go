@@ -26,9 +26,15 @@ func AddTopic(config *types.VNicConfig, vlan int32, topic string) {
 	}
 	if config.Topics == nil {
 		config.Topics = &types.Topics{}
-		config.Topics.VlanToTopic = make(map[int32]string)
+		config.Topics.TopicToVlan = make(map[string]*types.Vlans)
 	}
-	config.Topics.VlanToTopic[vlan] = topic
+	vlans := config.Topics.TopicToVlan[topic]
+	if vlans == nil {
+		config.Topics.TopicToVlan[topic] = &types.Vlans{}
+		config.Topics.TopicToVlan[topic].Vlans = make(map[int32]bool)
+		vlans = config.Topics.TopicToVlan[topic]
+	}
+	vlans.Vlans[vlan] = true
 }
 
 func NewUuid() string {

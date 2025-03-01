@@ -108,7 +108,11 @@ message VNicConfig {
 }
 
 message Topics {
-  map<int32, string> vlan_to_topic = 11;
+  map<string, Vlans> topic_to_vlan = 1;
+}
+
+message Vlans {
+  map<int32, bool> vlans = 1;
 }
 
 enum HealthState {
