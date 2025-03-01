@@ -12,7 +12,7 @@ type IVirtualNetworkInterface interface {
 	Unicast(types.Action, string, interface{}) error
 	Multicast(types.CastMode, types.Action, int32, string, interface{}) error
 	Request(types.CastMode, types.Action, int32, string, interface{}) (interface{}, error)
-	ForwardToLeader(message *types.Message) (interface{}, error)
+	Forward(*types.Message, string) (interface{}, error)
 	API(int32) API
 	Resources() IResources
 }
