@@ -48,8 +48,8 @@ message Message {
   string source_uuid = 1;
   // The source uuid identifier of the message sender switch
   string source_vnet_uuid = 2;
-  // The destination uuid identifier of the message, in case of a unicast
-  int32 area = 3;
+  // The vlan of the message
+  int32 vlan = 3;
   // The topic of the multicast
   string topic = 4;
   // To uniquely identify the source message, the sender process maintain a sequence number.
@@ -101,25 +101,25 @@ message VNicConfig {
   string local_alias = 9;
   // Custom remote alias for this vnic
   string remote_alias = 10;
-  // Service areas
-  Areas service_areas = 11;
-  // Service area
-  int32 area = 12;
+  // Vlans
+  Vlans vlans = 11;
+  // vlan
+  int32 vlan = 12;
   //Keep Alive interval in Seconds
   int64 keep_alive_interval_seconds = 13;
 }
 
-message Areas {
-  map<int32, Area> areas_map = 11;
+message Vlans {
+  map<int32, Vlan> vlans = 11;
 }
 
-message Area {
-  int32 number = 1;
-  map<string, Addrs> topics = 2;
+message Vlan {
+  int32 vlan = 1;
+  map<string, VlanMembers> members = 2;
 }
 
-message Addrs {
-  map<string, bool> uuids = 1;
+message VlanMembers {
+  map<string, int64> member_to_join_time = 1;
 }
 
 enum HealthState {
@@ -133,7 +133,7 @@ message HealthPoint {
   string a_uuid = 1;
   string z_uuid = 2;
   string alias = 3;
-  Areas serviceAreas = 4;
+  Vlans vlans = 4;
   HealthState status = 5;
   HealthPointStats stats = 6;
   int64 start_time = 7;

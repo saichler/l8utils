@@ -1,6 +1,9 @@
 package interfaces
 
-import "github.com/saichler/shared/go/types"
+import (
+	"github.com/saichler/shared/go/types"
+	"time"
+)
 import "github.com/google/uuid"
 
 type IResources interface {
@@ -15,27 +18,31 @@ type IResources interface {
 	AddTopic(int32, string)
 }
 
-func AddTopic(config *types.VNicConfig, area int32, topic string) {
+func AddTopic(config *types.VNicConfig, vlan int32, topic string) {
 	if config == nil {
 		return
 	}
-	if config.ServiceAreas == nil {
-		config.ServiceAreas = &types.Areas{}
-		config.ServiceAreas.AreasMap = make(map[int32]*types.Area)
+	if config.Vlans == nil {
+		config.Vlans = &types.Vlans{}
+		config.Vlans.Vlans = make(map[int32]*types.Vlan)
 	}
-	_, ok := config.ServiceAreas.AreasMap[area]
+	_, ok := config.Vlans.Vlans[vlan]
 	if !ok {
-		config.ServiceAreas.AreasMap[area] = &types.Area{}
-		config.ServiceAreas.AreasMap[area].Number = area
-		config.ServiceAreas.AreasMap[area].Topics = make(map[string]*types.Addrs)
+		config.Vlans.Vlans[vlan] = &types.Vlan{}
+		config.Vlans.Vlans[vlan].Vlan = vlan
+		config.Vlans.Vlans[vlan].Members = make(map[string]*types.VlanMembers)
 	}
-	_, ok = config.ServiceAreas.AreasMap[area].Topics[topic]
+	_, ok = config.Vlans.Vlans[vlan].Members[topic]
 	if !ok {
-		config.ServiceAreas.AreasMap[area].Topics[topic] = &types.Addrs{}
-		config.ServiceAreas.AreasMap[area].Topics[topic].Uuids = make(map[string]bool)
+		config.Vlans.Vlans[vlan].Members[topic] = &types.VlanMembers{}
+		config.Vlans.Vlans[vlan].Members[topic].MemberToJoinTime = make(map[string]int64)
 	}
 	if config.LocalUuid == "" {
-		config.LocalUuid = uuid.New().String()
+		config.LocalUuid = NewUuid()
 	}
-	config.ServiceAreas.AreasMap[area].Topics[topic].Uuids[config.LocalUuid] = true
+	config.Vlans.Vlans[vlan].Members[topic].MemberToJoinTime[config.LocalUuid] = time.Now().UnixMilli()
+}
+
+func NewUuid() string {
+	return uuid.New().String()
 }

@@ -10,7 +10,7 @@ type IServicePoints interface {
 	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	Notify(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
 	ServicePointHandler(string) (IServicePointHandler, bool)
-	ServiceAreas() *types.Areas
+	Vlans() *types.Vlans
 }
 
 type IServicePointHandler interface {
