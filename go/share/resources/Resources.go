@@ -44,8 +44,8 @@ func NewResources(registry interfaces.IRegistry,
 	return r
 }
 
-func (this *Resources) AddTopic(area int32, topic string) {
-	interfaces.AddTopic(this.config, area, topic)
+func (this *Resources) AddTopic(vlan int32, topic string) {
+	interfaces.AddTopic(this.config, vlan, topic)
 }
 
 func (this *Resources) Registry() interfaces.IRegistry {

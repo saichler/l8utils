@@ -69,8 +69,8 @@ func ExecuteProtocol(conn net.Conn, config *types.VNicConfig, security interface
 	return nil
 }
 
-func VlansToBytes(areas *types.Vlans) []byte {
-	data, err := proto.Marshal(areas)
+func VlansToBytes(vlans *types.Vlans) []byte {
+	data, err := proto.Marshal(vlans)
 	if err != nil {
 		return []byte{}
 	}
@@ -78,10 +78,10 @@ func VlansToBytes(areas *types.Vlans) []byte {
 }
 
 func BytesToVlans(data []byte) *types.Vlans {
-	areas := &types.Vlans{}
-	err := proto.Unmarshal(data, areas)
+	vlans := &types.Vlans{}
+	err := proto.Unmarshal(data, vlans)
 	if err != nil {
 		return nil
 	}
-	return areas
+	return vlans
 }
