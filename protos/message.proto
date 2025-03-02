@@ -136,6 +136,7 @@ message HealthPoint {
   HealthState status = 5;
   HealthPointStats stats = 6;
   int64 start_time = 7;
+  bool is_vnet = 8;
 }
 
 message HealthPointStats {
