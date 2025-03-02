@@ -81,7 +81,7 @@ enum TransactionState {
 
 message Transaction {
   string id = 1;
-  Transaction state = 2;
+  TransactionState state = 2;
 }
 
 // A config for the messages limitation and data size
