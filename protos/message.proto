@@ -76,7 +76,7 @@ enum TransactionState {
   Invalid_Transaction_State = 0;
   Lock = 1;
   Commit = 2;
-  Rollback 3;
+  Rollback = 3;
 }
 
 message Transaction {
