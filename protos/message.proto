@@ -72,10 +72,16 @@ message Message {
   Transaction tr = 14;
 }
 
+enum TransactionState {
+  Invalid_Transaction_State = 0;
+  Lock = 1;
+  Commit = 2;
+  Rollback 3;
+}
+
 message Transaction {
   string id = 1;
-  bool commit = 2;
-  bool rollback = 3;
+  Transaction state = 2;
 }
 
 // A config for the messages limitation and data size
