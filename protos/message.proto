@@ -69,10 +69,10 @@ message Message {
   //If this message needs a reply message
   bool is_request = 12;
   bool is_reply = 13;
-  Transaction tr = 14;
+  Tr tr = 14;
 }
 
-enum TransactionState {
+enum TrState {
   Invalid_Transaction_State = 0;
   Lock = 1;
   Locked = 2;
@@ -84,9 +84,9 @@ enum TransactionState {
   Finished = 8;
 }
 
-message Transaction {
+message Tr {
   string id = 1;
-  TransactionState state = 2;
+  TrState state = 2;
 }
 
 // A config for the messages limitation and data size
