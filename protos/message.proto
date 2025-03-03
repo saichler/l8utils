@@ -83,6 +83,8 @@ enum TrState {
   Finish = 7;
   Finished = 8;
   Errored = 9;
+  Created = 10;
+  Pending = 11;
 }
 
 message Tr {
