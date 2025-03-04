@@ -80,8 +80,8 @@ enum TrState {
   Commited = 4;
   Rollback = 5;
   Rollbacked = 6;
-  Finish = 7;
-  Finished = 8;
+  Clean = 7;
+  Cleaned = 8;
   Errored = 9;
   Created = 10;
   Pending = 11;
