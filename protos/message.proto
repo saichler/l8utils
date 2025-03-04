@@ -85,6 +85,7 @@ enum TrState {
   Errored = 9;
   Created = 10;
   Pending = 11;
+  LockFailed = 12;
 }
 
 message Tr {
