@@ -91,6 +91,7 @@ message Tr {
   string id = 1;
   TrState state = 2;
   string error = 3;
+  int64 start_time = 4;
 }
 
 // A config for the messages limitation and data size
