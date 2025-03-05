@@ -69,28 +69,26 @@ message Message {
   //If this message needs a reply message
   bool is_request = 12;
   bool is_reply = 13;
-  Tr tr = 14;
+  Transaction tr = 14;
 }
 
-enum TrState {
+enum TransactionState {
   Invalid_Transaction_State = 0;
-  Lock = 1;
-  Locked = 2;
-  Commit = 3;
-  Commited = 4;
-  Rollback = 5;
-  Rollbacked = 6;
-  Clean = 7;
-  Cleaned = 8;
-  Errored = 9;
-  Created = 10;
-  Pending = 11;
-  LockFailed = 12;
+  Create = 1;
+  Created = 2;
+  Lock = 3;
+  Locked = 4;
+  LockFailed = 5;
+  Commit = 6;
+  Commited = 7;
+  Rollback = 8;
+  Rollbacked = 9;
+  Errored = 10;
 }
 
-message Tr {
+message Transaction {
   string id = 1;
-  TrState state = 2;
+  TransactionState state = 2;
   string error = 3;
   int64 start_time = 4;
 }
