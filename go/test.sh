@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+go mod vendor
 # Fail on errors and don't open cover file
 set -e
 
