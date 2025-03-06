@@ -19,7 +19,7 @@ type IServicePointHandler interface {
 	Patch(proto.Message, IResources) (proto.Message, error)
 	Delete(proto.Message, IResources) (proto.Message, error)
 	GetCopy(proto.Message, IResources) (proto.Message, error)
-	Get(string, IResources) (proto.Message, error)
+	Get(proto.Message, IResources) (proto.Message, error)
 	Failed(proto.Message, IResources, *types.Message) (proto.Message, error)
 	EndPoint() string
 	Topic() string

@@ -94,6 +94,11 @@ message Transaction {
   int64 start_time = 4;
 }
 
+message GSQL {
+  string query = 1;
+  string type = 2;
+}
+
 // A config for the messages limitation and data size
 message VNicConfig {
   // The maximum data size for a message
