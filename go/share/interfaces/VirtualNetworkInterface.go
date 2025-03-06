@@ -13,6 +13,7 @@ type IVirtualNetworkInterface interface {
 	Multicast(types.CastMode, types.Action, int32, string, interface{}) error
 	Request(types.CastMode, types.Action, int32, string, interface{}) (interface{}, error)
 	Reply(*types.Message, interface{}) error
+	Transaction(types.Action, int32, string, interface{}) (interface{}, error)
 	Forward(*types.Message, string) (interface{}, error)
 	API(int32) API
 	Resources() IResources

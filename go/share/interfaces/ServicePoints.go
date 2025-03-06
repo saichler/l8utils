@@ -5,7 +5,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-//Add a bool for transaction
+// Add a bool for transaction
 type IServicePoints interface {
 	RegisterServicePoint(int32, proto.Message, IServicePointHandler) error
 	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message, bool) (proto.Message, error)
