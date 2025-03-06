@@ -49,10 +49,15 @@ func (tsp *TestServicePointHandler) Delete(pb proto.Message, resourcs interfaces
 	tsp.DeleteNumber++
 	return pb, nil
 }
-func (tsp *TestServicePointHandler) Get(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) GetCopy(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	return pb, nil
+}
+func (tsp *TestServicePointHandler) Get(gsql string, resourcs interfaces.IResources) (proto.Message, error) {
+	Log.Debug("Get -", tsp.Name, "- Test callback")
+	tsp.GetNumber++
+	return nil, nil
 }
 func (tsp *TestServicePointHandler) Failed(pb proto.Message, resourcs interfaces.IResources, info *types.Message) (proto.Message, error) {
 	dest := "n/a"
