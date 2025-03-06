@@ -76,14 +76,15 @@ enum TransactionState {
   Invalid_Transaction_State = 0;
   Create = 1;
   Created = 2;
-  Lock = 3;
-  Locked = 4;
-  LockFailed = 5;
-  Commit = 6;
-  Commited = 7;
-  Rollback = 8;
-  Rollbacked = 9;
-  Errored = 10;
+  Start = 3;
+  Lock = 4;
+  Locked = 5;
+  LockFailed = 6;
+  Commit = 7;
+  Commited = 8;
+  Rollback = 9;
+  Rollbacked = 10;
+  Errored = 11;
 }
 
 message Transaction {
