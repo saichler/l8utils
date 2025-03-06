@@ -7,8 +7,8 @@ import (
 
 type IServicePoints interface {
 	RegisterServicePoint(int32, proto.Message, IServicePointHandler) error
-	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
-	Notify(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message) (proto.Message, error)
+	Handle(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message, bool) (proto.Message, error)
+	Notify(proto.Message, types.Action, IVirtualNetworkInterface, *types.Message, bool) (proto.Message, error)
 	ServicePointHandler(string) (IServicePointHandler, bool)
 }
 
