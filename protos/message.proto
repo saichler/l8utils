@@ -84,7 +84,9 @@ enum TransactionState {
   Commited = 8;
   Rollback = 9;
   Rollbacked = 10;
-  Errored = 11;
+  Finish = 11;
+  Finished = 12;
+  Errored = 13;
 }
 
 message Transaction {
