@@ -24,7 +24,7 @@ func NewWorkers(limit int) *Workers {
 func (this *Workers) canStart() {
 	this.cond.L.Lock()
 	defer this.cond.L.Unlock()
-	for this.running < this.limit {
+	for this.running >= this.limit {
 		this.cond.Wait()
 	}
 	this.running++
@@ -41,4 +41,5 @@ func (this Worker) run() {
 	this.workers.cond.L.Lock()
 	defer this.workers.cond.L.Unlock()
 	this.workers.running--
+	this.workers.cond.Broadcast()
 }
