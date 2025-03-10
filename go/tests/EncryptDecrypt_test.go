@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/share/aes"
+	"github.com/saichler/types/go/aes"
 	"testing"
 )
 

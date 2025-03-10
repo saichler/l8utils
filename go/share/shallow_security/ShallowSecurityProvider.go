@@ -4,23 +4,21 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
-	"github.com/saichler/shared/go/share/aes"
-	"github.com/saichler/shared/go/share/interfaces"
-	"github.com/saichler/shared/go/share/nets"
-	"github.com/saichler/shared/go/types"
+	"github.com/saichler/types/go/aes"
+	"github.com/saichler/types/go/common"
+	"github.com/saichler/types/go/nets"
+	"github.com/saichler/types/go/types"
 	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
 	"strings"
 )
 
-var SecurityProvider interfaces.ISecurityProvider = createShallowSecurityProvider()
-
 type ShallowSecurityProvider struct {
 	secret    string
 	key       string
 	salts     []string
-	resources interfaces.IResources
+	resources common.IResources
 }
 
 func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSecurityProvider {
@@ -31,7 +29,7 @@ func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSec
 	return sp
 }
 
-func (this *ShallowSecurityProvider) Init(resources interfaces.IResources) {
+func (this *ShallowSecurityProvider) Init(resources common.IResources) {
 	if this.resources == nil {
 		this.resources = resources
 	}
@@ -87,7 +85,7 @@ func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salt
 	return "token"
 }
 
-func createShallowSecurityProvider() interfaces.ISecurityProvider {
+func CreateShallowSecurityProvider() common.ISecurityProvider {
 	hash := md5.New()
 	secret := "Shallow Security Provider"
 	hash.Write([]byte(secret))

@@ -2,15 +2,15 @@ package logger
 
 import (
 	"bytes"
-	"github.com/saichler/shared/go/share/interfaces"
 	su "github.com/saichler/shared/go/share/strings"
+	"github.com/saichler/types/go/common"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func FormatLog(level interfaces.LogLevel, t int64, args ...interface{}) string {
+func FormatLog(level common.LogLevel, t int64, args ...interface{}) string {
 	str := su.New()
 	str.Add(LogTimeFormat(t, level))
 	if args != nil {
@@ -21,7 +21,7 @@ func FormatLog(level interfaces.LogLevel, t int64, args ...interface{}) string {
 	return str.String()
 }
 
-func LogTimeFormat(epochSeconds int64, level interfaces.LogLevel) string {
+func LogTimeFormat(epochSeconds int64, level common.LogLevel) string {
 	t := time.Unix(epochSeconds, 0)
 	buff := bytes.Buffer{}
 	buff.WriteString(strconv.Itoa(t.Year()))

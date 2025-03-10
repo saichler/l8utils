@@ -1,9 +1,9 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/share/interfaces"
 	"github.com/saichler/shared/go/share/registry"
 	"github.com/saichler/shared/go/tests/infra"
+	"github.com/saichler/types/go/common"
 	"reflect"
 	"testing"
 	"time"
@@ -75,7 +75,7 @@ func TestRegistry(t *testing.T) {
 	}
 
 	info.AddSerializer(&infra.TestSerializer{})
-	ser := info.Serializer(interfaces.BINARY)
+	ser := info.Serializer(common.BINARY)
 
 	if ser == nil {
 		log.Fail(t, "Failed to create serializer")

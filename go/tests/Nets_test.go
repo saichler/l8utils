@@ -2,7 +2,7 @@ package tests
 
 import (
 	"bytes"
-	"github.com/saichler/shared/go/share/nets"
+	"github.com/saichler/types/go/nets"
 	"net"
 	"sync"
 	"testing"

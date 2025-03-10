@@ -2,7 +2,7 @@ package registry
 
 import (
 	"errors"
-	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/types/go/common"
 	"reflect"
 )
 
@@ -15,7 +15,7 @@ type Info struct {
 	/* The golang reflect type */
 	typ reflect.Type
 	/* The serializers */
-	serializers map[interfaces.SerializerMode]interfaces.ISerializer
+	serializers map[common.SerializerMode]common.ISerializer
 }
 
 // NewInfo /* Constructs a new type info with the given attributes */
@@ -24,7 +24,7 @@ func NewInfo(typ reflect.Type) (*Info, error) {
 		return nil, errors.New("Cannot register a nil type")
 	}
 	return &Info{typ: typ,
-		serializers: make(map[interfaces.SerializerMode]interfaces.ISerializer)}, nil
+		serializers: make(map[common.SerializerMode]common.ISerializer)}, nil
 }
 
 // Type /* Return the reflect type of this TypeInfo */
@@ -38,11 +38,11 @@ func (info *Info) Name() string {
 }
 
 // Serializer /* Return the serializer to be used with this type. Can be nil... */
-func (info *Info) Serializer(mode interfaces.SerializerMode) interfaces.ISerializer {
+func (info *Info) Serializer(mode common.SerializerMode) common.ISerializer {
 	return info.serializers[mode]
 }
 
-func (info *Info) AddSerializer(serializer interfaces.ISerializer) {
+func (info *Info) AddSerializer(serializer common.ISerializer) {
 	info.serializers[serializer.Mode()] = serializer
 }
 

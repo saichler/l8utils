@@ -2,12 +2,12 @@ package infra
 
 import (
 	"errors"
-	"github.com/saichler/shared/go/share/interfaces"
-	"github.com/saichler/shared/go/types"
+	"github.com/saichler/types/go/common"
+	"github.com/saichler/types/go/types"
 	"google.golang.org/protobuf/proto"
 )
 
-var Log interfaces.ILogger
+var Log common.ILogger
 
 type TestServicePointHandler struct {
 	Name         string
@@ -31,7 +31,7 @@ func NewTestServicePointHandler(name string) *TestServicePointHandler {
 	return tsp
 }
 
-func (tsp *TestServicePointHandler) Post(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Post(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Post -", tsp.Name, "- Test callback")
 	tsp.PostNumber++
 	var err error
@@ -40,7 +40,7 @@ func (tsp *TestServicePointHandler) Post(pb proto.Message, resourcs interfaces.I
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) Put(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Put(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Put -", tsp.Name, "- Test callback")
 	tsp.PutNumber++
 	var err error
@@ -49,7 +49,7 @@ func (tsp *TestServicePointHandler) Put(pb proto.Message, resourcs interfaces.IR
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) Patch(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Patch(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Patch -", tsp.Name, "- Test callback")
 	tsp.PatchNumber++
 	var err error
@@ -58,7 +58,7 @@ func (tsp *TestServicePointHandler) Patch(pb proto.Message, resourcs interfaces.
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) Delete(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Delete(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Delete -", tsp.Name, "- Test callback")
 	tsp.DeleteNumber++
 	var err error
@@ -67,7 +67,7 @@ func (tsp *TestServicePointHandler) Delete(pb proto.Message, resourcs interfaces
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) GetCopy(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) GetCopy(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	var err error
@@ -76,7 +76,7 @@ func (tsp *TestServicePointHandler) GetCopy(pb proto.Message, resourcs interface
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) Get(pb proto.Message, resourcs interfaces.IResources) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Get(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Get -", tsp.Name, "- Test callback")
 	tsp.GetNumber++
 	var err error
@@ -85,7 +85,7 @@ func (tsp *TestServicePointHandler) Get(pb proto.Message, resourcs interfaces.IR
 	}
 	return pb, err
 }
-func (tsp *TestServicePointHandler) Failed(pb proto.Message, resourcs interfaces.IResources, info *types.Message) (proto.Message, error) {
+func (tsp *TestServicePointHandler) Failed(pb proto.Message, resourcs common.IResources, info *types.Message) (proto.Message, error) {
 	dest := "n/a"
 	msg := "n/a"
 	if info != nil {

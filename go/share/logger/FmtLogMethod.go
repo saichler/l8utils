@@ -2,12 +2,12 @@ package logger
 
 import (
 	"fmt"
-	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/types/go/common"
 )
 
 type FmtLogMethod struct {
 }
 
-func (fmtLogMethod *FmtLogMethod) Log(level interfaces.LogLevel, msg string) {
+func (fmtLogMethod *FmtLogMethod) Log(level common.LogLevel, msg string) {
 	fmt.Println(msg)
 }

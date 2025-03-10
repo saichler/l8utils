@@ -1,16 +1,16 @@
 package infra
 
-import "github.com/saichler/shared/go/share/interfaces"
+import "github.com/saichler/types/go/common"
 
 type TestSerializer struct {
 }
 
-func (ts *TestSerializer) Mode() interfaces.SerializerMode {
-	return interfaces.BINARY
+func (ts *TestSerializer) Mode() common.SerializerMode {
+	return common.BINARY
 }
-func (ts *TestSerializer) Marshal(interface{}, interfaces.IRegistry) ([]byte, error) {
+func (ts *TestSerializer) Marshal(interface{}, common.IRegistry) ([]byte, error) {
 	return nil, nil
 }
-func (ts *TestSerializer) Unmarshal([]byte, string, interfaces.IRegistry) (interface{}, error) {
+func (ts *TestSerializer) Unmarshal([]byte, string, common.IRegistry) (interface{}, error) {
 	return nil, nil
 }

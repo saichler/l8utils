@@ -2,14 +2,14 @@ package logger
 
 import (
 	"errors"
-	"github.com/saichler/shared/go/share/interfaces"
+	"github.com/saichler/types/go/common"
 	"testing"
 	"time"
 )
 
 type LoggerDirectImpl struct {
 	logMethods []ILogMethod
-	logLevel   interfaces.LogLevel
+	logLevel   common.LogLevel
 }
 
 func NewLoggerDirectImpl(logMethods ...ILogMethod) *LoggerDirectImpl {
@@ -37,37 +37,37 @@ func (loggerImpl *LoggerDirectImpl) Empty() bool {
 }
 
 func (loggerImpl *LoggerDirectImpl) Trace(anys ...interface{}) {
-	if loggerImpl.logLevel > interfaces.Trace_Level {
+	if loggerImpl.logLevel > common.Trace_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(interfaces.Trace_Level, anys...))
+	loggerImpl.processEntry(newEntry(common.Trace_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Debug(anys ...interface{}) {
-	if loggerImpl.logLevel > interfaces.Debug_Level {
+	if loggerImpl.logLevel > common.Debug_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(interfaces.Debug_Level, anys...))
+	loggerImpl.processEntry(newEntry(common.Debug_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Info(anys ...interface{}) {
-	if loggerImpl.logLevel > interfaces.Info_Level {
+	if loggerImpl.logLevel > common.Info_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(interfaces.Info_Level, anys...))
+	loggerImpl.processEntry(newEntry(common.Info_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Warning(anys ...interface{}) {
-	if loggerImpl.logLevel > interfaces.Warning_Level {
+	if loggerImpl.logLevel > common.Warning_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(interfaces.Warning_Level, anys...))
+	loggerImpl.processEntry(newEntry(common.Warning_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Error(anys ...interface{}) error {
 	anys = append(anys, FileAndLine(".go", false))
-	loggerImpl.processEntry(newEntry(interfaces.Error_Level, anys...))
-	err := FormatLog(interfaces.Error_Level, time.Now().Unix(), anys...)
+	loggerImpl.processEntry(newEntry(common.Error_Level, anys...))
+	err := FormatLog(common.Error_Level, time.Now().Unix(), anys...)
 	return errors.New(err)
 }
 
@@ -80,6 +80,6 @@ func (loggerImpl *LoggerDirectImpl) Fail(t interface{}, args ...interface{}) {
 	}
 }
 
-func (loggerImpl *LoggerDirectImpl) SetLogLevel(level interfaces.LogLevel) {
+func (loggerImpl *LoggerDirectImpl) SetLogLevel(level common.LogLevel) {
 	loggerImpl.logLevel = level
 }
