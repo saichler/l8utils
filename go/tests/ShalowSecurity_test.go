@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/types"
 	"strings"
 	"testing"
 )
@@ -23,7 +22,7 @@ func TestShalowSecurity(t *testing.T) {
 	config := globals.Config()
 	config.LocalUuid = "Test Validate Connection"
 
-	err = sp.ValidateConnection(conn, config)
+	err = sp.ValidateConnection(conn)
 	if err != nil {
 		log.Fail(t, err)
 		return
@@ -32,7 +31,4 @@ func TestShalowSecurity(t *testing.T) {
 		log.Fail(t, "This connection is adjucent.")
 		return
 	}
-
-	sp.CanDo(types.Action_GET, "", "")
-	sp.CanView("", "", "")
 }
