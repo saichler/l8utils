@@ -49,3 +49,7 @@ func (this *TestServicePointHandler) GetN() int {
 func (this *TestServicePointHandler) DeleteN() int {
 	return int(this.deleteNumber.Load())
 }
+
+func (this *TestServicePointHandler) FailedN() int {
+	return int(this.failedNumber.Load())
+}
