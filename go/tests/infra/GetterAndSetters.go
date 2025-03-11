@@ -8,6 +8,8 @@ func (this *TestServicePointHandler) Reset() {
 	this.deleteNumber.Add(this.deleteNumber.Load() * -1)
 	this.tr = false
 	this.errorMode = false
+	this.replicationCount = 0
+	this.replicationScore = 0
 }
 
 func (this *TestServicePointHandler) Name() string {
@@ -52,4 +54,12 @@ func (this *TestServicePointHandler) DeleteN() int {
 
 func (this *TestServicePointHandler) FailedN() int {
 	return int(this.failedNumber.Load())
+}
+
+func (this *TestServicePointHandler) SetReplicationCount(i int) {
+	this.replicationCount = i
+}
+
+func (this *TestServicePointHandler) SetReplicationScore(i int) {
+	this.replicationScore = i
 }

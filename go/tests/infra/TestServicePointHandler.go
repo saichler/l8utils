@@ -12,15 +12,17 @@ import (
 var Log = logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
 
 type TestServicePointHandler struct {
-	name         string
-	postNumber   atomic.Int32
-	putNumber    atomic.Int32
-	patchNumber  atomic.Int32
-	deleteNumber atomic.Int32
-	getNumber    atomic.Int32
-	failedNumber atomic.Int32
-	tr           bool
-	errorMode    bool
+	name             string
+	postNumber       atomic.Int32
+	putNumber        atomic.Int32
+	patchNumber      atomic.Int32
+	deleteNumber     atomic.Int32
+	getNumber        atomic.Int32
+	failedNumber     atomic.Int32
+	tr               bool
+	errorMode        bool
+	replicationCount int
+	replicationScore int
 }
 
 const (
@@ -111,4 +113,10 @@ func (this *TestServicePointHandler) Topic() string {
 }
 func (this *TestServicePointHandler) Transactional() bool {
 	return this.tr
+}
+func (this *TestServicePointHandler) ReplicationCount() int {
+	return this.replicationCount
+}
+func (this *TestServicePointHandler) ReplicationScore() int {
+	return this.replicationScore
 }
