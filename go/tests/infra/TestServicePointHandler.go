@@ -2,16 +2,18 @@ package infra
 
 import (
 	"errors"
+	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/types/go/common"
 	"github.com/saichler/types/go/types"
 	"google.golang.org/protobuf/proto"
+	"sync/atomic"
 )
 
-var Log common.ILogger
+var Log = logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
 
 type TestServicePointHandler struct {
 	Name         string
-	PostNumber   int
+	PostNumber   atomic.Int32
 	PutNumber    int
 	PatchNumber  int
 	DeleteNumber int
@@ -33,7 +35,7 @@ func NewTestServicePointHandler(name string) *TestServicePointHandler {
 
 func (tsp *TestServicePointHandler) Post(pb proto.Message, resourcs common.IResources) (proto.Message, error) {
 	Log.Debug("Post -", tsp.Name, "- Test callback")
-	tsp.PostNumber++
+	tsp.PostNumber.Add(1)
 	var err error
 	if tsp.ErrorMode {
 		err = errors.New("Post - TestServicePointHandler Error")
