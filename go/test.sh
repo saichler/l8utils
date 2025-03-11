@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
-go mod vendor
+
 # Fail on errors and don't open cover file
 set -e
+
+rm -rf go.mod
+rm -rf go.sum
+rm -rf vendor
+
+go mod init
+GOPROXY=direct GOPRIVATE=github.com go mod tidy
+go mod vendor
 
 cd ./share/shallow_security
 go build -buildmode=plugin -o security.so plugin.go ShallowSecurityProvider.go
