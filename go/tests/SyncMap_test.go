@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/saichler/shared/go/share/maps"
+	. "github.com/saichler/shared/go/tests/infra"
 	"reflect"
 
 	"testing"
@@ -14,22 +15,22 @@ func TestSyncMap(t *testing.T) {
 	m.Put(key, val)
 	v, ok := m.Get(key)
 	if !ok {
-		log.Fail(t, "Expected key to exist")
+		Log.Fail(t, "Expected key to exist")
 		return
 	}
 	if v != val {
-		log.Fail(t, "Expected value to be '"+val+"'")
+		Log.Fail(t, "Expected value to be '"+val+"'")
 		return
 	}
 
 	if m.Size() != 1 {
-		log.Fail(t, "Expected size to be 1")
+		Log.Fail(t, "Expected size to be 1")
 		return
 	}
 
 	m.Clean()
 	if m.Size() != 0 {
-		log.Fail(t, "Expected size to be 0")
+		Log.Fail(t, "Expected size to be 0")
 		return
 	}
 
@@ -37,16 +38,16 @@ func TestSyncMap(t *testing.T) {
 
 	v, ok = m.Delete(key)
 	if !ok {
-		log.Fail(t, "Expected key to exist")
+		Log.Fail(t, "Expected key to exist")
 		return
 	}
 	if v != val {
-		log.Fail(t, "Expected value to be '"+val+"'")
+		Log.Fail(t, "Expected value to be '"+val+"'")
 		return
 	}
 
 	if m.Contains(key) {
-		log.Fail(t, "Expected key '"+key+" to NOT exist")
+		Log.Fail(t, "Expected key '"+key+" to NOT exist")
 	}
 
 	m.Put("a", "b")
@@ -65,12 +66,12 @@ func TestSyncMap(t *testing.T) {
 	list := l.([]string)
 
 	if len(list) != 2 {
-		log.Fail(t, "Expected length of list to be 2, but it is:", len(list))
+		Log.Fail(t, "Expected length of list to be 2, but it is:", len(list))
 		return
 	}
 
 	if !m.Contains("a") || !m.Contains("e") {
-		log.Fail(t, "Expected 'a' & 'e' keys to exist")
+		Log.Fail(t, "Expected 'a' & 'e' keys to exist")
 		return
 	}
 
@@ -78,19 +79,19 @@ func TestSyncMap(t *testing.T) {
 	list = l.([]string)
 
 	if len(list) != 3 {
-		log.Fail(t, "Expected length of list to be 3, but it is:", len(list))
+		Log.Fail(t, "Expected length of list to be 3, but it is:", len(list))
 		return
 	}
 
 	if !m.Contains("a") || !m.Contains("e") || !m.Contains("c") {
-		log.Fail(t, "Expected 'a', 'c' & 'e' keys to exist")
+		Log.Fail(t, "Expected 'a', 'c' & 'e' keys to exist")
 		return
 	}
 
 	l = m.KeysAsList(reflect.ValueOf(val).Type(), nil)
 	list = l.([]string)
 	if len(list) != 3 {
-		log.Fail(t, "Expected length of list to be 3, but it is:", len(list))
+		Log.Fail(t, "Expected length of list to be 3, but it is:", len(list))
 		return
 	}
 
@@ -105,12 +106,12 @@ func TestSyncMap(t *testing.T) {
 	l = m.KeysAsList(reflect.ValueOf(val).Type(), kFilter)
 	list = l.([]string)
 	if len(list) != 2 {
-		log.Fail(t, "Expected length of list to be 2, but it is:", len(list))
+		Log.Fail(t, "Expected length of list to be 2, but it is:", len(list))
 		return
 	}
 
 	itf := func(key interface{}, val interface{}) {
-		log.Debug("key:", key, " val:", val)
+		Log.Debug("key:", key, " val:", val)
 	}
 
 	m.Iterate(itf)

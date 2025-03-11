@@ -2,6 +2,7 @@ package tests
 
 import (
 	"bytes"
+	. "github.com/saichler/shared/go/tests/infra"
 	"github.com/saichler/types/go/nets"
 	"net"
 	"sync"
@@ -23,25 +24,25 @@ func TestNets(t *testing.T) {
 
 	err := nets.Write(nil, nil, nil)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(nil, conn, nil)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(nil, conn, config)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
 	err = nets.Write(make([]byte, config.MaxDataSize+1), conn, config)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
@@ -49,45 +50,45 @@ func TestNets(t *testing.T) {
 		time.Sleep(time.Millisecond * 500)
 		err = nets.Write(writeData, conn, config)
 		if err != nil {
-			log.Fail(t, err)
+			Log.Fail(t, err)
 			return
 		}
 	}()
 
 	_, err = nets.Read(nil, nil)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
 	_, err = nets.Read(conn, nil)
 	if err == nil {
-		log.Fail(t, "Error is nil")
+		Log.Fail(t, "Error is nil")
 		return
 	}
 
 	readData, err := nets.Read(conn, config)
 	if err != nil {
-		log.Fail(t, err)
+		Log.Fail(t, err)
 		return
 	}
 	if bytes.Compare(writeData, readData) != 0 {
-		log.Fail(t, "Write Data & Read Date do not match")
+		Log.Fail(t, "Write Data & Read Date do not match")
 		return
 	}
 
 	err = nets.WriteEncrypted(conn, writeData, config, globals.Security())
 	if err != nil {
-		log.Fail(t, err)
+		Log.Fail(t, err)
 		return
 	}
 	readStr, err := nets.ReadEncrypted(conn, config, globals.Security())
 	if err != nil {
-		log.Fail(t, err)
+		Log.Fail(t, err)
 		return
 	}
 	if readStr != string(writeData) {
-		log.Fail(t, "Write Data do not match read data")
+		Log.Fail(t, "Write Data do not match read data")
 		return
 	}
 }

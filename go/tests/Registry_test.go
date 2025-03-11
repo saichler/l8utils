@@ -3,6 +3,7 @@ package tests
 import (
 	"github.com/saichler/shared/go/share/registry"
 	"github.com/saichler/shared/go/tests/infra"
+	. "github.com/saichler/shared/go/tests/infra"
 	"github.com/saichler/types/go/common"
 	"reflect"
 	"testing"
@@ -15,62 +16,62 @@ func TestRegistry(t *testing.T) {
 
 	ok, err := globals.Registry().Register(nil)
 	if err == nil {
-		log.Fail("Expected an error for nil type")
+		Log.Fail("Expected an error for nil type")
 	}
 
 	ok, err = globals.Registry().Register(&TestProto{})
 	if !ok || err != nil {
-		log.Fail("Expected to register a proto successfully")
+		Log.Fail("Expected to register a proto successfully")
 	}
 
 	ok, err = globals.Registry().Register(TestProto{})
 	if ok {
-		log.Fail(t, "Type should have already been registered")
+		Log.Fail(t, "Type should have already been registered")
 		return
 	}
 	typ, err := globals.Registry().Info(protoName)
 	if err != nil {
-		log.Fail(t, "Failed to get type by name", err.Error())
+		Log.Fail(t, "Failed to get type by name", err.Error())
 		return
 	}
 	if typ.Name() != protoName {
-		log.Fail(t, "Wrong type by name")
+		Log.Fail(t, "Wrong type by name")
 		return
 	}
 	_, err = globals.Registry().Info(unknowProtoName)
 	if err == nil {
-		log.Fail(t, "Expected an error")
+		Log.Fail(t, "Expected an error")
 		return
 	}
 	info, err := globals.Registry().Info(protoName)
 	if err != nil {
-		log.Fail(t, "Failed to get type by name", err.Error())
+		Log.Fail(t, "Failed to get type by name", err.Error())
 		return
 	}
 	ins, err := info.NewInstance()
 	if err != nil {
-		log.Fail(t, "Failed to create instance", err.Error())
+		Log.Fail(t, "Failed to create instance", err.Error())
 		return
 	}
 	_, ok = ins.(*TestProto)
 	if !ok {
-		log.Fail(t, "Failed to cast instance")
+		Log.Fail(t, "Failed to cast instance")
 		return
 	}
 	_, err = globals.Registry().Info(unknowProtoName)
 	if err == nil {
-		log.Fail(t, "Expected an error")
+		Log.Fail(t, "Expected an error")
 		return
 	}
 
 	info, err = globals.Registry().Info(protoName)
 	if err != nil {
-		log.Fail(t, "Failed to get type by name", err.Error())
+		Log.Fail(t, "Failed to get type by name", err.Error())
 		return
 	}
 
 	if info.Type() == nil || info.Type().Name() != protoName {
-		log.Fail(t, "Wrong type by name")
+		Log.Fail(t, "Wrong type by name")
 		return
 	}
 
@@ -78,23 +79,23 @@ func TestRegistry(t *testing.T) {
 	ser := info.Serializer(common.BINARY)
 
 	if ser == nil {
-		log.Fail(t, "Failed to create serializer")
+		Log.Fail(t, "Failed to create serializer")
 		return
 	}
 
 	if reflect.ValueOf(ser).Elem().Type().Name() != "TestSerializer" {
-		log.Fail(t, "Wrong type by name")
+		Log.Fail(t, "Wrong type by name")
 		return
 	}
 
 	pb, err := info.NewInstance()
 	if err != nil {
-		log.Fail(t, "Failed to create protobuf instance", err.Error())
+		Log.Fail(t, "Failed to create protobuf instance", err.Error())
 		return
 	}
 	_, ok = pb.(*TestProto)
 	if !ok {
-		log.Fail(t, "Failed to cast protobuf instance")
+		Log.Fail(t, "Failed to cast protobuf instance")
 		return
 	}
 
@@ -102,32 +103,32 @@ func TestRegistry(t *testing.T) {
 	defer time.Sleep(time.Second)
 
 	if e == nil {
-		log.Fail(t, "Expected an error")
+		Log.Fail(t, "Expected an error")
 		return
 	}
 
 	if i != nil {
-		log.Fail(t, "Expected nil instance")
+		Log.Fail(t, "Expected nil instance")
 		return
 	}
 
 	b, e := globals.Registry().RegisterType(nil)
 	if e == nil {
-		log.Fail(t, "Expected an error")
+		Log.Fail(t, "Expected an error")
 		return
 	}
 	if b {
-		log.Fail(t, "Expected a false")
+		Log.Fail(t, "Expected a false")
 		return
 	}
 
 	b, e = globals.Registry().RegisterType(reflect.ValueOf(reflect.TypeOf(5)).Type().Elem())
 	if e != nil {
-		log.Fail(t, "Did not expect an error")
+		Log.Fail(t, "Did not expect an error")
 		return
 	}
 	if b {
-		log.Fail(t, "Expected a false")
+		Log.Fail(t, "Expected a false")
 		return
 	}
 }

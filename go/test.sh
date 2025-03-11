@@ -7,12 +7,12 @@ rm -rf go.mod
 rm -rf go.sum
 rm -rf vendor
 
-go mod init
+cp go.mod.main go.mod
 GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod vendor
 
 cd ./share/shallow_security
-go build -buildmode=plugin -o security.so plugin.go ShallowSecurityProvider.go
+./build.sh
 mv security.so ../../.
 cd ../../
 
