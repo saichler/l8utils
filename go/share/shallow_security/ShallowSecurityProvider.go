@@ -15,10 +15,9 @@ import (
 )
 
 type ShallowSecurityProvider struct {
-	secret    string
-	key       string
-	salts     []string
-	resources common.IResources
+	secret string
+	key    string
+	salts  []string
 }
 
 func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSecurityProvider {
@@ -27,12 +26,6 @@ func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSec
 	sp.secret = secret
 	sp.salts = salts
 	return sp
-}
-
-func (this *ShallowSecurityProvider) Init(resources common.IResources) {
-	if this.resources == nil {
-		this.resources = resources
-	}
 }
 
 func (this *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
@@ -46,14 +39,14 @@ func (this *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn) error {
-	err := nets.WriteEncrypted(conn, []byte(this.secret), this.resources.Config(), this)
+func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.VNicConfig) error {
+	err := nets.WriteEncrypted(conn, []byte(this.secret), config, this)
 	if err != nil {
 		conn.Close()
 		return err
 	}
 
-	secret, err := nets.ReadEncrypted(conn, this.resources.Config(), this)
+	secret, err := nets.ReadEncrypted(conn, config, this)
 	if err != nil {
 		conn.Close()
 		return err
@@ -64,7 +57,7 @@ func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn) error {
 		return errors.New("incorrect Secret/Key, aborting connection")
 	}
 
-	return nets.ExecuteProtocol(conn, this.resources.Config(), this)
+	return nets.ExecuteProtocol(conn, config, this)
 }
 
 func (this *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {

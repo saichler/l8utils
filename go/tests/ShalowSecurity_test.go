@@ -22,7 +22,7 @@ func TestShalowSecurity(t *testing.T) {
 	config := globals.Config()
 	config.LocalUuid = "Test Validate Connection"
 
-	err = sp.ValidateConnection(conn)
+	err = sp.ValidateConnection(conn, config)
 	if err != nil {
 		log.Fail(t, err)
 		return

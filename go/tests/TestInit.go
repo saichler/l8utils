@@ -25,5 +25,4 @@ func init() {
 	}
 	globals = resources.NewResources(registry.NewRegistry(),
 		secure, nil, log, nil, nil, config, nil)
-	globals.Security().Init(globals)
 }
