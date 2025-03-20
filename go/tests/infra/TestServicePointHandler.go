@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/types/go/common"
+	"github.com/saichler/types/go/testtypes"
 	"github.com/saichler/types/go/types"
 	"google.golang.org/protobuf/proto"
 	"sync/atomic"
@@ -26,7 +27,7 @@ type TestServicePointHandler struct {
 }
 
 const (
-	TEST_TOPIC = "TestProto"
+	TEST_Multicast = "TestProto"
 )
 
 func NewTestServicePointHandler(name string) *TestServicePointHandler {
@@ -108,9 +109,10 @@ func (this *TestServicePointHandler) Failed(pb proto.Message, resourcs common.IR
 func (this *TestServicePointHandler) EndPoint() string {
 	return "/Tests"
 }
-func (this *TestServicePointHandler) Topic() string {
-	return TEST_TOPIC
+func (this *TestServicePointHandler) Multicast() string {
+	return TEST_Multicast
 }
+func (this *TestServicePointHandler) SupportedProto() proto.Message { return &testtypes.TestProto{} }
 func (this *TestServicePointHandler) Transactional() bool {
 	return this.tr
 }

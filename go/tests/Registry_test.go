@@ -5,6 +5,7 @@ import (
 	"github.com/saichler/shared/go/tests/infra"
 	. "github.com/saichler/shared/go/tests/infra"
 	"github.com/saichler/types/go/common"
+	. "github.com/saichler/types/go/testtypes"
 	"reflect"
 	"testing"
 	"time"
