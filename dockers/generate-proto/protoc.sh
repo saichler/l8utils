@@ -5,4 +5,5 @@ cd proto
 source /root/.cargo/env
 protoc --go_out=. $PROTO
 protoc --rs_out=. $PROTO
+chmod -R 777 .
 echo "Done!"
