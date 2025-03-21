@@ -94,7 +94,7 @@ func (this *TestServicePointHandler) Failed(pb proto.Message, resourcs common.IR
 	dest := "n/a"
 	msg := "n/a"
 	if info != nil {
-		dest = info.SourceUuid
+		dest = info.Source
 		msg = info.FailMsg
 	}
 	Log.Debug("Failed -", this.name, " to ", dest, "- Test callback")
@@ -112,7 +112,7 @@ func (this *TestServicePointHandler) EndPoint() string {
 func (this *TestServicePointHandler) Multicast() string {
 	return TEST_Multicast
 }
-func (this *TestServicePointHandler) SupportedProto() proto.Message { return &testtypes.TestProto{} }
+func (this *TestServicePointHandler) ServiceModel() proto.Message { return &testtypes.TestProto{} }
 func (this *TestServicePointHandler) Transactional() bool {
 	return this.tr
 }

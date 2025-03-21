@@ -44,8 +44,8 @@ func NewResources(registry common.IRegistry,
 	return r
 }
 
-func (this *Resources) AddTopic(vlan int32, topic string) {
-	common.AddTopic(this.config, vlan, topic)
+func (this *Resources) AddService(serviceName string, serviceArea int32) {
+	common.AddService(this.config, serviceName, serviceArea)
 }
 
 func (this *Resources) Registry() common.IRegistry {

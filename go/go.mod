@@ -3,7 +3,7 @@ module github.com/saichler/shared/go
 go 1.23.2
 
 require (
-	github.com/saichler/types/go v0.0.0-20250320164653-f23d0f144748
+	github.com/saichler/types/go v0.0.0-20250321144100-1fbb9a64439f
 	google.golang.org/protobuf v1.36.5
 )
 
