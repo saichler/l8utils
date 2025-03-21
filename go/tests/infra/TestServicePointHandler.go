@@ -27,7 +27,7 @@ type TestServicePointHandler struct {
 }
 
 const (
-	TEST_Multicast = "TestProto"
+	ServiceName = "Tests"
 )
 
 func NewTestServicePointHandler(name string) *TestServicePointHandler {
@@ -109,8 +109,8 @@ func (this *TestServicePointHandler) Failed(pb proto.Message, resourcs common.IR
 func (this *TestServicePointHandler) EndPoint() string {
 	return "/Tests"
 }
-func (this *TestServicePointHandler) Multicast() string {
-	return TEST_Multicast
+func (this *TestServicePointHandler) ServiceName() string {
+	return ServiceName
 }
 func (this *TestServicePointHandler) ServiceModel() proto.Message { return &testtypes.TestProto{} }
 func (this *TestServicePointHandler) Transactional() bool {
