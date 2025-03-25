@@ -2,7 +2,6 @@ package tests
 
 import (
 	"errors"
-	. "github.com/saichler/shared/go/tests/infra"
 	"strings"
 	"testing"
 )

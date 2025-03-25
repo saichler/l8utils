@@ -2,7 +2,6 @@ package tests
 
 import (
 	. "github.com/saichler/shared/go/share/strings"
-	. "github.com/saichler/shared/go/tests/infra"
 	"reflect"
 	"strings"
 	"testing"

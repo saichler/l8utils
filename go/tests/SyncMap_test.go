@@ -2,7 +2,6 @@ package tests
 
 import (
 	"github.com/saichler/shared/go/share/maps"
-	. "github.com/saichler/shared/go/tests/infra"
 	"reflect"
 
 	"testing"

@@ -1,4 +1,4 @@
-package infra
+package tests
 
 import "github.com/saichler/types/go/common"
 

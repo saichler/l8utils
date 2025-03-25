@@ -2,8 +2,6 @@ package tests
 
 import (
 	"github.com/saichler/shared/go/share/registry"
-	"github.com/saichler/shared/go/tests/infra"
-	. "github.com/saichler/shared/go/tests/infra"
 	"github.com/saichler/types/go/common"
 	. "github.com/saichler/types/go/testtypes"
 	"reflect"
@@ -76,7 +74,7 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 
-	info.AddSerializer(&infra.TestSerializer{})
+	info.AddSerializer(&TestSerializer{})
 	ser := info.Serializer(common.BINARY)
 
 	if ser == nil {

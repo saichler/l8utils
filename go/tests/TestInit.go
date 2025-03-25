@@ -1,14 +1,15 @@
 package tests
 
 import (
+	"github.com/saichler/shared/go/share/logger"
 	"github.com/saichler/shared/go/share/registry"
 	"github.com/saichler/shared/go/share/resources"
-	. "github.com/saichler/shared/go/tests/infra"
 	"github.com/saichler/types/go/common"
 	"github.com/saichler/types/go/types"
 )
 
 var globals common.IResources
+var Log = logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
 
 func init() {
 	config := &types.VNicConfig{MaxDataSize: resources.DEFAULT_MAX_DATA_SIZE,
