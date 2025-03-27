@@ -11,6 +11,6 @@ func (ts *TestSerializer) Mode() common.SerializerMode {
 func (ts *TestSerializer) Marshal(interface{}, common.IRegistry) ([]byte, error) {
 	return nil, nil
 }
-func (ts *TestSerializer) Unmarshal([]byte, string, common.IRegistry) (interface{}, error) {
+func (ts *TestSerializer) Unmarshal([]byte, common.IRegistry) (interface{}, error) {
 	return nil, nil
 }

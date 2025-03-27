@@ -8,7 +8,6 @@ import (
 	"github.com/saichler/types/go/common"
 	"github.com/saichler/types/go/nets"
 	"github.com/saichler/types/go/types"
-	"google.golang.org/protobuf/proto"
 	"net"
 	"strconv"
 	"strings"
@@ -68,11 +67,11 @@ func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, this.key)
 }
 
-func (this *ShallowSecurityProvider) CanDoAction(action types.Action, pb proto.Message, uuid string, token string, salts ...string) error {
+func (this *ShallowSecurityProvider) CanDoAction(action types.Action, o common.IMObjects, uuid string, token string, salts ...string) error {
 	return nil
 }
-func (this *ShallowSecurityProvider) ScopeView(pb proto.Message, uuid string, token string, salts ...string) (proto.Message, error) {
-	return pb, nil
+func (this *ShallowSecurityProvider) ScopeView(o common.IMObjects, uuid string, token string, salts ...string) common.IMObjects {
+	return o
 }
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salts ...string) string {
 	return "token"
