@@ -3,11 +3,10 @@
 # Fail on errors and don't open cover file
 set -e
 
-rm -rf go.mod
+git checkout go.mod
 rm -rf go.sum
 rm -rf vendor
 
-cp go.mod.main go.mod
 GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod vendor
 
