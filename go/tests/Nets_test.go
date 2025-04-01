@@ -18,7 +18,7 @@ type MockAddr struct{}
 func TestNets(t *testing.T) {
 	conn := &MockConn{}
 	writeData := []byte("Testing Read/Write data to socket")
-	config := globals.Config()
+	config := globals.SysConfig()
 	config.LocalUuid = "abcde"
 
 	err := nets.Write(nil, nil, nil)

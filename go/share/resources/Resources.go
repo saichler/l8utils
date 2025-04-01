@@ -17,7 +17,7 @@ type Resources struct {
 	logger        common.ILogger
 	dataListener  common.IDatatListener
 	serializers   map[common.SerializerMode]common.ISerializer
-	config        *types.VNicConfig
+	config        *types.SysConfig
 	introspector  common.IIntrospector
 }
 
@@ -27,7 +27,7 @@ func NewResources(registry common.IRegistry,
 	logger common.ILogger,
 	dataListener common.IDatatListener,
 	serializer common.ISerializer,
-	config *types.VNicConfig,
+	config *types.SysConfig,
 	introspector common.IIntrospector) common.IResources {
 	r := &Resources{}
 	r.registry = registry
@@ -66,7 +66,7 @@ func (this *Resources) Serializer(mode common.SerializerMode) common.ISerializer
 func (this *Resources) Logger() common.ILogger {
 	return this.logger
 }
-func (this *Resources) Config() *types.VNicConfig {
+func (this *Resources) SysConfig() *types.SysConfig {
 	return this.config
 }
 func (this *Resources) Introspector() common.IIntrospector {

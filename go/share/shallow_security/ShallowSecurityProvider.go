@@ -38,7 +38,7 @@ func (this *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.VNicConfig) error {
+func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.SysConfig) error {
 	err := nets.WriteEncrypted(conn, []byte(this.secret), config, this)
 	if err != nil {
 		conn.Close()
@@ -67,10 +67,10 @@ func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, this.key)
 }
 
-func (this *ShallowSecurityProvider) CanDoAction(action types.Action, o common.IMObjects, uuid string, token string, salts ...string) error {
+func (this *ShallowSecurityProvider) CanDoAction(action types.Action, o common.IElements, uuid string, token string, salts ...string) error {
 	return nil
 }
-func (this *ShallowSecurityProvider) ScopeView(o common.IMObjects, uuid string, token string, salts ...string) common.IMObjects {
+func (this *ShallowSecurityProvider) ScopeView(o common.IElements, uuid string, token string, salts ...string) common.IElements {
 	return o
 }
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salts ...string) string {
