@@ -3,10 +3,12 @@
 # Fail on errors and don't open cover file
 set -e
 
+rm -rf go.mod
 rm -rf go.sum
 rm -rf vendor
 
 GOPROXY=direct GOPRIVATE=github.com go mod tidy
+go mod init
 go mod vendor
 
 cd ./share/shallow_security
