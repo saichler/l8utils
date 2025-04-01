@@ -3,7 +3,6 @@
 # Fail on errors and don't open cover file
 set -e
 
-git checkout go.mod
 rm -rf go.sum
 rm -rf vendor
 
