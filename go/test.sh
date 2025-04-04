@@ -7,8 +7,8 @@ rm -rf go.mod
 rm -rf go.sum
 rm -rf vendor
 
-GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod init
+GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod vendor
 
 cd ./share/shallow_security

@@ -67,7 +67,7 @@ func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, this.key)
 }
 
-func (this *ShallowSecurityProvider) CanDoAction(action types.Action, o common.IElements, uuid string, token string, salts ...string) error {
+func (this *ShallowSecurityProvider) CanDoAction(action common.Action, o common.IElements, uuid string, token string, salts ...string) error {
 	return nil
 }
 func (this *ShallowSecurityProvider) ScopeView(o common.IElements, uuid string, token string, salts ...string) common.IElements {
