@@ -7,7 +7,7 @@ import (
 
 const (
 	DEFAULT_MAX_DATA_SIZE = 1024 * 1024
-	DEFAULT_QUEUE_SIZE    = 10000
+	DEFAULT_QUEUE_SIZE    = 50000
 )
 
 type Resources struct {
