@@ -16,7 +16,7 @@ func init() {
 		RxQueueSize: resources.DEFAULT_QUEUE_SIZE,
 		TxQueueSize: resources.DEFAULT_QUEUE_SIZE,
 		LocalAlias:  "tests"}
-	secure, err := common.LoadSecurityProvider("security.so")
+	secure, err := common.LoadSecurityProvider("security.so", "../../../")
 	if err != nil {
 		panic(err)
 	}
