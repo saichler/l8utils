@@ -129,3 +129,17 @@ func CreateCrt(filenamePrefix, org, country, county, city, street, zipcode, emai
 		return errors.New("Certificate " + filenamePrefix + " already exists!")
 	}
 }
+
+func CreateLayer8CA(certName string) (*x509.Certificate, *rsa.PrivateKey, error) {
+	return CreateCA(certName, "Layer8", "USA", "Santa Clara",
+		"San Jose", "1993 Curtner Ave", "95124", "saichler@gmail.com", 10)
+}
+
+func CreateLayer8Crt(certName, host string, port int64) error {
+	ca, caKey, err := CreateLayer8CA(certName)
+	if err != nil {
+		return err
+	}
+	return CreateCrt(certName, "Layer8", "USA", "Santa Clara",
+		"San Jose", "1993 Curtner Ave", "95124", "saichler@gmail.com", host, "Layer8Secret", port, 10, ca, caKey)
+}
