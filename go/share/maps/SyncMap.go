@@ -17,56 +17,77 @@ func NewSyncMap() *SyncMap {
 	return mm
 }
 
-func (syncMap *SyncMap) Put(key, value interface{}) bool {
-	syncMap.s.Lock()
-	defer syncMap.s.Unlock()
-	_, ok := syncMap.m[key]
-	syncMap.m[key] = value
+func (this *SyncMap) Put(key, value interface{}) bool {
+	if this == nil {
+		return false
+	}
+	this.s.Lock()
+	defer this.s.Unlock()
+	_, ok := this.m[key]
+	this.m[key] = value
 	return !ok
 }
 
-func (syncMap *SyncMap) Get(key interface{}) (interface{}, bool) {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	v, ok := syncMap.m[key]
+func (this *SyncMap) Get(key interface{}) (interface{}, bool) {
+	if this == nil {
+		return nil, false
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	v, ok := this.m[key]
 	return v, ok
 }
 
-func (syncMap *SyncMap) Contains(key interface{}) bool {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	_, ok := syncMap.m[key]
+func (this *SyncMap) Contains(key interface{}) bool {
+	if this == nil {
+		return false
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	_, ok := this.m[key]
 	return ok
 }
 
-func (syncMap *SyncMap) Delete(key interface{}) (interface{}, bool) {
-	syncMap.s.Lock()
-	defer syncMap.s.Unlock()
-	v, ok := syncMap.m[key]
-	delete(syncMap.m, key)
+func (this *SyncMap) Delete(key interface{}) (interface{}, bool) {
+	if this == nil {
+		return nil, false
+	}
+	this.s.Lock()
+	defer this.s.Unlock()
+	v, ok := this.m[key]
+	delete(this.m, key)
 	return v, ok
 }
 
-func (syncMap *SyncMap) Size() int {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	return len(syncMap.m)
+func (this *SyncMap) Size() int {
+	if this == nil {
+		return 0
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	return len(this.m)
 }
 
-func (syncMap *SyncMap) Clean() map[interface{}]interface{} {
-	syncMap.s.Lock()
-	defer syncMap.s.Unlock()
-	result := syncMap.m
-	syncMap.m = make(map[interface{}]interface{})
+func (this *SyncMap) Clean() map[interface{}]interface{} {
+	if this == nil {
+		return nil
+	}
+	this.s.Lock()
+	defer this.s.Unlock()
+	result := this.m
+	this.m = make(map[interface{}]interface{})
 	return result
 }
 
-func (syncMap *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	newSlice := reflect.MakeSlice(reflect.SliceOf(typ), len(syncMap.m), len(syncMap.m))
+func (this *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
+	if this == nil {
+		return false
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	newSlice := reflect.MakeSlice(reflect.SliceOf(typ), len(this.m), len(this.m))
 	index := 0
-	for _, v := range syncMap.m {
+	for _, v := range this.m {
 		if filter != nil && !filter(v) {
 			continue
 		}
@@ -74,7 +95,7 @@ func (syncMap *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) 
 		index++
 	}
 
-	if index < len(syncMap.m) {
+	if index < len(this.m) {
 		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index, index)
 		for i := 0; i < index; i++ {
 			filterSlice.Index(i).Set(newSlice.Index(i))
@@ -85,12 +106,15 @@ func (syncMap *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) 
 	return newSlice.Interface()
 }
 
-func (syncMap *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	newSlice := reflect.MakeSlice(reflect.SliceOf(typ), len(syncMap.m), len(syncMap.m))
+func (this *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
+	if this == nil {
+		return false
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	newSlice := reflect.MakeSlice(reflect.SliceOf(typ), len(this.m), len(this.m))
 	index := 0
-	for v, _ := range syncMap.m {
+	for v, _ := range this.m {
 		if filter != nil && !filter(v) {
 			continue
 		}
@@ -98,7 +122,7 @@ func (syncMap *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bo
 		index++
 	}
 
-	if index < len(syncMap.m) {
+	if index < len(this.m) {
 		filterSlice := reflect.MakeSlice(reflect.SliceOf(typ), index, index)
 		for i := 0; i < index; i++ {
 			filterSlice.Index(i).Set(newSlice.Index(i))
@@ -109,10 +133,13 @@ func (syncMap *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bo
 	return newSlice.Interface()
 }
 
-func (syncMap *SyncMap) Iterate(do func(k, v interface{})) {
-	syncMap.s.RLock()
-	defer syncMap.s.RUnlock()
-	for k, v := range syncMap.m {
+func (this *SyncMap) Iterate(do func(k, v interface{})) {
+	if this == nil {
+		return
+	}
+	this.s.RLock()
+	defer this.s.RUnlock()
+	for k, v := range this.m {
 		do(k, v)
 	}
 }
