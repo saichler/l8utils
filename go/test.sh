@@ -13,7 +13,7 @@ go mod vendor
 
 cd ./share/shallow_security
 ./build.sh
-mv security.so ../../.
+mv loader.so ../../tests/.
 cd ../../
 
 # Run unit tests with coverage

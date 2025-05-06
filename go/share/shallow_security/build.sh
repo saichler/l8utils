@@ -1,1 +1,1 @@
-go build -buildmode=plugin -o security.so plugin.go ShallowSecurityProvider.go
+go build -buildmode=plugin -o loader.so Loader.go Provider.go

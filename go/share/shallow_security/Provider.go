@@ -16,14 +16,16 @@ import (
 type ShallowSecurityProvider struct {
 	secret string
 	key    string
-	salts  []string
 }
 
-func NewShallowSecurityProvider(key, secret string, salts ...string) *ShallowSecurityProvider {
+func NewShallowSecurityProvider() *ShallowSecurityProvider {
 	sp := &ShallowSecurityProvider{}
-	sp.key = key
+	hash := md5.New()
+	secret := "Shallow Security Provider"
+	hash.Write([]byte(secret))
+	kHash := hash.Sum(nil)
+	sp.key = base64.StdEncoding.EncodeToString(kHash)
 	sp.secret = secret
-	sp.salts = salts
 	return sp
 }
 
@@ -75,13 +77,4 @@ func (this *ShallowSecurityProvider) ScopeView(o common.IElements, uuid string, 
 }
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salts ...string) string {
 	return "token"
-}
-
-func CreateShallowSecurityProvider() common.ISecurityProvider {
-	hash := md5.New()
-	secret := "Shallow Security Provider"
-	hash.Write([]byte(secret))
-	kHash := hash.Sum(nil)
-	k := base64.StdEncoding.EncodeToString(kHash)
-	return NewShallowSecurityProvider(k, secret)
 }
