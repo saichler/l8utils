@@ -3,9 +3,9 @@ package tests
 import (
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
-	"github.com/saichler/shared/go/share/logger"
-	"github.com/saichler/shared/go/share/registry"
-	"github.com/saichler/shared/go/share/resources"
+	"github.com/saichler/l8utils/go/utils/logger"
+	"github.com/saichler/l8utils/go/utils/registry"
+	"github.com/saichler/l8utils/go/utils/resources"
 )
 
 var globals ifs.IResources

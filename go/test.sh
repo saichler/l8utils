@@ -11,13 +11,13 @@ go mod init
 GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod vendor
 
-cd ./share/shallow_security
+cd ./utils/shallow_security
 ./build.sh
 mv loader.so ../../tests/.
 cd ../../
 
 # Run unit tests with coverage
-go test -v -coverpkg=./share/... -coverprofile=cover-report.html ./... --failfast
+go test -v -coverpkg=./utils/... -coverprofile=cover-report.html ./... --failfast
 
 # Open the coverage report in a browser
 go tool cover -html=cover-report.html

@@ -2,8 +2,8 @@ package tests
 
 import (
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/shared/go/share/registry"
 	. "github.com/saichler/l8types/go/testtypes"
+	"github.com/saichler/l8utils/go/utils/registry"
 	"reflect"
 	"testing"
 	"time"

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/saichler/shared/go/share/queues"
+	"github.com/saichler/l8utils/go/utils/queues"
 	"testing"
 )
 

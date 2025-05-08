@@ -1,7 +1,7 @@
 package tests
 
 import (
-	. "github.com/saichler/shared/go/share/strings"
+	. "github.com/saichler/l8utils/go/utils/strings"
 	"reflect"
 	"strings"
 	"testing"

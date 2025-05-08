@@ -3,7 +3,7 @@ package logger
 import (
 	"errors"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/shared/go/share/queues"
+	"github.com/saichler/l8utils/go/utils/queues"
 	"testing"
 	"time"
 )

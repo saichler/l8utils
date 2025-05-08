@@ -1,5 +1,5 @@
-# shared
-Common Shared Utilities and Interfaces
+# l8utils
+Common Shared Utilities for Layer8 projects
 
 ## Overview
 Insights of developing **Micro Services** application have highlighted that there are 
