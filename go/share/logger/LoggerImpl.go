@@ -2,26 +2,26 @@ package logger
 
 import (
 	"errors"
+	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/shared/go/share/queues"
-	"github.com/saichler/types/go/common"
 	"testing"
 	"time"
 )
 
 type ILogMethod interface {
-	Log(level common.LogLevel, msg string)
+	Log(level ifs.LogLevel, msg string)
 }
 
 type LoggerImpl struct {
 	queue      *queues.Queue
 	logMethods []ILogMethod
-	logLevel   common.LogLevel
+	logLevel   ifs.LogLevel
 }
 
 type LoggerEntry struct {
 	anys []interface{}
 	t    int64
-	l    common.LogLevel
+	l    ifs.LogLevel
 }
 
 func NewLoggerImpl(logMethods ...ILogMethod) *LoggerImpl {
@@ -49,7 +49,7 @@ func (loggerImpl *LoggerImpl) processQueue() {
 	}
 }
 
-func newEntry(l common.LogLevel, anys ...interface{}) *LoggerEntry {
+func newEntry(l ifs.LogLevel, anys ...interface{}) *LoggerEntry {
 	return &LoggerEntry{
 		t:    time.Now().Unix(),
 		l:    l,
@@ -62,37 +62,37 @@ func (loggerImpl *LoggerImpl) Empty() bool {
 }
 
 func (loggerImpl *LoggerImpl) Trace(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Trace_Level {
+	if loggerImpl.logLevel > ifs.Trace_Level {
 		return
 	}
-	loggerImpl.queue.Add(newEntry(common.Trace_Level, anys...))
+	loggerImpl.queue.Add(newEntry(ifs.Trace_Level, anys...))
 }
 
 func (loggerImpl *LoggerImpl) Debug(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Debug_Level {
+	if loggerImpl.logLevel > ifs.Debug_Level {
 		return
 	}
-	loggerImpl.queue.Add(newEntry(common.Debug_Level, anys...))
+	loggerImpl.queue.Add(newEntry(ifs.Debug_Level, anys...))
 }
 
 func (loggerImpl *LoggerImpl) Info(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Info_Level {
+	if loggerImpl.logLevel > ifs.Info_Level {
 		return
 	}
-	loggerImpl.queue.Add(newEntry(common.Info_Level, anys...))
+	loggerImpl.queue.Add(newEntry(ifs.Info_Level, anys...))
 }
 
 func (loggerImpl *LoggerImpl) Warning(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Warning_Level {
+	if loggerImpl.logLevel > ifs.Warning_Level {
 		return
 	}
-	loggerImpl.queue.Add(newEntry(common.Warning_Level, anys...))
+	loggerImpl.queue.Add(newEntry(ifs.Warning_Level, anys...))
 }
 
 func (loggerImpl *LoggerImpl) Error(anys ...interface{}) error {
 	anys = append(anys, FileAndLine(".go", false))
-	loggerImpl.queue.Add(newEntry(common.Error_Level, anys...))
-	err := FormatLog(common.Error_Level, time.Now().Unix(), anys...)
+	loggerImpl.queue.Add(newEntry(ifs.Error_Level, anys...))
+	err := FormatLog(ifs.Error_Level, time.Now().Unix(), anys...)
 	return errors.New(err)
 }
 
@@ -105,6 +105,6 @@ func (loggerImpl *LoggerImpl) Fail(t interface{}, args ...interface{}) {
 	}
 }
 
-func (loggerImpl *LoggerImpl) SetLogLevel(level common.LogLevel) {
+func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
 }

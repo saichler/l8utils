@@ -2,14 +2,14 @@ package strings
 
 import (
 	"errors"
-	"github.com/saichler/types/go/common"
+	"github.com/saichler/l8types/go/ifs"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
 // Global map that map a type/kind to a method that converts string to that type
-var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind, common.IRegistry) (reflect.Value, error))
+var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind, ifs.IRegistry) (reflect.Value, error))
 
 const (
 	errorValue = "Failed to convert string to instance:"
@@ -39,12 +39,12 @@ func init() {
 }
 
 // Comvert string to string
-func stringFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func stringFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	return reflect.ValueOf(str), nil
 }
 
 // Convert string to int
-func intFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func intFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(0), nil
 	}
@@ -56,7 +56,7 @@ func intFromString(str string, kinds []reflect.Kind, registry common.IRegistry) 
 }
 
 // Convert string to int8
-func int8FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func int8FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(int8(0)), nil
 	}
@@ -68,7 +68,7 @@ func int8FromString(str string, kinds []reflect.Kind, registry common.IRegistry)
 }
 
 // Convert string to int16
-func int16FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func int16FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(int16(0)), nil
 	}
@@ -80,7 +80,7 @@ func int16FromString(str string, kinds []reflect.Kind, registry common.IRegistry
 }
 
 // Convert string to int32
-func int32FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func int32FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(int32(0)), nil
 	}
@@ -92,7 +92,7 @@ func int32FromString(str string, kinds []reflect.Kind, registry common.IRegistry
 }
 
 // Convert string to int64
-func int64FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func int64FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(int64(0)), nil
 	}
@@ -104,7 +104,7 @@ func int64FromString(str string, kinds []reflect.Kind, registry common.IRegistry
 }
 
 // Convert string to uint
-func uintFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func uintFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(uint(0)), nil
 	}
@@ -116,7 +116,7 @@ func uintFromString(str string, kinds []reflect.Kind, registry common.IRegistry)
 }
 
 // Convert string to uint8
-func uint8FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func uint8FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf([]byte{0}), nil
 	}
@@ -124,7 +124,7 @@ func uint8FromString(str string, kinds []reflect.Kind, registry common.IRegistry
 }
 
 // Convert string to uint16
-func uint16FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func uint16FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(uint16(0)), nil
 	}
@@ -136,7 +136,7 @@ func uint16FromString(str string, kinds []reflect.Kind, registry common.IRegistr
 }
 
 // Convert string to uint32
-func uint32FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func uint32FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(uint32(0)), nil
 	}
@@ -148,7 +148,7 @@ func uint32FromString(str string, kinds []reflect.Kind, registry common.IRegistr
 }
 
 // Convert string to uint64
-func uint64FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func uint64FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(uint64(0)), nil
 	}
@@ -160,7 +160,7 @@ func uint64FromString(str string, kinds []reflect.Kind, registry common.IRegistr
 }
 
 // Convert string to bool
-func boolFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func boolFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(false), nil
 	}
@@ -172,7 +172,7 @@ func boolFromString(str string, kinds []reflect.Kind, registry common.IRegistry)
 }
 
 // Convert string to float32
-func float32FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func float32FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(float32(0)), nil
 	}
@@ -184,7 +184,7 @@ func float32FromString(str string, kinds []reflect.Kind, registry common.IRegist
 }
 
 // Convert string to float64
-func float64FromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func float64FromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" {
 		return reflect.ValueOf(float64(0)), nil
 	}
@@ -196,7 +196,7 @@ func float64FromString(str string, kinds []reflect.Kind, registry common.IRegist
 }
 
 // Convert string to pointer
-func ptrFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func ptrFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	f := fromstrings[kinds[0]]
 	if f != nil {
 		v, err := f(str, kinds[1:], registry)
@@ -214,7 +214,7 @@ func ptrFromString(str string, kinds []reflect.Kind, registry common.IRegistry) 
 }
 
 // Convert string to interface
-func interfaceFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func interfaceFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	f := fromstrings[kinds[0]]
 	if f != nil {
 		v, err := f(str, kinds[1:], registry)
@@ -229,7 +229,7 @@ func interfaceFromString(str string, kinds []reflect.Kind, registry common.IRegi
 }
 
 // Convert string to map
-func mapFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func mapFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	str = strings.TrimSpace(str)
 	str = str[1 : len(str)-1]
 	items := strings.Split(str, ",")
@@ -268,7 +268,7 @@ func mapFromString(str string, kinds []reflect.Kind, registry common.IRegistry) 
 }
 
 // Convert string to slice
-func sliceFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func sliceFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	str = strings.TrimSpace(str)
 	// if it is byte array, it will not have square brackets
 	if len(str) > 1 && str[0] == '[' {
@@ -311,7 +311,7 @@ func sliceFromString(str string, kinds []reflect.Kind, registry common.IRegistry
 	return newSlice, nil
 }
 
-func structFromString(str string, kinds []reflect.Kind, registry common.IRegistry) (reflect.Value, error) {
+func structFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	if registry == nil {
 		return reflect.ValueOf(nil), errors.New("registry cannot be nil")
 	}
@@ -331,7 +331,7 @@ func structFromString(str string, kinds []reflect.Kind, registry common.IRegistr
 }
 
 // Convert string to an instance
-func InstanceOf(str string, registry common.IRegistry) (interface{}, error) {
+func InstanceOf(str string, registry ifs.IRegistry) (interface{}, error) {
 	v, e := FromString(str, registry)
 	if e != nil {
 		return nil, e
@@ -343,7 +343,7 @@ func InstanceOf(str string, registry common.IRegistry) (interface{}, error) {
 }
 
 // Conver string to a reflect.value
-func FromString(str string, registry common.IRegistry) (reflect.Value, error) {
+func FromString(str string, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" || str == "{0}" {
 		return reflect.ValueOf(nil), nil
 	}

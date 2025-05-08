@@ -1,12 +1,12 @@
 package main
 
-import "github.com/saichler/types/go/common"
+import "github.com/saichler/l8types/go/ifs"
 
-var Loader common.ISecurityProviderLoader = &ShallowLoader{}
+var Loader ifs.ISecurityProviderLoader = &ShallowLoader{}
 
 type ShallowLoader struct {
 }
 
-func (this *ShallowLoader) LoadSecurityProvider() (common.ISecurityProvider, error) {
+func (this *ShallowLoader) LoadSecurityProvider() (ifs.ISecurityProvider, error) {
 	return NewShallowSecurityProvider(), nil
 }

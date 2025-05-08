@@ -2,7 +2,7 @@ package registry
 
 import (
 	"errors"
-	"github.com/saichler/types/go/common"
+	"github.com/saichler/l8types/go/ifs"
 	"reflect"
 	"sync"
 )
@@ -54,7 +54,7 @@ func (this *RegistryImpl) RegisterType(t reflect.Type) (bool, error) {
 	return this.types.Put(t.Name(), t)
 }
 
-func (this *RegistryImpl) Info(name string) (common.IInfo, error) {
+func (this *RegistryImpl) Info(name string) (ifs.IInfo, error) {
 	typ, ok := this.types.Get(name)
 	if !ok {
 		return nil, errors.New("Unknown Type: " + name)

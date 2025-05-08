@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 )
 
 const (
@@ -11,31 +11,31 @@ const (
 )
 
 type Resources struct {
-	registry      common.IRegistry
-	servicePoints common.IServicePoints
-	security      common.ISecurityProvider
-	logger        common.ILogger
-	dataListener  common.IDatatListener
-	serializers   map[common.SerializerMode]common.ISerializer
-	config        *types.SysConfig
-	introspector  common.IIntrospector
+	registry     ifs.IRegistry
+	services     ifs.IServices
+	security     ifs.ISecurityProvider
+	logger       ifs.ILogger
+	dataListener ifs.IDatatListener
+	serializers  map[ifs.SerializerMode]ifs.ISerializer
+	config       *types.SysConfig
+	introspector ifs.IIntrospector
 }
 
-func NewResources(registry common.IRegistry,
-	security common.ISecurityProvider,
-	servicePoints common.IServicePoints,
-	logger common.ILogger,
-	dataListener common.IDatatListener,
-	serializer common.ISerializer,
+func NewResources(registry ifs.IRegistry,
+	security ifs.ISecurityProvider,
+	servicePoints ifs.IServices,
+	logger ifs.ILogger,
+	dataListener ifs.IDatatListener,
+	serializer ifs.ISerializer,
 	config *types.SysConfig,
-	introspector common.IIntrospector) common.IResources {
+	introspector ifs.IIntrospector) ifs.IResources {
 	r := &Resources{}
 	r.registry = registry
-	r.servicePoints = servicePoints
+	r.services = servicePoints
 	r.security = security
 	r.logger = logger
 	r.dataListener = dataListener
-	r.serializers = make(map[common.SerializerMode]common.ISerializer)
+	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
 	if serializer != nil {
 		r.serializers[serializer.Mode()] = serializer
 	}
@@ -45,30 +45,30 @@ func NewResources(registry common.IRegistry,
 }
 
 func (this *Resources) AddService(serviceName string, serviceArea int32) {
-	common.AddService(this.config, serviceName, serviceArea)
+	ifs.AddService(this.config, serviceName, serviceArea)
 }
 
-func (this *Resources) Registry() common.IRegistry {
+func (this *Resources) Registry() ifs.IRegistry {
 	return this.registry
 }
-func (this *Resources) ServicePoints() common.IServicePoints {
-	return this.servicePoints
+func (this *Resources) Services() ifs.IServices {
+	return this.services
 }
-func (this *Resources) Security() common.ISecurityProvider {
+func (this *Resources) Security() ifs.ISecurityProvider {
 	return this.security
 }
-func (this *Resources) DataListener() common.IDatatListener {
+func (this *Resources) DataListener() ifs.IDatatListener {
 	return this.dataListener
 }
-func (this *Resources) Serializer(mode common.SerializerMode) common.ISerializer {
+func (this *Resources) Serializer(mode ifs.SerializerMode) ifs.ISerializer {
 	return this.serializers[mode]
 }
-func (this *Resources) Logger() common.ILogger {
+func (this *Resources) Logger() ifs.ILogger {
 	return this.logger
 }
 func (this *Resources) SysConfig() *types.SysConfig {
 	return this.config
 }
-func (this *Resources) Introspector() common.IIntrospector {
+func (this *Resources) Introspector() ifs.IIntrospector {
 	return this.introspector
 }

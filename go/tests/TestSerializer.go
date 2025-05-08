@@ -1,16 +1,16 @@
 package tests
 
-import "github.com/saichler/types/go/common"
+import "github.com/saichler/l8types/go/ifs"
 
 type TestSerializer struct {
 }
 
-func (ts *TestSerializer) Mode() common.SerializerMode {
-	return common.BINARY
+func (ts *TestSerializer) Mode() ifs.SerializerMode {
+	return ifs.BINARY
 }
-func (ts *TestSerializer) Marshal(interface{}, common.IRegistry) ([]byte, error) {
+func (ts *TestSerializer) Marshal(interface{}, ifs.IRegistry) ([]byte, error) {
 	return nil, nil
 }
-func (ts *TestSerializer) Unmarshal([]byte, common.IRegistry) (interface{}, error) {
+func (ts *TestSerializer) Unmarshal([]byte, ifs.IRegistry) (interface{}, error) {
 	return nil, nil
 }

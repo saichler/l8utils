@@ -1,9 +1,9 @@
 package tests
 
 import (
+	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/shared/go/share/registry"
-	"github.com/saichler/types/go/common"
-	. "github.com/saichler/types/go/testtypes"
+	. "github.com/saichler/l8types/go/testtypes"
 	"reflect"
 	"testing"
 	"time"
@@ -75,7 +75,7 @@ func TestRegistry(t *testing.T) {
 	}
 
 	info.AddSerializer(&TestSerializer{})
-	ser := info.Serializer(common.BINARY)
+	ser := info.Serializer(ifs.BINARY)
 
 	if ser == nil {
 		Log.Fail(t, "Failed to create serializer")

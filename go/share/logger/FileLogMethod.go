@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"github.com/saichler/types/go/common"
+	"github.com/saichler/l8types/go/ifs"
 	"os"
 )
 
@@ -14,7 +14,7 @@ func NewFileLogMethod(filename string) *FileLogMethod {
 	return &FileLogMethod{filename: filename}
 }
 
-func (this *FileLogMethod) Log(level common.LogLevel, msg string) {
+func (this *FileLogMethod) Log(level ifs.LogLevel, msg string) {
 	if this.file == nil {
 		_, err := os.Stat(this.filename)
 		if err != nil {

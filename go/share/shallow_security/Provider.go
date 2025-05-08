@@ -4,10 +4,10 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
-	"github.com/saichler/types/go/aes"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/nets"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/aes"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/nets"
+	"github.com/saichler/l8types/go/types"
 	"net"
 	"strconv"
 	"strings"
@@ -69,10 +69,10 @@ func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, this.key)
 }
 
-func (this *ShallowSecurityProvider) CanDoAction(action common.Action, o common.IElements, uuid string, token string, salts ...string) error {
+func (this *ShallowSecurityProvider) CanDoAction(action ifs.Action, o ifs.IElements, uuid string, token string, salts ...string) error {
 	return nil
 }
-func (this *ShallowSecurityProvider) ScopeView(o common.IElements, uuid string, token string, salts ...string) common.IElements {
+func (this *ShallowSecurityProvider) ScopeView(o ifs.IElements, uuid string, token string, salts ...string) ifs.IElements {
 	return o
 }
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salts ...string) string {

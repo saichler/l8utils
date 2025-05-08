@@ -2,7 +2,7 @@ package registry
 
 import (
 	"errors"
-	"github.com/saichler/types/go/common"
+	"github.com/saichler/l8types/go/ifs"
 	"reflect"
 )
 
@@ -15,7 +15,7 @@ type Info struct {
 	/* The golang reflect type */
 	typ reflect.Type
 	/* The serializers */
-	serializers map[common.SerializerMode]common.ISerializer
+	serializers map[ifs.SerializerMode]ifs.ISerializer
 }
 
 // NewInfo /* Constructs a new type info with the given attributes */
@@ -24,7 +24,7 @@ func NewInfo(typ reflect.Type) (*Info, error) {
 		return nil, errors.New("Cannot register a nil type")
 	}
 	return &Info{typ: typ,
-		serializers: make(map[common.SerializerMode]common.ISerializer)}, nil
+		serializers: make(map[ifs.SerializerMode]ifs.ISerializer)}, nil
 }
 
 // Type /* Return the reflect type of this TypeInfo */
@@ -38,11 +38,11 @@ func (info *Info) Name() string {
 }
 
 // Serializer /* Return the serializer to be used with this type. Can be nil... */
-func (info *Info) Serializer(mode common.SerializerMode) common.ISerializer {
+func (info *Info) Serializer(mode ifs.SerializerMode) ifs.ISerializer {
 	return info.serializers[mode]
 }
 
-func (info *Info) AddSerializer(serializer common.ISerializer) {
+func (info *Info) AddSerializer(serializer ifs.ISerializer) {
 	info.serializers[serializer.Mode()] = serializer
 }
 

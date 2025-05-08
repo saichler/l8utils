@@ -2,14 +2,14 @@ package logger
 
 import (
 	"errors"
-	"github.com/saichler/types/go/common"
+	"github.com/saichler/l8types/go/ifs"
 	"testing"
 	"time"
 )
 
 type LoggerDirectImpl struct {
 	logMethods []ILogMethod
-	logLevel   common.LogLevel
+	logLevel   ifs.LogLevel
 }
 
 func NewLoggerDirectImpl(logMethods ...ILogMethod) *LoggerDirectImpl {
@@ -37,37 +37,37 @@ func (loggerImpl *LoggerDirectImpl) Empty() bool {
 }
 
 func (loggerImpl *LoggerDirectImpl) Trace(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Trace_Level {
+	if loggerImpl.logLevel > ifs.Trace_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(common.Trace_Level, anys...))
+	loggerImpl.processEntry(newEntry(ifs.Trace_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Debug(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Debug_Level {
+	if loggerImpl.logLevel > ifs.Debug_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(common.Debug_Level, anys...))
+	loggerImpl.processEntry(newEntry(ifs.Debug_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Info(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Info_Level {
+	if loggerImpl.logLevel > ifs.Info_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(common.Info_Level, anys...))
+	loggerImpl.processEntry(newEntry(ifs.Info_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Warning(anys ...interface{}) {
-	if loggerImpl.logLevel > common.Warning_Level {
+	if loggerImpl.logLevel > ifs.Warning_Level {
 		return
 	}
-	loggerImpl.processEntry(newEntry(common.Warning_Level, anys...))
+	loggerImpl.processEntry(newEntry(ifs.Warning_Level, anys...))
 }
 
 func (loggerImpl *LoggerDirectImpl) Error(anys ...interface{}) error {
 	anys = append(anys, FileAndLine(".go", false))
-	loggerImpl.processEntry(newEntry(common.Error_Level, anys...))
-	err := FormatLog(common.Error_Level, time.Now().Unix(), anys...)
+	loggerImpl.processEntry(newEntry(ifs.Error_Level, anys...))
+	err := FormatLog(ifs.Error_Level, time.Now().Unix(), anys...)
 	return errors.New(err)
 }
 
@@ -80,6 +80,6 @@ func (loggerImpl *LoggerDirectImpl) Fail(t interface{}, args ...interface{}) {
 	}
 }
 
-func (loggerImpl *LoggerDirectImpl) SetLogLevel(level common.LogLevel) {
+func (loggerImpl *LoggerDirectImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
 }
