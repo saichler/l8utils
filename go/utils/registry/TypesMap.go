@@ -32,6 +32,11 @@ func (m *TypesMap) Get(key string) (*Info, bool) {
 	return nil, ok
 }
 
+func (m *TypesMap) Del(key string) bool {
+	_, ok := m.impl.Delete(key)
+	return ok
+}
+
 func (m *TypesMap) Contains(key string) bool {
 	return m.impl.Contains(key)
 }
