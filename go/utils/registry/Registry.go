@@ -54,25 +54,11 @@ func (this *RegistryImpl) RegisterType(t reflect.Type) (bool, error) {
 	return this.types.Put(t.Name(), t)
 }
 
-func (this *RegistryImpl) UnRegister(any interface{}) (bool, error) {
-	v := reflect.ValueOf(any)
-	if !v.IsValid() {
-		return false, errors.New("invalid input")
+func (this *RegistryImpl) UnRegister(typeName string) (bool, error) {
+	if typeName == "" {
+		return false, errors.New("Cannot unregister a blank type")
 	}
-	if v.Kind() == reflect.Ptr {
-		return this.UnRegisterType(v.Elem().Type())
-	}
-	return this.UnRegisterType(v.Type())
-}
-
-func (this *RegistryImpl) UnRegisterType(t reflect.Type) (bool, error) {
-	if t == nil {
-		return false, errors.New("Cannot unregister a nil type")
-	}
-	if t.Name() == "rtype" {
-		return false, nil
-	}
-	return this.types.Del(t.Name()), nil
+	return this.types.Del(typeName), nil
 }
 
 func (this *RegistryImpl) Info(name string) (ifs.IInfo, error) {
