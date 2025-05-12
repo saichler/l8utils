@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 	"google.golang.org/protobuf/proto"
 	"reflect"
 )
@@ -64,4 +65,46 @@ func (this *WebService) typeOf(pb proto.Message) string {
 	v := reflect.ValueOf(pb).Elem()
 	this.pbs[v.Type().Name()] = pb
 	return v.Type().Name()
+}
+
+func (this *WebService) Serialize() *types.WebService {
+	r := &types.WebService{}
+	r.ServiceName = this.serviceName
+	r.ServiceArea = int32(this.serviceArea)
+
+	r.PostRespType = this.postResp
+	r.PostBodyType = this.postBody
+
+	r.PutRespType = this.putResp
+	r.PutBodyType = this.putBody
+
+	r.PatchRespType = this.patchResp
+	r.PatchBodyType = this.patchBody
+
+	r.DeleteRespType = this.deleteResp
+	r.DeleteBodyType = this.deleteBody
+
+	r.GetRespType = this.getResp
+	r.GetBodyType = this.getBody
+	return r
+}
+
+func (this *WebService) DeSerialize(ws *types.WebService) {
+	this.serviceArea = uint16(ws.ServiceArea)
+	this.serviceName = ws.ServiceName
+
+	this.postBody = ws.PostBodyType
+	this.postResp = ws.PostRespType
+
+	this.putBody = ws.PutBodyType
+	this.putResp = ws.PutRespType
+
+	this.patchBody = ws.PatchBodyType
+	this.patchResp = ws.PatchRespType
+
+	this.deleteBody = ws.DeleteBodyType
+	this.deleteResp = ws.DeleteRespType
+
+	this.getBody = ws.GetBodyType
+	this.getResp = ws.GetRespType
 }
