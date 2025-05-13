@@ -39,6 +39,7 @@ func New(serviceName string, serviceArea uint16,
 	webService := &WebService{}
 	webService.serviceName = serviceName
 	webService.serviceArea = serviceArea
+	webService.pbs = make(map[string]proto.Message)
 
 	webService.postBody = webService.typeOf(postBody)
 	webService.postResp = webService.typeOf(postResp)
