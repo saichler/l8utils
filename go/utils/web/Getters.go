@@ -36,3 +36,6 @@ func (this *WebService) GetBody() string {
 func (this *WebService) GetResp() string {
 	return this.getResp
 }
+func (this *WebService) Plugin() string {
+	return this.plugin
+}

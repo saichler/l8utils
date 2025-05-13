@@ -1,10 +1,13 @@
 package web
 
 import (
+	"encoding/base64"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
 	"google.golang.org/protobuf/proto"
+	"os"
 	"reflect"
+	"strconv"
 )
 
 type WebService struct {
@@ -56,6 +59,15 @@ func New(serviceName string, serviceArea uint16,
 	webService.getBody = webService.typeOf(getBody)
 	webService.getResp = webService.typeOf(getResp)
 
+	filename := serviceName + "-" + strconv.Itoa(int(serviceArea)) + "-registry.so"
+	_, err := os.Stat(filename)
+	if err == nil {
+		data, err := os.ReadFile(filename)
+		if err == nil {
+			webService.plugin = base64.StdEncoding.EncodeToString(data)
+		}
+	}
+
 	return webService
 }
 
@@ -87,6 +99,9 @@ func (this *WebService) Serialize() *types.WebService {
 
 	r.GetRespType = this.getResp
 	r.GetBodyType = this.getBody
+	if this.plugin != "" {
+		r.Plugin = &types.Plugin{Data: this.plugin}
+	}
 	return r
 }
 
@@ -108,4 +123,7 @@ func (this *WebService) DeSerialize(ws *types.WebService) {
 
 	this.getBody = ws.GetBodyType
 	this.getResp = ws.GetRespType
+	if ws.Plugin != nil {
+		this.plugin = ws.Plugin.Data
+	}
 }
