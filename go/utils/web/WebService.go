@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/base64"
+	"fmt"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
 	"google.golang.org/protobuf/proto"
@@ -60,12 +61,16 @@ func New(serviceName string, serviceArea uint16,
 	webService.getResp = webService.typeOf(getResp)
 
 	filename := serviceName + "-" + strconv.Itoa(int(serviceArea)) + "-registry.so"
+	fmt.Print("Trying to load registry plugin ", filename, "...")
 	_, err := os.Stat(filename)
 	if err == nil {
+		fmt.Println("Done")
 		data, err := os.ReadFile(filename)
 		if err == nil {
 			webService.plugin = base64.StdEncoding.EncodeToString(data)
 		}
+	} else {
+		fmt.Println("Error ", err.Error())
 	}
 
 	return webService
