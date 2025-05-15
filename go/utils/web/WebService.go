@@ -60,17 +60,16 @@ func New(serviceName string, serviceArea uint16,
 	webService.getBody = webService.typeOf(getBody)
 	webService.getResp = webService.typeOf(getResp)
 
+	fmt.Println("Get Body:", webService.getBody, " Get Resp:", webService.getResp)
+
 	filename := serviceName + "-" + strconv.Itoa(int(serviceArea)) + "-registry.so"
-	fmt.Print("Trying to load registry plugin ", filename, "...")
 	_, err := os.Stat(filename)
 	if err == nil {
-		fmt.Println("Done")
+		fmt.Print("Loaded registry plugin ", filename)
 		data, err := os.ReadFile(filename)
 		if err == nil {
 			webService.plugin = base64.StdEncoding.EncodeToString(data)
 		}
-	} else {
-		fmt.Println("Error ", err.Error())
 	}
 
 	return webService
