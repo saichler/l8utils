@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
+	"reflect"
 )
 
 const (
@@ -11,41 +12,86 @@ const (
 )
 
 type Resources struct {
+	logger       ifs.ILogger
 	registry     ifs.IRegistry
 	services     ifs.IServices
 	security     ifs.ISecurityProvider
-	logger       ifs.ILogger
 	dataListener ifs.IDatatListener
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
 	config       *types.SysConfig
 	introspector ifs.IIntrospector
 }
 
-func NewResources(registry ifs.IRegistry,
-	security ifs.ISecurityProvider,
-	servicePoints ifs.IServices,
-	logger ifs.ILogger,
-	dataListener ifs.IDatatListener,
-	serializer ifs.ISerializer,
-	config *types.SysConfig,
-	introspector ifs.IIntrospector) ifs.IResources {
+func NewResources(logger ifs.ILogger) ifs.IResources {
 	r := &Resources{}
-	r.registry = registry
-	r.services = servicePoints
-	r.security = security
 	r.logger = logger
-	r.dataListener = dataListener
 	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
-	if serializer != nil {
-		r.serializers[serializer.Mode()] = serializer
-	}
-	r.config = config
-	r.introspector = introspector
 	return r
 }
 
 func (this *Resources) AddService(serviceName string, serviceArea int32) {
 	ifs.AddService(this.config, serviceName, serviceArea)
+}
+
+func (this *Resources) Set(any interface{}) {
+	if any == nil {
+		return
+	}
+	registry, ok := any.(ifs.IRegistry)
+	if ok {
+		this.registry = registry
+		return
+	}
+
+	services, ok := any.(ifs.IServices)
+	if ok {
+		this.services = services
+		return
+	}
+
+	security, ok := any.(ifs.ISecurityProvider)
+	if ok {
+		this.security = security
+		return
+	}
+
+	dataListener, ok := any.(ifs.IDatatListener)
+	if ok {
+		this.dataListener = dataListener
+		return
+	}
+
+	serializer, ok := any.(ifs.ISerializer)
+	if ok {
+		this.serializers[serializer.Mode()] = serializer
+	}
+
+	config, ok := any.(*types.SysConfig)
+	if ok {
+		this.config = config
+		return
+	}
+
+	introspector, ok := any.(ifs.IIntrospector)
+	if ok {
+		this.introspector = introspector
+		return
+	}
+	v := reflect.ValueOf(any)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	this.logger.Error("Unknown Set type ", v.Type().Name())
+}
+
+func (this *Resources) Copy(other ifs.IResources) {
+	this.registry = other.Registry()
+	this.security = other.Security()
+	this.services = other.Services()
+	this.serializers[ifs.BINARY] = other.Serializer(ifs.BINARY)
+	this.introspector = other.Introspector()
+	this.dataListener = other.DataListener()
+	this.config = other.SysConfig()
 }
 
 func (this *Resources) Registry() ifs.IRegistry {
