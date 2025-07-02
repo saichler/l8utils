@@ -12,14 +12,20 @@ var globals ifs.IResources
 var Log = logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
 
 func init() {
-	config := &types.SysConfig{MaxDataSize: resources.DEFAULT_MAX_DATA_SIZE,
+	_log := logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
+	_log.SetLogLevel(ifs.Trace_Level)
+	_resources := resources.NewResources(_log)
+	_resources.Set(registry.NewRegistry())
+	_security, err := ifs.LoadSecurityProvider(nil)
+	if err != nil {
+		panic("Failed to load security provider " + err.Error())
+	}
+	_resources.Set(_security)
+	_config := &types.SysConfig{MaxDataSize: resources.DEFAULT_MAX_DATA_SIZE,
 		RxQueueSize: resources.DEFAULT_QUEUE_SIZE,
 		TxQueueSize: resources.DEFAULT_QUEUE_SIZE,
-		LocalAlias:  "tests"}
-	secure, err := ifs.LoadSecurityProvider()
-	if err != nil {
-		panic(err)
-	}
-	globals = resources.NewResources(registry.NewRegistry(),
-		secure, nil, Log, nil, nil, config, nil)
+		VnetPort:    50000}
+	_resources.Set(_config)
+	globals = _resources
+
 }

@@ -75,6 +75,9 @@ func (this *ShallowSecurityProvider) CanDoAction(action ifs.Action, o ifs.IEleme
 func (this *ShallowSecurityProvider) ScopeView(o ifs.IElements, uuid string, token string, salts ...string) ifs.IElements {
 	return o
 }
-func (this *ShallowSecurityProvider) Authenticate(user string, pass string, salts ...string) string {
+func (this *ShallowSecurityProvider) Authenticate(user string, pass string) string {
 	return "token"
+}
+func (this *ShallowSecurityProvider) Message(string) *ifs.Message {
+	return nil
 }

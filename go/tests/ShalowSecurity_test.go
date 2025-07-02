@@ -9,7 +9,6 @@ func TestShalowSecurity(t *testing.T) {
 	sp := globals.Security()
 	conn, err := sp.CanDial("127.0.0.1", 8910)
 	if err != nil && !strings.Contains(err.Error(), "connection refused") {
-
 		Log.Fail(t, err)
 		return
 	}
