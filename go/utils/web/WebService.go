@@ -13,7 +13,7 @@ import (
 
 type WebService struct {
 	serviceName string
-	serviceArea uint16
+	serviceArea byte
 
 	postBody string
 	postResp string
@@ -34,7 +34,7 @@ type WebService struct {
 	pbs    map[string]proto.Message
 }
 
-func New(serviceName string, serviceArea uint16,
+func New(serviceName string, serviceArea byte,
 	postBody, postResp,
 	putBody, putResp,
 	patchBody, patchResp,
@@ -110,7 +110,7 @@ func (this *WebService) Serialize() *types.WebService {
 }
 
 func (this *WebService) DeSerialize(ws *types.WebService) {
-	this.serviceArea = uint16(ws.ServiceArea)
+	this.serviceArea = byte(ws.ServiceArea)
 	this.serviceName = ws.ServiceName
 
 	this.postBody = ws.PostBodyType

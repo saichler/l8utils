@@ -3,7 +3,7 @@ package web
 func (this *WebService) ServiceName() string {
 	return this.serviceName
 }
-func (this *WebService) ServiceArea() uint16 {
+func (this *WebService) ServiceArea() byte {
 	return this.serviceArea
 }
 func (this *WebService) PostBody() string {
