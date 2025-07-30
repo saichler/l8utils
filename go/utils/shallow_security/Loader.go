@@ -7,6 +7,6 @@ var Loader ifs.ISecurityProviderLoader = &ShallowLoader{}
 type ShallowLoader struct {
 }
 
-func (this *ShallowLoader) LoadSecurityProvider(resources ifs.IResources) (ifs.ISecurityProvider, error) {
+func (this *ShallowLoader) LoadSecurityProvider(args ...interface{}) (ifs.ISecurityProvider, error) {
 	return NewShallowSecurityProvider(), nil
 }
