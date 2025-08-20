@@ -14,6 +14,7 @@ type ByteQueue struct {
 	cond    *sync.Cond
 	maxSize int
 	active  bool
+	size    int
 }
 
 func NewByteQueue(name string, maxSize int) *ByteQueue {
@@ -33,7 +34,7 @@ func NewByteQueue(name string, maxSize int) *ByteQueue {
 func (this *ByteQueue) Add(data []byte) {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
-	if this.size() >= this.maxSize && this.active {
+	if this.size >= this.maxSize && this.active {
 		this.rwMtx.Unlock()
 		for this.Size() >= this.maxSize && this.active {
 			this.cond.Broadcast()
@@ -44,6 +45,7 @@ func (this *ByteQueue) Add(data []byte) {
 	if this.active {
 		priority := data[ifs.PPriority] >> 4
 		this.queues[priority] = append(this.queues[priority], data)
+		this.size++
 	} else {
 		this.clear()
 	}
@@ -54,7 +56,7 @@ func (this *ByteQueue) Next() []byte {
 	for this.active {
 		var item []byte
 		this.rwMtx.Lock()
-		if this.size() == 0 {
+		if this.size == 0 {
 			this.cond.Wait()
 		} else {
 			item = this.next()
@@ -84,30 +86,24 @@ func (this *ByteQueue) next() []byte {
 		if len(this.queues[i]) > 0 {
 			data := this.queues[i][0]
 			this.queues[i] = this.queues[i][1:]
+			this.size--
 			return data
 		}
 	}
 	return nil
 }
 
-func (this *ByteQueue) size() int {
-	sum := 0
-	for _, b := range this.queues {
-		sum += len(b)
-	}
-	return sum
-}
-
 func (this *ByteQueue) clear() {
 	for i := range this.queues {
 		this.queues[i] = [][]byte{}
 	}
+	this.size = 0
 }
 
 func (this *ByteQueue) Size() int {
 	this.rwMtx.RLock()
 	defer this.rwMtx.RUnlock()
-	return this.size()
+	return this.size
 }
 
 func (this *ByteQueue) Clear() {
@@ -119,5 +115,5 @@ func (this *ByteQueue) Clear() {
 func (this *ByteQueue) IsEmpty() bool {
 	this.rwMtx.RLock()
 	defer this.rwMtx.RUnlock()
-	return this.size() == 0
+	return this.size == 0
 }
