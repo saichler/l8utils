@@ -1,32 +1,36 @@
 package queues
 
 import (
+	"math/bits"
 	"sync"
-	"time"
 
 	"github.com/saichler/l8types/go/ifs"
 )
 
 type ByteQueue struct {
-	name    string
-	queues  [][][]byte
-	rwMtx   *sync.RWMutex
-	cond    *sync.Cond
-	maxSize int
-	active  bool
-	size    int
+	name         string
+	queues       [][][]byte
+	priorityMask uint8
+	rwMtx        *sync.RWMutex
+	cond         *sync.Cond
+	maxSize      int
+	active       bool
+	size         int
 }
 
 func NewByteQueue(name string, maxSize int) *ByteQueue {
-	bq := &ByteQueue{}
-	bq.active = true
+	bq := &ByteQueue{
+		name:         name,
+		maxSize:      maxSize,
+		active:       true,
+		priorityMask: 0,
+		size:         0,
+	}
 	bq.rwMtx = &sync.RWMutex{}
 	bq.cond = sync.NewCond(bq.rwMtx)
-	bq.name = name
-	bq.maxSize = maxSize
 	bq.queues = make([][][]byte, ifs.P1+1)
 	for i := range bq.queues {
-		bq.queues[i] = [][]byte{}
+		bq.queues[i] = make([][]byte, 0, 16)
 	}
 	return bq
 }
@@ -34,21 +38,25 @@ func NewByteQueue(name string, maxSize int) *ByteQueue {
 func (this *ByteQueue) Add(data []byte) {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
-	if this.size >= this.maxSize && this.active {
-		this.rwMtx.Unlock()
-		for this.Size() >= this.maxSize && this.active {
-			this.cond.Broadcast()
-			time.Sleep(time.Millisecond * 100)
-		}
-		this.rwMtx.Lock()
+	
+	// Wait if queue is full using proper condition variable
+	for this.size >= this.maxSize && this.active {
+		this.cond.Wait()
 	}
-	if this.active {
-		priority := data[ifs.PPriority] >> 4
-		this.queues[priority] = append(this.queues[priority], data)
-		this.size++
-	} else {
-		this.clear()
+	
+	if !this.active {
+		return
 	}
+	
+	priority := data[ifs.PPriority] >> 4
+	if priority > 7 {
+		priority = 7 // Cap at maximum priority
+	}
+	
+	this.queues[priority] = append(this.queues[priority], data)
+	this.priorityMask |= (1 << priority) // Set bit for this priority
+	this.size++
+	
 	this.cond.Broadcast()
 }
 
@@ -74,29 +82,42 @@ func (this *ByteQueue) Active() bool {
 }
 
 func (this *ByteQueue) Shutdown() {
+	this.rwMtx.Lock()
+	defer this.rwMtx.Unlock()
+	
 	this.active = false
-	this.Clear()
-	for i := 0; i < this.Size(); i++ {
-		this.cond.Broadcast()
-	}
+	this.clear()
+	this.cond.Broadcast()
 }
 
 func (this *ByteQueue) next() []byte {
-	for i := len(this.queues) - 1; i >= 0; i-- {
-		if len(this.queues[i]) > 0 {
-			data := this.queues[i][0]
-			this.queues[i] = this.queues[i][1:]
-			this.size--
-			return data
-		}
+	if this.priorityMask == 0 {
+		return nil // No items in any queue
 	}
-	return nil
+	
+	// Find highest priority with items - O(1) bit operation
+	priority := 7 - bits.LeadingZeros8(this.priorityMask)
+	
+	// Dequeue from highest priority - O(1)
+	queue := &this.queues[priority]
+	item := (*queue)[0]
+	*queue = (*queue)[1:]
+	this.size--
+	
+	// Clear bit if this priority queue becomes empty - O(1)
+	if len(*queue) == 0 {
+		this.priorityMask &^= (1 << priority)
+	}
+	
+	this.cond.Broadcast() // Signal waiting producers
+	return item
 }
 
 func (this *ByteQueue) clear() {
 	for i := range this.queues {
-		this.queues[i] = [][]byte{}
+		this.queues[i] = this.queues[i][:0] // Keep capacity, reset length
 	}
+	this.priorityMask = 0
 	this.size = 0
 }
 
