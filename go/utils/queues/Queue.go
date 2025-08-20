@@ -13,7 +13,8 @@ type Queue struct {
 	// The queue itself
 	queue []interface{}
 	// The cond for waking up go routined
-	mtx *sync.Cond
+	cond  *sync.Cond
+	rwMtx *sync.RWMutex
 	// Maximum size for the queue, in which the queue will block the input go routine
 	maxSize int
 	// Is the queue active, e.g. shutdown was not called
@@ -23,7 +24,8 @@ type Queue struct {
 // NewQueue Constructs a new queue
 func NewQueue(queueName string, maxSize int) *Queue {
 	queue := &Queue{}
-	queue.mtx = sync.NewCond(&sync.Mutex{})
+	queue.rwMtx = &sync.RWMutex{}
+	queue.cond = sync.NewCond(queue.rwMtx)
 	queue.queue = make([]interface{}, 0)
 	queue.maxSize = maxSize
 	queue.active = true
@@ -33,38 +35,37 @@ func NewQueue(queueName string, maxSize int) *Queue {
 
 // Add an element to the queue and broadcast notification
 func (queue *Queue) Add(any interface{}) {
-	queue.mtx.L.Lock()
-	defer queue.mtx.L.Unlock()
-
+	queue.rwMtx.Lock()
+	defer queue.rwMtx.Unlock()
 	if len(queue.queue) >= queue.maxSize && queue.active {
-		queue.mtx.L.Unlock()
+		queue.rwMtx.Unlock()
 		for len(queue.queue) >= queue.maxSize && queue.active {
-			queue.mtx.Broadcast()
+			queue.cond.Broadcast()
 			time.Sleep(time.Millisecond * 100)
 		}
-		queue.mtx.L.Lock()
+		queue.rwMtx.Lock()
 	}
 	if queue.active {
 		queue.queue = append(queue.queue, any)
 	} else {
 		queue.queue = queue.queue[0:0]
 	}
-	queue.mtx.Broadcast()
+	queue.cond.Broadcast()
 }
 
 // Next retrieve the next element in the queue, if the queue is empty this is a blocking queue
 func (queue *Queue) Next() interface{} {
 	for queue.active {
 		var item interface{}
-		queue.mtx.L.Lock()
+		queue.rwMtx.Lock()
 		if len(queue.queue) == 0 {
-			queue.mtx.Wait()
+			queue.cond.Wait()
 		} else {
 			item = queue.queue[0]
 			queue.queue = queue.queue[1:]
 
 		}
-		queue.mtx.L.Unlock()
+		queue.rwMtx.Unlock()
 		if item != nil {
 			return item
 		}
@@ -82,14 +83,14 @@ func (queue *Queue) Shutdown() {
 	queue.active = false
 	queue.Clear()
 	for i := 0; i < 100; i++ {
-		queue.mtx.Broadcast()
+		queue.cond.Broadcast()
 	}
 }
 
 // Clear all the content of the queue and return it
 func (queue *Queue) Clear() []interface{} {
-	queue.mtx.L.Lock()
-	defer queue.mtx.L.Unlock()
+	queue.rwMtx.Lock()
+	defer queue.rwMtx.Unlock()
 	result := queue.queue
 	queue.queue = make([]interface{}, 0)
 	return result
@@ -97,7 +98,13 @@ func (queue *Queue) Clear() []interface{} {
 
 // Size of the queue
 func (queue *Queue) Size() int {
-	queue.mtx.L.Lock()
-	defer queue.mtx.L.Unlock()
+	queue.rwMtx.RLock()
+	defer queue.rwMtx.RUnlock()
 	return len(queue.queue)
+}
+
+func (queue *Queue) IsEmpty() bool {
+	queue.rwMtx.RLock()
+	defer queue.rwMtx.RUnlock()
+	return len(queue.queue) == 0
 }

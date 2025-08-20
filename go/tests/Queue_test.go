@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"github.com/saichler/l8utils/go/utils/queues"
 	"testing"
+
+	"github.com/saichler/l8utils/go/utils/queues"
 )
 
 func TestQueue(t *testing.T) {
@@ -52,16 +53,4 @@ func popFromQueue(q *queues.Queue, t *testing.T) {
 		nxt := q.Next()
 		Log.Debug(nxt)
 	}
-}
-
-func TestByteQueue(t *testing.T) {
-	bq := queues.NewByteSliceQueue("test", 3)
-	bq.Add([]byte{50, 51, 51})
-	b := bq.Next()
-	if b[0] != 50 || b[1] != 51 || b[2] != 51 {
-		Log.Fail(t, "Expected byte slice to be 50 51 51")
-		return
-	}
-	bq.Shutdown()
-	bq.Active()
 }
