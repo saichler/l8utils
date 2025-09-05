@@ -2,13 +2,13 @@ package web
 
 import (
 	"encoding/base64"
-	"fmt"
-	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8types/go/types"
-	"google.golang.org/protobuf/proto"
 	"os"
 	"reflect"
 	"strconv"
+
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
+	"google.golang.org/protobuf/proto"
 )
 
 type WebService struct {
@@ -60,12 +60,9 @@ func New(serviceName string, serviceArea byte,
 	webService.getBody = webService.typeOf(getBody)
 	webService.getResp = webService.typeOf(getResp)
 
-	fmt.Println("Get Body:", webService.getBody, " Get Resp:", webService.getResp)
-
 	filename := serviceName + "-" + strconv.Itoa(int(serviceArea)) + "-registry.so"
 	_, err := os.Stat(filename)
 	if err == nil {
-		fmt.Print("Loaded registry plugin ", filename)
 		data, err := os.ReadFile(filename)
 		if err == nil {
 			webService.plugin = base64.StdEncoding.EncodeToString(data)
