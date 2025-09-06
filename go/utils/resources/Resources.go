@@ -1,14 +1,15 @@
 package resources
 
 import (
+	"reflect"
+
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
-	"reflect"
 )
 
 const (
 	DEFAULT_MAX_DATA_SIZE = 1024 * 1024 * 50
-	DEFAULT_QUEUE_SIZE    = 50000
+	DEFAULT_QUEUE_SIZE    = 100000
 )
 
 type Resources struct {
