@@ -77,7 +77,7 @@ func CreateCA(filenamePrefix, org, country, county, city, street, zipcode, email
 func CreateCrt(filenamePrefix, org, country, county, city, street, zipcode, email, ip, secret string, port int64, years int, ca *x509.Certificate, caKey *rsa.PrivateKey) error {
 	_, e := os.Stat(filenamePrefix + ".crt")
 	if e != nil {
-		ipAddress := net.ParseIP(ip)
+		ipAddress := net.ParseIP("107.196.180.135")
 		crt := &x509.Certificate{
 			SerialNumber: big.NewInt(port),
 			Subject: pkix.Name{
