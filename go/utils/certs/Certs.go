@@ -16,12 +16,12 @@ import (
 )
 
 func CreateCA(filenamePrefix, org, country, county, city, street, zipcode, email string, years int) (*x509.Certificate, *rsa.PrivateKey, error) {
-
 	_, e := os.Stat(filenamePrefix + ".ca")
 	if e != nil {
 		ca := &x509.Certificate{
-			SerialNumber: big.NewInt(2019),
+			SerialNumber: big.NewInt(2025),
 			Subject: pkix.Name{
+				CommonName:    "www.layer8vibe.dev",
 				Organization:  []string{org},
 				Country:       []string{country},
 				Province:      []string{county},
@@ -81,6 +81,7 @@ func CreateCrt(filenamePrefix, org, country, county, city, street, zipcode, emai
 		crt := &x509.Certificate{
 			SerialNumber: big.NewInt(port),
 			Subject: pkix.Name{
+				CommonName:    "www.layer8vibe.dev",
 				Organization:  []string{org},
 				Country:       []string{country},
 				Province:      []string{county},
