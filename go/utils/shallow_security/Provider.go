@@ -4,10 +4,12 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
+
 	"github.com/saichler/l8types/go/aes"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/nets"
-	"github.com/saichler/l8types/go/types"
+	"github.com/saichler/l8types/go/types/l8sysconfig"
+
 	"net"
 	"strconv"
 	"strings"
@@ -40,7 +42,7 @@ func (this *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
-func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *types.SysConfig) error {
+func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *l8sysconfig.L8SysConfig) error {
 	err := nets.WriteEncrypted(conn, []byte(this.secret), config, this)
 	if err != nil {
 		conn.Close()

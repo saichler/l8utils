@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8types/go/types"
+	"github.com/saichler/l8types/go/types/l8sysconfig"
 )
 
 const (
@@ -19,7 +19,7 @@ type Resources struct {
 	security     ifs.ISecurityProvider
 	dataListener ifs.IDatatListener
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
-	config       *types.SysConfig
+	config       *l8sysconfig.L8SysConfig
 	introspector ifs.IIntrospector
 }
 
@@ -67,7 +67,7 @@ func (this *Resources) Set(any interface{}) {
 		this.serializers[serializer.Mode()] = serializer
 	}
 
-	config, ok := any.(*types.SysConfig)
+	config, ok := any.(*l8sysconfig.L8SysConfig)
 	if ok {
 		this.config = config
 		return
@@ -113,7 +113,7 @@ func (this *Resources) Serializer(mode ifs.SerializerMode) ifs.ISerializer {
 func (this *Resources) Logger() ifs.ILogger {
 	return this.logger
 }
-func (this *Resources) SysConfig() *types.SysConfig {
+func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
 	return this.config
 }
 func (this *Resources) Introspector() ifs.IIntrospector {

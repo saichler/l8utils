@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8types/go/types"
+	"github.com/saichler/l8types/go/types/l8web"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -81,8 +81,8 @@ func (this *WebService) typeOf(pb proto.Message) string {
 	return v.Type().Name()
 }
 
-func (this *WebService) Serialize() *types.WebService {
-	r := &types.WebService{}
+func (this *WebService) Serialize() *l8web.L8WebService {
+	r := &l8web.L8WebService{}
 	r.ServiceName = this.serviceName
 	r.ServiceArea = int32(this.serviceArea)
 
@@ -101,12 +101,12 @@ func (this *WebService) Serialize() *types.WebService {
 	r.GetRespType = this.getResp
 	r.GetBodyType = this.getBody
 	if this.plugin != "" {
-		r.Plugin = &types.Plugin{Data: this.plugin}
+		r.Plugin = &l8web.L8Plugin{Data: this.plugin}
 	}
 	return r
 }
 
-func (this *WebService) DeSerialize(ws *types.WebService) {
+func (this *WebService) DeSerialize(ws *l8web.L8WebService) {
 	this.serviceArea = byte(ws.ServiceArea)
 	this.serviceName = ws.ServiceName
 
