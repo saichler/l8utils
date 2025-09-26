@@ -78,7 +78,10 @@ func (this *ShallowSecurityProvider) ScopeView(o ifs.IElements, uuid string, tok
 	return o
 }
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string) (string, error) {
-	return "token", nil
+	return "bearer token", nil
+}
+func (this *ShallowSecurityProvider) ValidateToken(string) bool {
+	return true
 }
 func (this *ShallowSecurityProvider) Message(string) (*ifs.Message, error) {
 	return &ifs.Message{}, nil
