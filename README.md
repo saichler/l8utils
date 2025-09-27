@@ -1,13 +1,22 @@
-# L8Utils
+# Layer 8 Utils
 
 [![Go Version](https://img.shields.io/badge/Go-1.23.8-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-green.svg)]()
 
-Common shared utilities and building blocks for Layer8 microservices applications.
+Common shared utilities and building blocks for Layer 8 microservices applications.
 
 ## Overview
 
-L8Utils provides a comprehensive collection of utilities, interfaces, and default implementations designed to address common requirements in microservices architecture. The library emphasizes modularity, allowing projects to use default implementations or provide custom implementations that adhere to defined interfaces.
+Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and default implementations designed to address common requirements in microservices architecture. The library emphasizes modularity, allowing projects to use default implementations or provide custom implementations that adhere to defined interfaces.
+
+## Recent Updates
+
+- **Enhanced Security**: Improved certificate management with self-signed certificate support
+- **Interface Improvements**: Fixed interface implementations for better type safety
+- **Token Validation**: Added robust token validation mechanisms
+- **Performance Optimizations**: Enhanced byte queue performance and enlarged queue sizes
+- **Type System**: Rebranded and improved type definitions for better consistency
 
 ## Features
 
@@ -133,9 +142,9 @@ service.HandleGet(userGetHandler)
 
 ## Dependencies
 
-- **l8types**: Core type definitions and interfaces
-- **Protocol Buffers**: Message serialization
-- **UUID**: Unique identifier generation
+- **l8types** (v0.0.0-20250926135209-1d316857fdcf): Core type definitions and interfaces
+- **Protocol Buffers** (v1.36.9): Message serialization and data exchange
+- **Google UUID** (v1.6.0): Unique identifier generation and management
 
 ## Performance Features
 
