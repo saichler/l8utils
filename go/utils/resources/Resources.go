@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8types/go/types/l8sysconfig"
 )
 
@@ -21,12 +22,18 @@ type Resources struct {
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
 	config       *l8sysconfig.L8SysConfig
 	introspector ifs.IIntrospector
+	authUser     *l8api.AuthUser
 }
 
 func NewResources(logger ifs.ILogger) ifs.IResources {
+	return NewResourcesWithUser(logger, &l8api.AuthUser{User: "admin", Pass: "admin"})
+}
+
+func NewResourcesWithUser(logger ifs.ILogger, authUser *l8api.AuthUser) ifs.IResources {
 	r := &Resources{}
 	r.logger = logger
 	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
+	r.authUser = authUser
 	return r
 }
 
@@ -118,4 +125,7 @@ func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
 }
 func (this *Resources) Introspector() ifs.IIntrospector {
 	return this.introspector
+}
+func (this *Resources) DefaultUser() *l8api.AuthUser {
+	return this.authUser
 }
