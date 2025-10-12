@@ -23,7 +23,6 @@ type Cache struct {
 	r             ifs.IResources
 
 	notifySequence uint32
-	source         string
 	serviceName    string
 	serviceArea    byte
 
@@ -86,10 +85,9 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	return this
 }
 
-func (this *Cache) SetNotificationsFor(source, serviceName string, serviceArea byte) {
+func (this *Cache) SetNotificationsFor(serviceName string, serviceArea byte) {
 	this.serviceName = serviceName
 	this.serviceArea = serviceArea
-	this.source = source
 }
 
 func (this *Cache) cacheEnabled() bool {
@@ -167,4 +165,16 @@ func (this *Cache) PrimaryKeyFor(any interface{}) (string, error) {
 
 func allElementsInCache(i interface{}) (bool, interface{}) {
 	return true, i
+}
+
+func (this *Cache) ServiceName() string {
+	return this.serviceName
+}
+
+func (this *Cache) ServiceArea() byte {
+	return this.serviceArea
+}
+
+func (this *Cache) Source() string {
+	return this.r.SysConfig().LocalUuid
 }
