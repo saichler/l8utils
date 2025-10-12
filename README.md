@@ -12,15 +12,32 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 ## Recent Updates
 
+- **Cache System**: New high-performance in-memory cache with storage integration, CRUD operations, notifications, and query support (78.1% test coverage)
+- **Notification Framework**: Comprehensive notification system for distributed state management with support for Add, Delete, Update, Replace, and Sync operations (87.8% test coverage)
+- **Test Suite Expansion**: Added comprehensive test utilities (createModel, newResources, createChanges) for building robust test suites
 - **Enhanced Security**: Improved certificate management with self-signed certificate support
 - **Interface Improvements**: Fixed interface implementations for better type safety
 - **Token Validation**: Added robust token validation mechanisms
 - **Performance Optimizations**: Enhanced byte queue performance and enlarged queue sizes
-- **Type System**: Rebranded and improved type definitions for better consistency
 
 ## Features
 
 ### 🚀 Core Utilities
+
+- **Cache**: High-performance in-memory cache with storage integration
+  - CRUD operations (Post, Get, Put, Patch, Delete)
+  - Storage layer integration with persistence support
+  - Built-in notification system for change tracking
+  - Statistics tracking with functional filters
+  - Clone-based isolation for concurrent access
+  - Query support with pagination and filtering
+
+- **Notifications**: Comprehensive notification system for distributed state management
+  - Support for Add, Delete, Update, Replace, and Sync notification types
+  - Serialization/deserialization with protocol buffers
+  - Change tracking with property-level granularity
+  - Sequence numbering for ordering guarantees
+  - Service-area based routing support
 
 - **Queues**: High-performance thread-safe queues with priority support
   - `ByteQueue`: Optimized byte queue with priority handling
@@ -94,17 +111,22 @@ func main() {
 
 ```
 go/
-└── utils/
-    ├── certs/          # Certificate management
-    ├── logger/         # Logging framework
-    ├── maps/           # Thread-safe map implementations
-    ├── queues/         # High-performance queue implementations
-    ├── registry/       # Resource registry
-    ├── resources/      # Resource management
-    ├── shallow_security/ # Basic security utilities
-    ├── strings/        # String manipulation utilities
-    ├── web/           # Web service framework
-    └── workers/       # Worker pool implementations
+├── utils/
+│   ├── cache/          # High-performance cache with storage integration
+│   ├── certs/          # Certificate management
+│   ├── logger/         # Logging framework
+│   ├── maps/           # Thread-safe map implementations
+│   ├── notify/         # Notification system for state changes
+│   ├── queues/         # High-performance queue implementations
+│   ├── registry/       # Resource registry
+│   ├── resources/      # Resource management
+│   ├── shallow_security/ # Basic security utilities
+│   ├── strings/        # String manipulation utilities
+│   ├── web/           # Web service framework
+│   └── workers/       # Worker pool implementations
+└── tests/
+    ├── Cache_test.go         # Cache tests (78.1% coverage)
+    └── Notifications_test.go # Notification tests (87.8% coverage)
 ```
 
 ## Key Components
@@ -138,6 +160,79 @@ RESTful service utilities with protocol buffer support:
 service := web.NewWebService("user-service", serviceArea)
 service.HandlePost(userCreateHandler)
 service.HandleGet(userGetHandler)
+```
+
+### Cache
+High-performance in-memory cache with optional storage persistence:
+
+```go
+// Create cache with storage backend
+cache := cache.NewCache(&MyModel{}, storage, nil, resources)
+
+// CRUD operations
+cache.Post(item, true)  // Add with notification
+item := cache.Get(key)
+cache.Put(key, updatedItem, true)
+cache.Patch(key, changes, true)
+cache.Delete(key, true)
+
+// Query with pagination
+results := cache.Fetch(0, 25, query)
+
+// Statistics tracking
+stats := cache.Stats(func(item interface{}) bool {
+    return item.(*MyModel).Status == "active"
+})
+```
+
+### Notifications
+Create and manage notifications for distributed state synchronization:
+
+```go
+// Create Add notification
+notSet, err := notify.CreateAddNotification(
+    model, "service-name", "model-key",
+    serviceArea, "ModelType", "source", 1, sequence,
+)
+
+// Create Update notification from changes
+notSet, err := notify.CreateUpdateNotification(
+    changes, "service-name", "model-key",
+    serviceArea, "ModelType", "source", len(changes), sequence,
+)
+
+// Extract item from notification
+item, err := notify.ItemOf(notSet, resources)
+```
+
+## Testing
+
+The library includes comprehensive test suites with high code coverage:
+
+- **Cache Tests** (`go/tests/Cache_test.go`): 78.1% coverage
+  - CRUD operations testing
+  - Storage integration tests
+  - Notification system tests
+  - Statistics tracking validation
+  - Concurrent access and isolation tests
+
+- **Notification Tests** (`go/tests/Notifications_test.go`): 87.8% coverage
+  - All notification type tests (Add, Delete, Update, Replace, Sync)
+  - Serialization/deserialization validation
+  - ItemOf extraction tests
+  - Property-level change tracking tests
+  - Sequence and service area validation
+
+Test utilities available:
+```go
+// Create test model instance
+model := createModel(i)
+
+// Create resources with registry and introspection
+resources := newResources()
+
+// Generate changes between models
+changes := createChanges(oldModel, newModel, resources)
 ```
 
 ## Dependencies
