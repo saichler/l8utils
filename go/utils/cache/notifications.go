@@ -16,7 +16,7 @@ func (this *Cache) createAddNotification(any interface{}, key string) (*l8notify
 	return notify.CreateAddNotification(any, this.serviceName, key, this.serviceArea, this.modelType, this.Source(), 1, this.notifySequence)
 }
 
-func (this *Cache) createSyncNotification(any interface{}, key string) (*l8notify.L8NotificationSet, error) {
+func (this *Cache) CreateSyncNotification(any interface{}, key string) (*l8notify.L8NotificationSet, error) {
 	defer func() { this.notifySequence++ }()
 	return notify.CreateSyncNotification(any, this.serviceName, key, this.serviceArea, this.modelType, this.Source(), 1, this.notifySequence)
 }
