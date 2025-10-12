@@ -11,11 +11,12 @@ go mod init
 GOPROXY=direct GOPRIVATE=github.com go mod tidy
 go mod vendor
 
+echo "Building Security..."
 cd ./utils/shallow_security
 ./build.sh
 mv loader.so ../../tests/.
 cd ../../
-
+echo "Starting Tests"
 # Run unit tests with coverage
 go test -v -coverpkg=./utils/... -coverprofile=cover-report.html ./... --failfast
 
