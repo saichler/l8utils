@@ -135,7 +135,7 @@ func TestCachePost(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(10)
 	notification, err := c.Post(newModel, true)
@@ -183,7 +183,7 @@ func TestCachePostReplace(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Post with same key but different values
 	model1Updated := createModel(1)
@@ -267,7 +267,7 @@ func TestCachePut(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(30)
 	notification, err := c.Put(newModel, true)
@@ -292,7 +292,7 @@ func TestCachePatch(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Patch with partial update
 	patchModel := createModel(1)
@@ -326,7 +326,7 @@ func TestCachePatchNewItem(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(40)
 	notification, err := c.Patch(newModel, true)
@@ -372,7 +372,7 @@ func TestCacheDelete(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	notification, err := c.Delete(model1, true)
 
@@ -442,7 +442,7 @@ func TestCacheSetNotificationsFor(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("my-source", "my-service", 5)
+	c.SetNotificationsFor("my-service", 5)
 
 	// Test that notifications work after setting
 	newModel := createModel(50)
@@ -454,9 +454,7 @@ func TestCacheSetNotificationsFor(t *testing.T) {
 	if notification == nil {
 		t.Error("Expected notification to be created")
 	}
-	if notification.Source != "my-source" {
-		t.Errorf("Expected source 'my-source', got '%s'", notification.Source)
-	}
+	// Source is now automatically determined from resources, not set explicitly
 	if notification.ServiceName != "my-service" {
 		t.Errorf("Expected service name 'my-service', got '%s'", notification.ServiceName)
 	}
@@ -471,7 +469,7 @@ func TestCacheNotificationSequence(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	sequences := []uint32{}
 
@@ -505,7 +503,7 @@ func TestCacheMultipleOperations(t *testing.T) {
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Post
 	model1 := createModel(1)
@@ -748,7 +746,7 @@ func TestCachePostNoChanges(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Post same model again
 	notification, err := c.Post(model1, true)
@@ -812,7 +810,7 @@ func TestCachePatchNoChanges(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Patch with same values
 	patchModel := createModel(1)
@@ -870,7 +868,7 @@ func TestCachePostUpdateReplaceNotification(t *testing.T) {
 
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
-	c.SetNotificationsFor("test-source", "test-service", 1)
+	c.SetNotificationsFor("test-service", 1)
 
 	// Post update with different value
 	model1Updated := createModel(1)

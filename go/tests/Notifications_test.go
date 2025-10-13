@@ -9,6 +9,7 @@ import (
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/testtypes"
 	"github.com/saichler/l8types/go/types/l8notify"
+	"github.com/saichler/l8types/go/types/l8sysconfig"
 	"github.com/saichler/l8utils/go/utils/logger"
 	"github.com/saichler/l8utils/go/utils/notify"
 	"github.com/saichler/l8utils/go/utils/registry"
@@ -23,6 +24,7 @@ func newResources() ifs.IResources {
 	log := logger.NewLoggerDirectImpl(&logger.FmtLogMethod{})
 	res := resources.NewResources(log)
 	res.Set(registry.NewRegistry())
+	res.Set(&l8sysconfig.L8SysConfig{})
 	in := introspecting.NewIntrospect(res.Registry())
 	res.Set(in)
 	node, _ := res.Introspector().Inspect(testtypes.TestProto{})
