@@ -25,17 +25,6 @@ type Cache struct {
 	notifySequence uint32
 	serviceName    string
 	serviceArea    byte
-
-	/*
-
-		listener      ifs.IServiceCacheListener
-		source        string
-		serviceName   string
-		serviceArea   byte
-
-		sequence      uint32
-	*/
-
 }
 
 func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.IStorage, r ifs.IResources) *Cache {
@@ -177,4 +166,8 @@ func (this *Cache) ServiceArea() byte {
 
 func (this *Cache) Source() string {
 	return this.r.SysConfig().LocalUuid
+}
+
+func (this *Cache) ModelType() string {
+	return this.modelType
 }
