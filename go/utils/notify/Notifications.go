@@ -25,20 +25,7 @@ func CreateNotificationSet(t l8notify.L8NotificationType, serviceName, key strin
 }
 
 func CreateAddNotification(any interface{}, serviceName, key string, serviceArea byte, modelType, source string, changeCount int, notifySequence uint32) (*l8notify.L8NotificationSet, error) {
-	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Add, serviceName, key, serviceArea, modelType, source, changeCount, notifySequence)
-	obj := object.NewEncode()
-	err := obj.Add(any)
-	if err != nil {
-		return nil, err
-	}
-	n := &l8notify.L8Notification{}
-	n.NewValue = obj.Data()
-	notificationSet.NotificationList[0] = n
-	return notificationSet, nil
-}
-
-func CreateSyncNotification(any interface{}, serviceName, key string, serviceArea byte, modelType, source string, changeCount int, notifySequence uint32) (*l8notify.L8NotificationSet, error) {
-	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Sync, serviceName, key, serviceArea, modelType, source, changeCount, notifySequence)
+	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Post, serviceName, key, serviceArea, modelType, source, changeCount, notifySequence)
 	obj := object.NewEncode()
 	err := obj.Add(any)
 	if err != nil {
@@ -51,7 +38,7 @@ func CreateSyncNotification(any interface{}, serviceName, key string, serviceAre
 }
 
 func CreateReplaceNotification(old, new interface{}, serviceName, key string, serviceArea byte, modelType, source string, changeCount int, notifySequence uint32) (*l8notify.L8NotificationSet, error) {
-	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Replace, serviceName, key, serviceArea, modelType, source, 1, notifySequence)
+	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Put, serviceName, key, serviceArea, modelType, source, 1, notifySequence)
 	oldObj := object.NewEncode()
 	err := oldObj.Add(old)
 	if err != nil {
@@ -85,7 +72,7 @@ func CreateDeleteNotification(any interface{}, serviceName, key string, serviceA
 }
 
 func CreateUpdateNotification(changes []*updating.Change, serviceName, key string, serviceArea byte, modelType, source string, changeCount int, notifySequence uint32) (*l8notify.L8NotificationSet, error) {
-	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Update, serviceName, key, serviceArea, modelType, source, changeCount, notifySequence)
+	notificationSet := CreateNotificationSet(l8notify.L8NotificationType_Patch, serviceName, key, serviceArea, modelType, source, changeCount, notifySequence)
 	for i, change := range changes {
 		n := &l8notify.L8Notification{}
 		n.PropertyId = change.PropertyId()
@@ -112,11 +99,9 @@ func CreateUpdateNotification(changes []*updating.Change, serviceName, key strin
 
 func ItemOf(n *l8notify.L8NotificationSet, resources ifs.IResources) (interface{}, error) {
 	switch n.Type {
-	case l8notify.L8NotificationType_Replace:
+	case l8notify.L8NotificationType_Put:
 		fallthrough
-	case l8notify.L8NotificationType_Sync:
-		fallthrough
-	case l8notify.L8NotificationType_Add:
+	case l8notify.L8NotificationType_Post:
 		obj := object.NewDecode(n.NotificationList[0].NewValue, 0, resources.Registry())
 		v, e := obj.Get()
 		return v, e
@@ -124,7 +109,7 @@ func ItemOf(n *l8notify.L8NotificationSet, resources ifs.IResources) (interface{
 		obj := object.NewDecode(n.NotificationList[0].OldValue, 0, resources.Registry())
 		v, e := obj.Get()
 		return v, e
-	case l8notify.L8NotificationType_Update:
+	case l8notify.L8NotificationType_Patch:
 		info, err := resources.Registry().Info(n.ModelType)
 		if err != nil {
 			return nil, err
