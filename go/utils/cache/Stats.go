@@ -1,5 +1,9 @@
 package cache
 
+const (
+	Total = "Total"
+)
+
 func (this *Cache) AddStatFunc(name string, f func(interface{}) bool) {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
@@ -14,4 +18,12 @@ func (this *Cache) Stats() map[string]int32 {
 		result[k] = v
 	}
 	return result
+}
+
+func addTotalStat(cache *Cache) {
+	cache.AddStatFunc(Total, TotalStat)
+}
+
+func TotalStat(any interface{}) bool {
+	return true
 }

@@ -41,7 +41,7 @@ func createChanges(aside, zside *testtypes.TestProto, r ifs.IResources) []*updat
 // Test CreateNotificationSet
 func TestCreateNotificationSet(t *testing.T) {
 	notSet := notify.CreateNotificationSet(
-		l8notify.L8NotificationType_Add,
+		l8notify.L8NotificationType_Post,
 		"test-service",
 		"test-key",
 		1,
@@ -69,7 +69,7 @@ func TestCreateNotificationSet(t *testing.T) {
 	if notSet.Source != "test-source" {
 		t.Errorf("Expected source 'test-source', got '%s'", notSet.Source)
 	}
-	if notSet.Type != l8notify.L8NotificationType_Add {
+	if notSet.Type != l8notify.L8NotificationType_Post {
 		t.Errorf("Expected type Add, got %v", notSet.Type)
 	}
 	if len(notSet.NotificationList) != 5 {
@@ -102,7 +102,7 @@ func TestCreateAddNotification(t *testing.T) {
 	if notSet == nil {
 		t.Fatal("Expected notification set to be created")
 	}
-	if notSet.Type != l8notify.L8NotificationType_Add {
+	if notSet.Type != l8notify.L8NotificationType_Post {
 		t.Errorf("Expected Add type, got %v", notSet.Type)
 	}
 	if len(notSet.NotificationList) != 1 {
@@ -113,48 +113,6 @@ func TestCreateAddNotification(t *testing.T) {
 	}
 
 	// Test ItemOf with Add notification
-	item, err := notify.ItemOf(notSet, res)
-	if err != nil {
-		t.Errorf("Expected no error from ItemOf, got: %v", err)
-	}
-	if item == nil {
-		t.Error("Expected item to be extracted")
-	}
-}
-
-// Test CreateSyncNotification
-func TestCreateSyncNotification(t *testing.T) {
-	model := createModel(2)
-	res := newResources()
-
-	notSet, err := notify.CreateSyncNotification(
-		model,
-		"sync-service",
-		"sync-key",
-		2,
-		"TestProto",
-		"sync-source",
-		1,
-		200,
-	)
-
-	if err != nil {
-		t.Fatalf("Expected no error, got: %v", err)
-	}
-	if notSet == nil {
-		t.Fatal("Expected notification set to be created")
-	}
-	if notSet.Type != l8notify.L8NotificationType_Sync {
-		t.Errorf("Expected Sync type, got %v", notSet.Type)
-	}
-	if notSet.ServiceName != "sync-service" {
-		t.Errorf("Expected service name 'sync-service', got '%s'", notSet.ServiceName)
-	}
-	if notSet.NotificationList[0].NewValue == nil {
-		t.Error("Expected new value to be set")
-	}
-
-	// Test ItemOf with Sync notification
 	item, err := notify.ItemOf(notSet, res)
 	if err != nil {
 		t.Errorf("Expected no error from ItemOf, got: %v", err)
@@ -188,7 +146,7 @@ func TestCreateReplaceNotification(t *testing.T) {
 	if notSet == nil {
 		t.Fatal("Expected notification set to be created")
 	}
-	if notSet.Type != l8notify.L8NotificationType_Replace {
+	if notSet.Type != l8notify.L8NotificationType_Put {
 		t.Errorf("Expected Replace type, got %v", notSet.Type)
 	}
 	if notSet.NotificationList[0].OldValue == nil {
@@ -283,7 +241,7 @@ func TestCreateUpdateNotification(t *testing.T) {
 	if notSet == nil {
 		t.Fatal("Expected notification set to be created")
 	}
-	if notSet.Type != l8notify.L8NotificationType_Update {
+	if notSet.Type != l8notify.L8NotificationType_Patch {
 		t.Errorf("Expected Update type, got %v", notSet.Type)
 	}
 	if len(notSet.NotificationList) != len(changes) {
@@ -384,13 +342,6 @@ func TestItemOfVariousTypes(t *testing.T) {
 			wantItem: true,
 		},
 		{
-			name: "Sync notification",
-			setup: func() (*l8notify.L8NotificationSet, error) {
-				return notify.CreateSyncNotification(createModel(2), "svc", "key", 1, "TestProto", "src", 1, 2)
-			},
-			wantItem: true,
-		},
-		{
 			name: "Replace notification",
 			setup: func() (*l8notify.L8NotificationSet, error) {
 				return notify.CreateReplaceNotification(createModel(1), createModel(2), "svc", "key", 1, "TestProto", "src", 1, 3)
@@ -477,11 +428,10 @@ func TestServiceAreas(t *testing.T) {
 // Test notification types
 func TestNotificationTypes(t *testing.T) {
 	types := []l8notify.L8NotificationType{
-		l8notify.L8NotificationType_Add,
+		l8notify.L8NotificationType_Post,
 		l8notify.L8NotificationType_Delete,
-		l8notify.L8NotificationType_Update,
-		l8notify.L8NotificationType_Replace,
-		l8notify.L8NotificationType_Sync,
+		l8notify.L8NotificationType_Patch,
+		l8notify.L8NotificationType_Put,
 	}
 
 	for _, nt := range types {
