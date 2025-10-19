@@ -2,9 +2,10 @@ package registry
 
 import (
 	"errors"
-	"github.com/saichler/l8types/go/ifs"
 	"reflect"
 	"sync"
+
+	"github.com/saichler/l8types/go/ifs"
 )
 
 type RegistryImpl struct {
@@ -81,4 +82,12 @@ func (this *RegistryImpl) Enum(name string) int32 {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
 	return this.enums[name]
+}
+
+func (this *RegistryImpl) NewOf(any interface{}) interface{} {
+	this.Register(any)
+	typeName := reflect.ValueOf(any).Elem().Type().Name()
+	info, _ := this.Info(typeName)
+	r, _ := info.NewInstance()
+	return r
 }
