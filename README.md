@@ -12,7 +12,15 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 ## Recent Updates
 
-- **Cache System**: New high-performance in-memory cache with storage integration, CRUD operations, notifications, and query support (78.1% test coverage)
+### Latest Changes (October 2025)
+- **Registry Enhancement**: Added `NewOf()` function for dynamic instance creation from registered types
+- **Cache Statistics**: Introduced `TotalStats` feature with automatic total counting for all cache items
+- **Collection Support**: Added `Collect()` functionality for advanced data aggregation in cache
+- **Model Type Integration**: Enhanced type handling and model type support across the framework
+- **Source Management**: Improved source tracking and management in components
+
+### Core Improvements
+- **Cache System**: High-performance in-memory cache with storage integration, CRUD operations, notifications, and query support (78.1% test coverage)
 - **Notification Framework**: Comprehensive notification system for distributed state management with support for Add, Delete, Update, Replace, and Sync operations (87.8% test coverage)
 - **Test Suite Expansion**: Added comprehensive test utilities (createModel, newResources, createChanges) for building robust test suites
 - **Enhanced Security**: Improved certificate management with self-signed certificate support
@@ -28,9 +36,11 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
   - CRUD operations (Post, Get, Put, Patch, Delete)
   - Storage layer integration with persistence support
   - Built-in notification system for change tracking
-  - Statistics tracking with functional filters
+  - Enhanced statistics tracking with named stat functions and automatic totals
+  - Collection operations with `Collect()` for data aggregation
   - Clone-based isolation for concurrent access
   - Query support with pagination and filtering
+  - Dynamic stat functions registration with `AddStatFunc()`
 
 - **Notifications**: Comprehensive notification system for distributed state management
   - Support for Add, Delete, Update, Replace, and Sync notification types
@@ -71,6 +81,10 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 ### 📊 System Management
 
 - **Registry**: Centralized resource and configuration management
+  - Type registration and lookup
+  - Dynamic instance creation with `NewOf()` function
+  - Enum registration and management
+  - Thread-safe operations
 - **Resources**: Resource loading and management utilities
 - **Workers**: Worker pool implementations for concurrent processing
 
@@ -179,10 +193,17 @@ cache.Delete(key, true)
 // Query with pagination
 results := cache.Fetch(0, 25, query)
 
-// Statistics tracking
-stats := cache.Stats(func(item interface{}) bool {
+// Enhanced statistics tracking
+cache.AddStatFunc("active", func(item interface{}) bool {
     return item.(*MyModel).Status == "active"
 })
+cache.AddStatFunc("pending", func(item interface{}) bool {
+    return item.(*MyModel).Status == "pending"
+})
+stats := cache.Stats() // Returns map with counts for "Total", "active", "pending"
+
+// Collection operations
+collection := cache.Collect(predicate)
 ```
 
 ### Notifications
@@ -205,23 +226,61 @@ notSet, err := notify.CreateUpdateNotification(
 item, err := notify.ItemOf(notSet, resources)
 ```
 
+### Registry
+Type registration and dynamic instance creation:
+
+```go
+// Create registry
+registry := registry.NewRegistry()
+
+// Register a type
+registry.Register(&MyModel{})
+
+// Create new instance dynamically
+newInstance := registry.NewOf(&MyModel{})
+
+// Get type information
+info, err := registry.Info("MyModel")
+
+// Register enums
+registry.RegisterEnum("Status", []string{"active", "pending", "completed"})
+```
+
 ## Testing
 
 The library includes comprehensive test suites with high code coverage:
 
-- **Cache Tests** (`go/tests/Cache_test.go`): 78.1% coverage
+### Coverage Reports
+- **Cache Package**: 78.1% coverage
+- **Notifications Package**: 87.8% coverage
+- **Overall**: Comprehensive test coverage across all packages
+
+### Test Files
+- **Cache Tests** (`go/tests/Cache_test.go`):
   - CRUD operations testing
   - Storage integration tests
   - Notification system tests
-  - Statistics tracking validation
+  - Statistics tracking validation including new TotalStats feature
+  - Collection operations testing
   - Concurrent access and isolation tests
 
-- **Notification Tests** (`go/tests/Notifications_test.go`): 87.8% coverage
+- **Notification Tests** (`go/tests/Notifications_test.go`):
   - All notification type tests (Add, Delete, Update, Replace, Sync)
   - Serialization/deserialization validation
   - ItemOf extraction tests
   - Property-level change tracking tests
   - Sequence and service area validation
+
+### Running Tests
+```bash
+cd go
+./test.sh  # Runs all tests with coverage reporting
+```
+
+### Coverage Visualization
+HTML coverage reports are generated at:
+- `go/cover-report.html` - Full coverage report
+- `go/coverage_notify.html` - Notification-specific coverage
 
 Test utilities available:
 ```go
@@ -237,9 +296,18 @@ changes := createChanges(oldModel, newModel, resources)
 
 ## Dependencies
 
-- **l8types** (v0.0.0-20250926135209-1d316857fdcf): Core type definitions and interfaces
-- **Protocol Buffers** (v1.36.9): Message serialization and data exchange
+### Direct Dependencies
+- **l8reflect** (v0.0.0-20251012150625-41304187d527): Reflection utilities for dynamic type handling
+- **l8srlz** (v0.0.0-20251010183545-1dc2ad85aec0): Serialization framework for data exchange
+- **l8types** (v0.0.0-20251020135133-5dc074d0670c): Core type definitions and interfaces
+- **Protocol Buffers** (v1.36.10): Message serialization and data exchange
+
+### Indirect Dependencies
 - **Google UUID** (v1.6.0): Unique identifier generation and management
+- **l8bus** (v0.0.0-20251020135521-8892f5ac8f9c): Event bus for distributed messaging
+- **l8ql** (v0.0.0-20250927164348-155ee588c3cb): Query language support
+- **l8services** (v0.0.0-20251019174910-451b61827826): Services framework
+- **l8test** (v0.0.0-20251019130747-4b37b734925d): Testing utilities
 
 ## Performance Features
 
@@ -256,6 +324,19 @@ changes := createChanges(oldModel, newModel, resources)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Recent Commits
+
+### October 2025
+- `d1faf0e` - Add NewOf function for dynamic instance creation
+- `e5abe4b` - Add TotalStats feature for automatic cache statistics
+- `f854626` - Remove sync dependencies
+- `bc797de` - Fix tests
+- `0a66b52` - Add model type support
+- `e928f7d` - Add Collect functionality for cache aggregation
+- `0f9e63f` - Add comprehensive cache & notification systems
+- `92ff836` - Add tests for notification framework
+- `ceb655e` - Update README documentation
 
 ## License
 
