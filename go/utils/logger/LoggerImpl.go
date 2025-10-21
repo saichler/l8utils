@@ -2,10 +2,15 @@ package logger
 
 import (
 	"errors"
-	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8utils/go/utils/queues"
+	"fmt"
+	"log"
+	"os"
+	"syscall"
 	"testing"
 	"time"
+
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8utils/go/utils/queues"
 )
 
 type ILogMethod interface {
@@ -107,4 +112,32 @@ func (loggerImpl *LoggerImpl) Fail(t interface{}, args ...interface{}) {
 
 func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
+}
+
+func init() {
+	os.MkdirAll("/data/logs", 0777)
+	hostname := os.Getenv("HOSTNAME")
+	if hostname == "" {
+		hostname = "localhost"
+	}
+
+	uuid := ifs.NewUuid()
+	panicFileName := "/data/logs/" + hostname + "-" + uuid + ".err"
+	panicFile, err := os.Create(panicFileName)
+
+	logFileName := "/data/logs/" + hostname + "-" + uuid + ".log"
+	logFile, err := os.Create(logFileName)
+
+	if err == nil {
+		err = syscall.Dup2(int(panicFile.Fd()), int(os.Stderr.Fd()))
+		if err != nil {
+			log.Fatalf("Failed to redirect stderr: %v", err)
+		}
+		err = syscall.Dup2(int(logFile.Fd()), int(os.Stdout.Fd()))
+		if err != nil {
+			log.Fatalf("Failed to redirect stdout: %v", err)
+		}
+	} else {
+		fmt.Println("Failed to create error file:", err)
+	}
 }
