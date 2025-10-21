@@ -115,6 +115,9 @@ func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 }
 
 func init() {
+	if !ifs.LogToFiles {
+		return
+	}
 	os.MkdirAll("/data/logs", 0777)
 	hostname := os.Getenv("HOSTNAME")
 	if hostname == "" {
