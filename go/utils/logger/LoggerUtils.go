@@ -2,12 +2,16 @@ package logger
 
 import (
 	"bytes"
-	"github.com/saichler/l8types/go/ifs"
-	strings2 "github.com/saichler/l8utils/go/utils/strings"
+	"os"
+	"os/signal"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
+
+	"github.com/saichler/l8types/go/ifs"
+	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
 func FormatLog(level ifs.LogLevel, t int64, args ...interface{}) string {
@@ -86,4 +90,12 @@ func findFileAndLine(path string, trimPath bool) (string, int) {
 		return filename[index:], line
 	}
 	return filename, line
+}
+
+func WaitForSignal(resources ifs.IResources) {
+	resources.Logger().Info(resources.SysConfig().LocalAlias, ", Waiting for os signal...")
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-sigs
+	resources.Logger().Info(resources.SysConfig().LocalAlias, ", End signal received! ", sig)
 }
