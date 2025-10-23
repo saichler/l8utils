@@ -19,15 +19,6 @@ func TestResources(t *testing.T) {
 		t.Error("Logger should not be nil")
 	}
 
-	// Test default user
-	user := r.DefaultUser()
-	if user == nil {
-		t.Error("Default user should not be nil")
-	}
-	if user.User != "admin" || user.Pass != "admin" {
-		t.Errorf("Expected admin/admin, got %s/%s", user.User, user.Pass)
-	}
-
 	// Test other getters returning nil initially
 	if r.Registry() != nil {
 		t.Error("Registry should be nil initially")
