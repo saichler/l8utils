@@ -2,9 +2,10 @@ package logger
 
 import (
 	"errors"
-	"github.com/saichler/l8types/go/ifs"
 	"testing"
 	"time"
+
+	"github.com/saichler/l8types/go/ifs"
 )
 
 type LoggerDirectImpl struct {
@@ -14,6 +15,7 @@ type LoggerDirectImpl struct {
 
 func NewLoggerDirectImpl(logMethods ...ILogMethod) *LoggerDirectImpl {
 	logImpl := &LoggerDirectImpl{}
+	logToFiles()
 	logImpl.logMethods = logMethods
 	return logImpl
 }

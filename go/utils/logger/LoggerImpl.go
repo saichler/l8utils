@@ -31,6 +31,7 @@ type LoggerEntry struct {
 
 func NewLoggerImpl(logMethods ...ILogMethod) *LoggerImpl {
 	logImpl := &LoggerImpl{}
+	logToFiles()
 	logImpl.logMethods = logMethods
 	logImpl.queue = queues.NewQueue("Logger Queue", 50000)
 	go logImpl.processQueue()
@@ -114,7 +115,7 @@ func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
 }
 
-func init() {
+func logToFiles() {
 	if !ifs.LogToFiles {
 		return
 	}
