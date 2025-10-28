@@ -7,10 +7,8 @@ import (
 	"github.com/saichler/l8types/go/types/l8sysconfig"
 )
 
-const (
-	DEFAULT_MAX_DATA_SIZE = 1024 * 1024 * 50
-	DEFAULT_QUEUE_SIZE    = 100000
-)
+var DEFAULT_MAX_DATA_SIZE uint64 = 1024 * 1024 * 50
+var DEFAULT_QUEUE_SIZE uint64 = 100000
 
 type Resources struct {
 	logger       ifs.ILogger

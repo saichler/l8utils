@@ -1,1 +1,1 @@
-go build -buildmode=plugin -o loader.so Loader.go Provider.go
+go build -buildmode=plugin -o /var/loader.so Loader.go Provider.go
