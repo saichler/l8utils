@@ -15,7 +15,6 @@ type LoggerDirectImpl struct {
 
 func NewLoggerDirectImpl(logMethods ...ILogMethod) *LoggerDirectImpl {
 	logImpl := &LoggerDirectImpl{}
-	logToFiles()
 	logImpl.logMethods = logMethods
 	return logImpl
 }

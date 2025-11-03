@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"syscall"
 	"testing"
 	"time"
@@ -31,7 +32,6 @@ type LoggerEntry struct {
 
 func NewLoggerImpl(logMethods ...ILogMethod) *LoggerImpl {
 	logImpl := &LoggerImpl{}
-	logToFiles()
 	logImpl.logMethods = logMethods
 	logImpl.queue = queues.NewQueue("Logger Queue", 50000)
 	go logImpl.processQueue()
@@ -115,25 +115,26 @@ func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
 }
 
-func logToFiles() {
-	if !ifs.LogToFiles {
-		return
-	}
-	os.MkdirAll("/data/logs", 0777)
+const (
+	PATH_TO_LOGS = "/data/logs"
+)
+
+func SetLogToFile(alias string) {
 	hostname := os.Getenv("HOSTNAME")
 	if hostname == "" {
 		hostname = "localhost"
 	}
 
-	uuid := ifs.NewUuid()
-	panicFileName := "/data/logs/" + hostname + "-" + uuid + ".err"
-	panicFile, err := os.Create(panicFileName)
+	os.MkdirAll(filepath.Join(PATH_TO_LOGS, hostname), 0777)
 
-	logFileName := "/data/logs/" + hostname + "-" + uuid + ".log"
+	errorFileName := filepath.Join(PATH_TO_LOGS, hostname, alias+".err")
+	logFileName := filepath.Join(PATH_TO_LOGS, hostname, alias+".log")
+
+	errorFile, err := os.Create(errorFileName)
 	logFile, err := os.Create(logFileName)
 
 	if err == nil {
-		err = syscall.Dup2(int(panicFile.Fd()), int(os.Stderr.Fd()))
+		err = syscall.Dup2(int(errorFile.Fd()), int(os.Stderr.Fd()))
 		if err != nil {
 			log.Fatalf("Failed to redirect stderr: %v", err)
 		}
