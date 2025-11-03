@@ -39,3 +39,9 @@ func (this *WebService) GetResp() string {
 func (this *WebService) Plugin() string {
 	return this.plugin
 }
+func (this *WebService) Vnet() uint32 {
+	return this.vnet
+}
+func (this *WebService) SetVnet(vnet uint32) {
+	this.vnet = vnet
+}

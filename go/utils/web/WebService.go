@@ -32,6 +32,7 @@ type WebService struct {
 
 	plugin string
 	pbs    map[string]proto.Message
+	vnet   uint32
 }
 
 func New(serviceName string, serviceArea byte,
@@ -103,6 +104,7 @@ func (this *WebService) Serialize() *l8web.L8WebService {
 	if this.plugin != "" {
 		r.Plugin = &l8web.L8Plugin{Data: this.plugin}
 	}
+	r.Vnet = this.vnet
 	return r
 }
 
@@ -127,4 +129,5 @@ func (this *WebService) DeSerialize(ws *l8web.L8WebService) {
 	if ws.Plugin != nil {
 		this.plugin = ws.Plugin.Data
 	}
+	this.vnet = ws.Vnet
 }
