@@ -575,8 +575,8 @@
         <div class="hero-content parallax-base">
             <img src="Layer8Logo.gif" alt="Layer 8 Logo" style="width: 75px; height: 75px; margin-bottom: 2rem; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
             <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem;">
-                <span style="background: #d4af37; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">v1.0 Oct 2025</span>
-                <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">Go 1.23.8</span>
+                <span style="background: #d4af37; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">v1.1 Nov 2025</span>
+                <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">Go 1.24.9</span>
                 <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">78%+ Coverage</span>
             </div>
             <h1>Layer 8 Utils</h1>
@@ -606,8 +606,8 @@
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon web">🌐</div>
-                    <h3>Web Services Framework</h3>
-                    <p>RESTful service utilities with HTTP method handlers, request/response marshaling, and protocol buffer integration.</p>
+                    <h3>Web Services with VNet</h3>
+                    <p>RESTful service utilities with HTTP method handlers, request/response marshaling, protocol buffer integration, and VNet (Virtual Network) support for distributed networking.</p>
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon performance">⚡</div>
@@ -624,6 +624,11 @@
                     <h3>Notification System</h3>
                     <p>Comprehensive notification system for distributed state management with Add, Delete, Update, Replace, and Sync operations (87.8% test coverage).</p>
                 </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Shared Resources</h3>
+                    <p>Centralized resource management with integrated logger, registry, security provider, system configuration, introspection, and service manager - all configured via NewResources().</p>
+                </div>
             </div>
         </div>
     </section>
@@ -634,33 +639,33 @@
             <h2 class="section-title fade-in">Recent Updates</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 3rem;">
                 <div class="feature-card fade-in" style="border-left: 4px solid #d4af37;">
-                    <h3 style="color: #d4af37;">🚀 October 2025 Release</h3>
+                    <h3 style="color: #d4af37;">🚀 November 2025 Release</h3>
                     <ul style="list-style: none; padding-left: 0; line-height: 2;">
-                        <li>✅ <strong>Registry.NewOf()</strong> - Dynamic instance creation from registered types</li>
-                        <li>✅ <strong>TotalStats</strong> - Automatic total counting for cache items</li>
-                        <li>✅ <strong>Cache.Collect()</strong> - Advanced data aggregation functionality</li>
-                        <li>✅ <strong>Enhanced Type System</strong> - Improved model type integration</li>
-                        <li>✅ <strong>Source Management</strong> - Better tracking across components</li>
+                        <li>✅ <strong>VNet Support</strong> - Virtual Network integration in WebService</li>
+                        <li>✅ <strong>File Logging Fixed</strong> - Enhanced file logging with better error handling</li>
+                        <li>✅ <strong>Shared Resources</strong> - New centralized resource management utilities</li>
+                        <li>✅ <strong>Service Integration</strong> - Improved l8services framework support</li>
+                        <li>✅ <strong>Configuration Management</strong> - L8SysConfig with VNet and keep-alive settings</li>
                     </ul>
                 </div>
                 <div class="feature-card fade-in" style="border-left: 4px solid #4ecdc4;">
-                    <h3 style="color: #4ecdc4;">📊 Latest Improvements</h3>
+                    <h3 style="color: #4ecdc4;">📊 October 2025 Features</h3>
                     <ul style="list-style: none; padding-left: 0; line-height: 2;">
-                        <li>📈 Cache package: 78.1% test coverage</li>
-                        <li>📈 Notifications: 87.8% test coverage</li>
-                        <li>⚡ Performance optimizations in ByteQueue</li>
-                        <li>🔒 Enhanced security with self-signed certificates</li>
-                        <li>🛠️ Fixed interface implementations for type safety</li>
+                        <li>✅ <strong>Registry.NewOf()</strong> - Dynamic instance creation</li>
+                        <li>✅ <strong>TotalStats</strong> - Automatic cache statistics</li>
+                        <li>✅ <strong>Cache.Collect()</strong> - Data aggregation</li>
+                        <li>✅ <strong>Enhanced Type System</strong> - Model type integration</li>
+                        <li>✅ <strong>Source Management</strong> - Component tracking</li>
                     </ul>
                 </div>
                 <div class="feature-card fade-in" style="border-left: 4px solid #8e44ad;">
-                    <h3 style="color: #8e44ad;">🔧 Enhanced Features</h3>
+                    <h3 style="color: #8e44ad;">🔧 Test Coverage & Quality</h3>
                     <ul style="list-style: none; padding-left: 0; line-height: 2;">
-                        <li>🎯 <strong>AddStatFunc()</strong> - Register custom statistics functions</li>
-                        <li>📦 <strong>Storage Integration</strong> - Persistent cache backing</li>
-                        <li>🔄 <strong>Clone-based Isolation</strong> - Safe concurrent access</li>
-                        <li>📡 <strong>Protocol Buffers v1.36.10</strong> - Latest serialization</li>
-                        <li>🏗️ <strong>Go 1.23.8</strong> - Latest language features</li>
+                        <li>📈 <strong>Cache Package</strong> - 78.1% test coverage</li>
+                        <li>📈 <strong>Notifications</strong> - 87.8% test coverage</li>
+                        <li>⚡ <strong>Performance</strong> - Optimized ByteQueue operations</li>
+                        <li>🔒 <strong>Security</strong> - Enhanced certificate management</li>
+                        <li>🛠️ <strong>Type Safety</strong> - Fixed interface implementations</li>
                     </ul>
                 </div>
             </div>
@@ -675,7 +680,7 @@
                     <h2>Microservices Architecture</h2>
                     <p>Layer 8 Utils provides a comprehensive foundation for building scalable microservices. Our modular design allows you to use default implementations or provide custom implementations that adhere to defined interfaces.</p>
                     <p>Enhanced with recent improvements including better interface implementations, performance optimizations, and robust security features.</p>
-                    <p>Built with Go 1.23.8 and leveraging Protocol Buffers v1.36.10 for efficient data serialization. Includes comprehensive test coverage with 78.1% for cache operations and 87.8% for notification systems.</p>
+                    <p>Built with Go 1.24.9 and leveraging Protocol Buffers v1.36.10 for efficient data serialization. Includes comprehensive test coverage with 78.1% for cache operations and 87.8% for notification systems.</p>
                 </div>
                 <div class="architecture-diagram fade-in">
                     <div class="diagram-nodes">
@@ -701,19 +706,22 @@
                 </div>
             </div>
             <div class="fade-in">
-                <h3>Example Usage - Basic</h3>
+                <h3>Example Usage - With Shared Resources</h3>
                 <div class="code-block">
                     <pre>package main
 
 import (
-    "github.com/saichler/l8utils/go/utils/logger"
+    "github.com/saichler/l8utils/go/utils"
     "github.com/saichler/l8utils/go/utils/queues"
     "github.com/saichler/l8types/go/ifs"
 )
 
 func main() {
-    // Create logger with console output
-    log := logger.NewLoggerImpl(logger.NewFmtLogMethod())
+    // Create shared resources with VNet support
+    resources := utils.NewResources("my-service", 8080, 30)
+
+    // Get logger from resources
+    log := resources.Logger()
     log.Info("Application started")
 
     // Create high-performance byte queue
@@ -752,7 +760,15 @@ activeItems := cache.Collect(func(item interface{}) bool {
 // Registry with dynamic instance creation
 registry := registry.NewRegistry()
 registry.Register(&MyModel{})
-newInstance := registry.NewOf(&MyModel{}) // Dynamically create new instance</pre>
+newInstance := registry.NewOf(&MyModel{}) // Dynamically create new instance
+
+// WebService with VNet support (NEW!)
+service := web.NewWebService("user-service", serviceArea)
+service.SetVnet(8080) // Set VNet port for distributed networking
+service.HandlePost(userCreateHandler)
+service.HandleGet(userGetHandler)
+service.HandlePut(userUpdateHandler)
+service.HandleDelete(userDeleteHandler)</pre>
                 </div>
             </div>
         </div>
@@ -786,7 +802,7 @@ newInstance := registry.NewOf(&MyModel{}) // Dynamically create new instance</pr
                     <p><a href="#">Release Notes</a></p>
                 </div>
             </div>
-            <p>&copy; 2025 Layer 8 Utils. Licensed under Apache 2.0 | Go 1.23.8 | Protocol Buffers v1.36.10</p>
+            <p>&copy; 2025 Layer 8 Utils. Licensed under Apache 2.0 | Go 1.24.9 | Protocol Buffers v1.36.10</p>
         </div>
     </footer>
 

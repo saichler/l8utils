@@ -1,6 +1,6 @@
 # Layer 8 Utils
 
-[![Go Version](https://img.shields.io/badge/Go-1.23.8-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.24.9-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-green.svg)]()
 
@@ -12,7 +12,13 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 ## Recent Updates
 
-### Latest Changes (October 2025)
+### Latest Changes (November 2025)
+- **VNet Support**: Added VNet (Virtual Network) support to WebService for enhanced networking capabilities
+- **Logging Enhancements**: Fixed and improved file logging functionality with better error handling
+- **Shared Resources**: Added new shared resource utilities (`NewResources`) for centralized resource management
+- **Service Integration**: Enhanced integration with l8services for improved microservices support
+
+### October 2025 Updates
 - **Registry Enhancement**: Added `NewOf()` function for dynamic instance creation from registered types
 - **Cache Statistics**: Introduced `TotalStats` feature with automatic total counting for all cache items
 - **Collection Support**: Added `Collect()` functionality for advanced data aggregation in cache
@@ -77,6 +83,8 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
   - HTTP method handlers (GET, POST, PUT, PATCH, DELETE)
   - Request/response marshaling
   - Protocol buffer integration
+  - VNet (Virtual Network) support for distributed networking
+  - Enhanced service-to-service communication
 
 ### 📊 System Management
 
@@ -100,20 +108,24 @@ go get github.com/saichler/l8utils/go
 package main
 
 import (
+    "github.com/saichler/l8utils/go/utils"
     "github.com/saichler/l8utils/go/utils/logger"
     "github.com/saichler/l8utils/go/utils/queues"
     "github.com/saichler/l8types/go/ifs"
 )
 
 func main() {
-    // Create a logger with console output
-    log := logger.NewLoggerImpl(logger.NewFmtLogMethod())
+    // Create shared resources with VNet support
+    resources := utils.NewResources("my-service", 8080, 30)
+
+    // Get logger from resources
+    log := resources.Logger()
     log.Info("Application started")
 
     // Create a high-performance byte queue
     queue := queues.NewByteQueue("main-queue", 10000)
     queue.Add([]byte("Hello World"), ifs.PRIORITY_MEDIUM)
-    
+
     // Process queue items
     if data := queue.Poll(); data != nil {
         log.Info("Processed:", string(data))
@@ -159,21 +171,51 @@ result := queue.Next() // Blocking until data available
 Asynchronous logging with multiple output methods:
 
 ```go
+// Console logging
+logger := logger.NewLoggerImpl(logger.NewFmtLogMethod())
+
+// File logging with automatic file management
+fileLog := logger.NewFileLogMethod("app.log")
+logger := logger.NewLoggerImpl(fileLog)
+
+// Combined logging
 logger := logger.NewLoggerImpl(
     logger.NewFileLogMethod("app.log"),
     logger.NewFmtLogMethod(),
 )
-logger.SetLogLevel(ifs.LOG_INFO)
+logger.SetLogLevel(ifs.Error_Level)
 logger.Info("Application ready")
 ```
 
 ### Web Services
-RESTful service utilities with protocol buffer support:
+RESTful service utilities with protocol buffer and VNet support:
 
 ```go
+// Create web service with VNet support
 service := web.NewWebService("user-service", serviceArea)
+service.SetVnet(8080) // Set VNet port
+
+// Register handlers
 service.HandlePost(userCreateHandler)
 service.HandleGet(userGetHandler)
+service.HandlePut(userUpdateHandler)
+service.HandleDelete(userDeleteHandler)
+```
+
+### Shared Resources
+Centralized resource management with integrated components:
+
+```go
+// Create resources with alias, VNet port, and keep-alive settings
+resources := utils.NewResources("my-service", 8080, 30)
+
+// Resources automatically include:
+// - Logger with error-level default
+// - Registry for type management
+// - Security provider
+// - System configuration
+// - Introspection capabilities
+// - Service manager
 ```
 
 ### Cache
@@ -297,17 +339,17 @@ changes := createChanges(oldModel, newModel, resources)
 ## Dependencies
 
 ### Direct Dependencies
-- **l8reflect** (v0.0.0-20251012150625-41304187d527): Reflection utilities for dynamic type handling
-- **l8srlz** (v0.0.0-20251010183545-1dc2ad85aec0): Serialization framework for data exchange
-- **l8types** (v0.0.0-20251020135133-5dc074d0670c): Core type definitions and interfaces
+- **l8reflect** (v0.0.0-20251020202633-feaa244d0a2b): Reflection utilities for dynamic type handling
+- **l8services** (v0.0.0-20251031163521-852f7c020c80): Services framework for microservices management
+- **l8srlz** (v0.0.0-20251027151455-5149a019bed7): Serialization framework for data exchange
+- **l8types** (v0.0.0-20251103131334-82d3444d09d8): Core type definitions and interfaces
 - **Protocol Buffers** (v1.36.10): Message serialization and data exchange
 
 ### Indirect Dependencies
 - **Google UUID** (v1.6.0): Unique identifier generation and management
-- **l8bus** (v0.0.0-20251020135521-8892f5ac8f9c): Event bus for distributed messaging
-- **l8ql** (v0.0.0-20250927164348-155ee588c3cb): Query language support
-- **l8services** (v0.0.0-20251019174910-451b61827826): Services framework
-- **l8test** (v0.0.0-20251019130747-4b37b734925d): Testing utilities
+- **l8bus** (v0.0.0-20251031141311-e67190ca68dc): Event bus for distributed messaging
+- **l8ql** (v0.0.0-20251030150208-8a58a1d7ac8a): Query language support
+- **l8test** (v0.0.0-20251030140121-4de54523fc40): Testing utilities
 
 ## Performance Features
 
@@ -327,16 +369,19 @@ changes := createChanges(oldModel, newModel, resources)
 
 ## Recent Commits
 
+### November 2025
+- `2119a29` - Add vnet to web - Added VNet support to WebService
+- `64ab2f9` - Fix log to file - Fixed file logging functionality
+- `5ca22f1` - move loader - Reorganized loader components
+- `27fa796` - add shared - Added shared resource utilities
+- `cb17025` - Log to files - Enhanced file logging capabilities
+
 ### October 2025
-- `d1faf0e` - Add NewOf function for dynamic instance creation
-- `e5abe4b` - Add TotalStats feature for automatic cache statistics
-- `f854626` - Remove sync dependencies
-- `bc797de` - Fix tests
-- `0a66b52` - Add model type support
-- `e928f7d` - Add Collect functionality for cache aggregation
-- `0f9e63f` - Add comprehensive cache & notification systems
-- `92ff836` - Add tests for notification framework
-- `ceb655e` - Update README documentation
+- `d7f9d0d` - Wait for signal - Added signal handling
+- `fe2c916` - remove default user - Security enhancement
+- `74eaae4` - Add log to files - Initial file logging implementation
+- `046924f` - Add file logs - File logging support
+- `06f7f2d` - update readme - Documentation updates
 
 ## License
 
