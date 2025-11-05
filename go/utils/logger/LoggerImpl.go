@@ -6,12 +6,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"syscall"
 	"testing"
 	"time"
 
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/queues"
+	"golang.org/x/sys/unix"
 )
 
 type ILogMethod interface {
@@ -134,11 +134,11 @@ func SetLogToFile(alias string) {
 	logFile, err := os.Create(logFileName)
 
 	if err == nil {
-		err = syscall.Dup2(int(errorFile.Fd()), int(os.Stderr.Fd()))
+		err = unix.Dup2(int(errorFile.Fd()), int(os.Stderr.Fd()))
 		if err != nil {
 			log.Fatalf("Failed to redirect stderr: %v", err)
 		}
-		err = syscall.Dup2(int(logFile.Fd()), int(os.Stdout.Fd()))
+		err = unix.Dup2(int(logFile.Fd()), int(os.Stdout.Fd()))
 		if err != nil {
 			log.Fatalf("Failed to redirect stdout: %v", err)
 		}
