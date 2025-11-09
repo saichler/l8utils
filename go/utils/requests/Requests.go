@@ -115,15 +115,15 @@ func (this *Request) SetResponse(resp ifs.IElements) {
 		return
 	}
 
-	// Use once to ensure we only process the response once
+	tr, ok := resp.Element().(*l8services.L8Transaction)
+
+	// If transaction is not ended, don't complete the request yet
+	if ok && tr.End == 0 {
+		return
+	}
+
+	// Use once to ensure we only send the final response once
 	this.once.Do(func() {
-		tr, ok := resp.Element().(*l8services.L8Transaction)
-
-		// If transaction is not ended, don't complete the request yet
-		if ok && tr.End == 0 {
-			return
-		}
-
 		// Send response to channel (non-blocking)
 		select {
 		case this.responseChan <- resp:
