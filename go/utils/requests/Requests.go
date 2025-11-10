@@ -111,7 +111,7 @@ func (this *Request) Wait() ifs.IElements {
 }
 
 func (this *Request) SetResponse(resp ifs.IElements) {
-	if resp == nil {
+	if this == nil || resp == nil {
 		return
 	}
 
