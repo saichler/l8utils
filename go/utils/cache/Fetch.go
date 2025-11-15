@@ -13,5 +13,6 @@ func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8
 	for i, v := range values {
 		result[i] = cloner.Clone(v)
 	}
-	return result, counts
+	countsClone := cloner.Clone(counts).(*l8api.L8Counts)
+	return result, countsClone
 }
