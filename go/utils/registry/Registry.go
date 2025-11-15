@@ -8,6 +8,11 @@ import (
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8types/go/types/l8health"
+	"github.com/saichler/l8types/go/types/l8notify"
+	"github.com/saichler/l8types/go/types/l8reflect"
+	"github.com/saichler/l8types/go/types/l8services"
+	"github.com/saichler/l8types/go/types/l8sysconfig"
+	"github.com/saichler/l8types/go/types/l8system"
 	"github.com/saichler/l8types/go/types/l8web"
 )
 
@@ -40,12 +45,23 @@ func (this *RegistryImpl) registerPrimitives() {
 
 func (this *RegistryImpl) registerBase() {
 	this.Register(&l8api.L8Query{})
-	this.Register(&l8api.L8Counts{})
+	this.Register(&l8api.L8MetaData{})
 	this.Register(&l8api.AuthToken{})
 	this.Register(&l8api.AuthUser{})
 	this.Register(&l8health.L8Health{})
 	this.Register(&l8health.L8HealthList{})
 	this.Register(&l8web.L8Empty{})
+	this.Register(&l8notify.L8NotificationSet{})
+	this.Register(&l8reflect.L8Node{})
+	this.Register(&l8reflect.L8TableView{})
+	this.Register(&l8web.L8WebService{})
+	this.Register(&l8services.L8Services{})
+	this.Register(&l8services.L8ReplicationIndex{})
+	this.Register(&l8services.L8Transaction{})
+	this.Register(&l8services.L8ServiceLink{})
+	this.Register(&l8sysconfig.L8SysConfig{})
+	this.Register(&l8system.L8SystemMessage{})
+	this.Register(&l8web.L8Plugin{})
 }
 
 func (this *RegistryImpl) Register(any interface{}) (bool, error) {
