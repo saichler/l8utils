@@ -10,13 +10,13 @@ import (
 )
 
 type internalCache struct {
-	cache       map[string]interface{}
-	addedOrder  []string
-	key2order   map[string]int
-	stamp       int64
-	queries     map[string]*internalQuery
-	countFunc   map[string]func(interface{}) (bool, string)
-	globalCount *l8api.L8Counts
+	cache          map[string]interface{}
+	addedOrder     []string
+	key2order      map[string]int
+	stamp          int64
+	queries        map[string]*internalQuery
+	metadataFunc   map[string]func(interface{}) (bool, string)
+	globalMetadata *l8api.L8MetaData
 }
 
 func newInternalCache() *internalCache {
@@ -25,31 +25,31 @@ func newInternalCache() *internalCache {
 	iq.addedOrder = make([]string, 0)
 	iq.key2order = make(map[string]int)
 	iq.queries = make(map[string]*internalQuery)
-	iq.globalCount = newCounts()
+	iq.globalMetadata = newMetadata()
 	return iq
 }
 
-func newCounts() *l8api.L8Counts {
-	counts := &l8api.L8Counts{}
-	counts.Counts = &l8api.L8ValueCount{}
-	counts.Counts.Counts = make(map[string]int32)
-	counts.ValueCounts = make(map[string]*l8api.L8ValueCount)
-	return counts
+func newMetadata() *l8api.L8MetaData {
+	metadata := &l8api.L8MetaData{}
+	metadata.KeyCount = &l8api.L8Count{}
+	metadata.KeyCount.Counts = make(map[string]int32)
+	metadata.ValueCount = make(map[string]*l8api.L8Count)
+	return metadata
 }
 
-func (this *internalCache) removeFromCounts(key string) (interface{}, bool) {
+func (this *internalCache) removeFromMetadata(key string) (interface{}, bool) {
 	old, ok := this.cache[key]
-	if ok && this.countFunc != nil {
-		for count, f := range this.countFunc {
+	if ok && this.metadataFunc != nil {
+		for count, f := range this.metadataFunc {
 			ok1, v := f(old)
 			if ok1 {
-				this.globalCount.Counts.Counts[count]--
+				this.globalMetadata.KeyCount.Counts[count]--
 				if v != "" {
-					vCount, ok2 := this.globalCount.ValueCounts[count]
+					vCount, ok2 := this.globalMetadata.ValueCount[count]
 					if !ok2 {
-						vCount = &l8api.L8ValueCount{}
+						vCount = &l8api.L8Count{}
 						vCount.Counts = make(map[string]int32)
-						this.globalCount.ValueCounts[count] = vCount
+						this.globalMetadata.ValueCount[count] = vCount
 					}
 					vCount.Counts[v]--
 				}
@@ -59,38 +59,22 @@ func (this *internalCache) removeFromCounts(key string) (interface{}, bool) {
 	return old, ok
 }
 
-func (this *internalCache) addToCounts(value interface{}) {
-	if this.countFunc != nil {
-		for count, f := range this.countFunc {
-			ok1, v := f(value)
-			if ok1 {
-				this.globalCount.Counts.Counts[count]++
-				if v != "" {
-					vCount, ok2 := this.globalCount.ValueCounts[count]
-					if !ok2 {
-						vCount = &l8api.L8ValueCount{}
-						vCount.Counts = make(map[string]int32)
-						this.globalCount.ValueCounts[count] = vCount
-					}
-					vCount.Counts[v]++
-				}
-			}
-		}
-	}
+func (this *internalCache) addToMetadata(value interface{}) {
+	addToMetadata(value, this.metadataFunc, this.globalMetadata)
 }
 
-func addToCounts(value interface{}, countFunc map[string]func(interface{}) (bool, string), counts *l8api.L8Counts) {
-	if countFunc != nil {
-		for count, f := range countFunc {
+func addToMetadata(value interface{}, metadataFunc map[string]func(interface{}) (bool, string), metadata *l8api.L8MetaData) {
+	if metadataFunc != nil {
+		for count, f := range metadataFunc {
 			ok1, v := f(value)
 			if ok1 {
-				counts.Counts.Counts[count]++
+				metadata.KeyCount.Counts[count]++
 				if v != "" {
-					vCount, ok2 := counts.ValueCounts[count]
+					vCount, ok2 := metadata.ValueCount[count]
 					if !ok2 {
-						vCount = &l8api.L8ValueCount{}
+						vCount = &l8api.L8Count{}
 						vCount.Counts = make(map[string]int32)
-						counts.ValueCounts[count] = vCount
+						metadata.ValueCount[count] = vCount
 					}
 					vCount.Counts[v]++
 				}
@@ -100,14 +84,14 @@ func addToCounts(value interface{}, countFunc map[string]func(interface{}) (bool
 }
 
 func (this *internalCache) put(key string, value interface{}) {
-	_, ok := this.removeFromCounts(key)
+	_, ok := this.removeFromMetadata(key)
 	this.cache[key] = value
 	if !ok {
 		this.addedOrder = append(this.addedOrder, key)
 		this.stamp = time.Now().Unix()
 		this.key2order[key] = len(this.addedOrder) - 1
 	}
-	this.addToCounts(value)
+	this.addToMetadata(value)
 }
 
 func (this *internalCache) get(key string) (interface{}, bool) {
@@ -116,7 +100,7 @@ func (this *internalCache) get(key string) (interface{}, bool) {
 }
 
 func (this *internalCache) delete(key string) (interface{}, bool) {
-	item, ok := this.removeFromCounts(key)
+	item, ok := this.removeFromMetadata(key)
 	delete(this.cache, key)
 	this.stamp = time.Now().Unix()
 	return item, ok
@@ -126,7 +110,7 @@ func (this *internalCache) size() int {
 	return len(this.cache)
 }
 
-func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8Counts) {
+func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8MetaData) {
 
 	noCriteriaOrSort := true
 
@@ -144,10 +128,10 @@ func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interfac
 		noCriteriaOrSort = (!qrt.IsValid() || qrt.IsNil()) && strings.TrimSpace(q.SortBy()) == ""
 		//Query does not have criteria so use the added order for keys
 		if noCriteriaOrSort {
-			dq.prepare(this.cache, this.addedOrder, this.stamp, this.countFunc)
+			dq.prepare(this.cache, this.addedOrder, this.stamp, this.metadataFunc)
 		} else {
 			//We need to create a dataset sorted by the sortby and filter by the criteria
-			dq.prepare(this.cache, nil, this.stamp, this.countFunc)
+			dq.prepare(this.cache, nil, this.stamp, this.metadataFunc)
 		}
 	}
 
@@ -167,27 +151,27 @@ func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interfac
 		}
 	}
 	if !noCriteriaOrSort {
-		return result, dq.counts
+		return result, dq.metadata
 	}
-	return result, this.globalCount
+	return result, this.globalMetadata
 }
 
-func (this *internalCache) addCountFunc(name string, f func(interface{}) (bool, string)) {
-	if this.countFunc == nil {
-		this.countFunc = make(map[string]func(interface{}) (bool, string))
+func (this *internalCache) addMetadataFunc(name string, f func(interface{}) (bool, string)) {
+	if this.metadataFunc == nil {
+		this.metadataFunc = make(map[string]func(interface{}) (bool, string))
 	}
-	this.countFunc[name] = f
+	this.metadataFunc[name] = f
 	if len(this.cache) > 0 {
 		for _, elem := range this.cache {
 			ok1, v := f(elem)
 			if ok1 {
-				this.globalCount.Counts.Counts[name]++
+				this.globalMetadata.KeyCount.Counts[name]++
 				if v != "" {
-					vCount, ok2 := this.globalCount.ValueCounts[name]
+					vCount, ok2 := this.globalMetadata.ValueCount[name]
 					if !ok2 {
-						vCount = &l8api.L8ValueCount{}
+						vCount = &l8api.L8Count{}
 						vCount.Counts = make(map[string]int32)
-						this.globalCount.ValueCounts[name] = vCount
+						this.globalMetadata.ValueCount[name] = vCount
 					}
 					vCount.Counts[v]++
 				}

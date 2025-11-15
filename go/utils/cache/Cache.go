@@ -71,7 +71,7 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 			this.iCache.put(k, item)
 		}
 	}
-	addTotalCount(this)
+	addTotalMetadata(this)
 	return this
 }
 

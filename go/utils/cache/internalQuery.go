@@ -10,21 +10,21 @@ import (
 )
 
 type internalQuery struct {
-	query  ifs.IQuery
-	data   []string
-	stamp  int64
-	hash   string
-	counts *l8api.L8Counts
+	query    ifs.IQuery
+	data     []string
+	stamp    int64
+	hash     string
+	metadata *l8api.L8MetaData
 }
 
 func newInternalQuery(query ifs.IQuery) *internalQuery {
 	iq := &internalQuery{query: query}
 	iq.hash = query.Hash()
-	iq.counts = newCounts()
+	iq.metadata = newMetadata()
 	return iq
 }
 
-func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []string, stamp int64, countFunc map[string]func(interface{}) (bool, string)) {
+func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []string, stamp int64, metadataFunc map[string]func(interface{}) (bool, string)) {
 	this.stamp = stamp
 
 	data := make([]string, 0)
@@ -37,7 +37,7 @@ func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []st
 		for k, v := range cache {
 			if this.query.Match(v) {
 				data = append(data, k)
-				addToCounts(v, countFunc, this.counts)
+				addToMetadata(v, metadataFunc, this.metadata)
 			}
 		}
 	}
