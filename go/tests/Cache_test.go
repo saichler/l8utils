@@ -594,15 +594,15 @@ func TestCacheMultipleItems(t *testing.T) {
 	}
 }
 
-// Test AddCountFunc and Counts
+// Test AddMetadataFunc and Metadata
 func TestCacheStats(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	// Add a count function that counts items with MyInt32 > 100
-	c.AddCountFunc("high_values", func(i interface{}) (bool, string) {
+	// Add a metadata function that counts items with MyInt32 > 100
+	c.AddMetadataFunc("high_values", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32 > 100, ""
 		}
@@ -619,10 +619,10 @@ func TestCacheStats(t *testing.T) {
 		}
 	}
 
-	counts := c.Counts()
-	highValues, ok := counts["high_values"]
+	metadata := c.Metadata()
+	highValues, ok := metadata["high_values"]
 	if !ok {
-		t.Error("Expected 'high_values' count to exist")
+		t.Error("Expected 'high_values' metadata to exist")
 	}
 
 	// Models with i=3,4,5 should have MyInt32 > 100 (150, 200, 250)
@@ -631,36 +631,36 @@ func TestCacheStats(t *testing.T) {
 	}
 }
 
-// Test Counts with empty cache
+// Test Metadata with empty cache
 func TestCacheStatsEmpty(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	c.AddCountFunc("any_stat", func(i interface{}) (bool, string) {
+	c.AddMetadataFunc("any_stat", func(i interface{}) (bool, string) {
 		return true, ""
 	})
 
-	counts := c.Counts()
-	// When cache is empty, the count might not be initialized
-	if len(counts) > 0 {
-		anyStat, ok := counts["any_stat"]
+	metadata := c.Metadata()
+	// When cache is empty, the metadata might not be initialized
+	if len(metadata) > 0 {
+		anyStat, ok := metadata["any_stat"]
 		if ok && anyStat != 0 {
 			t.Errorf("Expected 0 for empty cache, got %d", anyStat)
 		}
 	}
 }
 
-// Test Counts update after patch
+// Test Metadata update after patch
 func TestCacheStatsAfterPatch(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	// Add count function
-	c.AddCountFunc("even_values", func(i interface{}) (bool, string) {
+	// Add metadata function
+	c.AddMetadataFunc("even_values", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32%2 == 0, ""
 		}
@@ -675,9 +675,9 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 		t.Fatalf("Failed to post: %v", err)
 	}
 
-	counts := c.Counts()
-	if counts["even_values"] != 0 {
-		t.Errorf("Expected 0 even values, got %d", counts["even_values"])
+	metadata := c.Metadata()
+	if metadata["even_values"] != 0 {
+		t.Errorf("Expected 0 even values, got %d", metadata["even_values"])
 	}
 
 	// Patch to even value
@@ -688,21 +688,21 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 		t.Fatalf("Failed to patch: %v", err)
 	}
 
-	counts = c.Counts()
-	if counts["even_values"] != 1 {
-		t.Errorf("Expected 1 even value after patch, got %d", counts["even_values"])
+	metadata = c.Metadata()
+	if metadata["even_values"] != 1 {
+		t.Errorf("Expected 1 even value after patch, got %d", metadata["even_values"])
 	}
 }
 
-// Test Counts update after delete
+// Test Metadata update after delete
 func TestCacheStatsAfterDelete(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	// Add count function
-	c.AddCountFunc("count_all", func(i interface{}) (bool, string) {
+	// Add metadata function
+	c.AddMetadataFunc("count_all", func(i interface{}) (bool, string) {
 		return true, ""
 	})
 
@@ -712,17 +712,17 @@ func TestCacheStatsAfterDelete(t *testing.T) {
 	c.Post(model1, false)
 	c.Post(model2, false)
 
-	counts := c.Counts()
-	if counts["count_all"] != 2 {
-		t.Errorf("Expected 2 items, got %d", counts["count_all"])
+	metadata := c.Metadata()
+	if metadata["count_all"] != 2 {
+		t.Errorf("Expected 2 items, got %d", metadata["count_all"])
 	}
 
 	// Delete one
 	c.Delete(model1, false)
 
-	counts = c.Counts()
-	if counts["count_all"] != 1 {
-		t.Errorf("Expected 1 item after delete, got %d", counts["count_all"])
+	metadata = c.Metadata()
+	if metadata["count_all"] != 1 {
+		t.Errorf("Expected 1 item after delete, got %d", metadata["count_all"])
 	}
 }
 
@@ -761,22 +761,22 @@ func TestCachePostNoChanges(t *testing.T) {
 	}
 }
 
-// Test Counts with multiple functions
+// Test Metadata with multiple functions
 func TestCacheStatsMultipleFunctions(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	// Add multiple count functions
-	c.AddCountFunc("positive", func(i interface{}) (bool, string) {
+	// Add multiple metadata functions
+	c.AddMetadataFunc("positive", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32 > 0, ""
 		}
 		return false, ""
 	})
 
-	c.AddCountFunc("large", func(i interface{}) (bool, string) {
+	c.AddMetadataFunc("large", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32 > 100, ""
 		}
@@ -790,16 +790,16 @@ func TestCacheStatsMultipleFunctions(t *testing.T) {
 		c.Post(newModel, false)
 	}
 
-	counts := c.Counts()
+	metadata := c.Metadata()
 
 	// All should be positive
-	if counts["positive"] != 5 {
-		t.Errorf("Expected 5 positive values, got %d", counts["positive"])
+	if metadata["positive"] != 5 {
+		t.Errorf("Expected 5 positive values, got %d", metadata["positive"])
 	}
 
 	// Items with i=4,5 should be > 100 (120, 150)
-	if counts["large"] != 2 {
-		t.Errorf("Expected 2 large values, got %d", counts["large"])
+	if metadata["large"] != 2 {
+		t.Errorf("Expected 2 large values, got %d", metadata["large"])
 	}
 }
 
@@ -887,7 +887,7 @@ func TestCachePostUpdateReplaceNotification(t *testing.T) {
 	}
 }
 
-// Test AddCountFunc on cache with existing items
+// Test AddMetadataFunc on cache with existing items
 func TestCacheAddStatFuncWithExistingItems(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
@@ -901,34 +901,34 @@ func TestCacheAddStatFuncWithExistingItems(t *testing.T) {
 		c.Post(newModel, false)
 	}
 
-	// Then add count function
-	c.AddCountFunc("over_50", func(i interface{}) (bool, string) {
+	// Then add metadata function
+	c.AddMetadataFunc("over_50", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32 > 50, ""
 		}
 		return false, ""
 	})
 
-	counts := c.Counts()
+	metadata := c.Metadata()
 
 	// Items with i=2,3 should be > 50 (80, 120)
-	if counts["over_50"] != 2 {
-		t.Errorf("Expected 2 items over 50, got %d", counts["over_50"])
+	if metadata["over_50"] != 2 {
+		t.Errorf("Expected 2 items over 50, got %d", metadata["over_50"])
 	}
 }
 
-// Test delete with count update
+// Test delete with metadata update
 func TestCacheDeleteWithStats(t *testing.T) {
 	res := newResources()
 	model := createModel(1)
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	c.AddCountFunc("all_items", func(i interface{}) (bool, string) {
+	c.AddMetadataFunc("all_items", func(i interface{}) (bool, string) {
 		return true, ""
 	})
 
-	c.AddCountFunc("high_int", func(i interface{}) (bool, string) {
+	c.AddMetadataFunc("high_int", func(i interface{}) (bool, string) {
 		if testModel, ok := i.(*testtypes.TestProto); ok {
 			return testModel.MyInt32 > 50, ""
 		}
@@ -944,23 +944,23 @@ func TestCacheDeleteWithStats(t *testing.T) {
 	c.Post(model1, false)
 	c.Post(model2, false)
 
-	counts := c.Counts()
-	if counts["all_items"] != 2 {
-		t.Errorf("Expected 2 items, got %d", counts["all_items"])
+	metadata := c.Metadata()
+	if metadata["all_items"] != 2 {
+		t.Errorf("Expected 2 items, got %d", metadata["all_items"])
 	}
-	if counts["high_int"] != 1 {
-		t.Errorf("Expected 1 high_int, got %d", counts["high_int"])
+	if metadata["high_int"] != 1 {
+		t.Errorf("Expected 1 high_int, got %d", metadata["high_int"])
 	}
 
 	// Delete the high int item
 	c.Delete(model1, false)
 
-	counts = c.Counts()
-	if counts["all_items"] != 1 {
-		t.Errorf("Expected 1 item after delete, got %d", counts["all_items"])
+	metadata = c.Metadata()
+	if metadata["all_items"] != 1 {
+		t.Errorf("Expected 1 item after delete, got %d", metadata["all_items"])
 	}
-	if counts["high_int"] != 0 {
-		t.Errorf("Expected 0 high_int after delete, got %d", counts["high_int"])
+	if metadata["high_int"] != 0 {
+		t.Errorf("Expected 0 high_int after delete, got %d", metadata["high_int"])
 	}
 }
 
