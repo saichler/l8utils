@@ -6,6 +6,9 @@ import (
 	"sync"
 
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
+	"github.com/saichler/l8types/go/types/l8health"
+	"github.com/saichler/l8types/go/types/l8web"
 )
 
 type RegistryImpl struct {
@@ -20,6 +23,7 @@ func NewRegistry() *RegistryImpl {
 	registry.enums = make(map[string]int32)
 	registry.mtx = new(sync.RWMutex)
 	registry.registerPrimitives()
+	registry.registerBase()
 	return registry
 }
 
@@ -32,6 +36,16 @@ func (this *RegistryImpl) registerPrimitives() {
 	this.RegisterType(reflect.TypeOf(true))
 	this.RegisterType(reflect.TypeOf(float32(0)))
 	this.RegisterType(reflect.TypeOf(float64(0)))
+}
+
+func (this *RegistryImpl) registerBase() {
+	this.Register(&l8api.L8Query{})
+	this.Register(&l8api.L8Counts{})
+	this.Register(&l8api.AuthToken{})
+	this.Register(&l8api.AuthUser{})
+	this.Register(&l8health.L8Health{})
+	this.Register(&l8health.L8HealthList{})
+	this.Register(&l8web.L8Empty{})
 }
 
 func (this *RegistryImpl) Register(any interface{}) (bool, error) {
