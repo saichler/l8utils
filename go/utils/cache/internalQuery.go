@@ -34,6 +34,7 @@ func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []st
 	if addedOrder != nil {
 		data = addedOrder
 	} else {
+		this.metadata = newMetadata()
 		for k, v := range cache {
 			if this.query.Match(v) {
 				data = append(data, k)

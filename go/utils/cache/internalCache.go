@@ -46,12 +46,9 @@ func (this *internalCache) removeFromMetadata(key string) (interface{}, bool) {
 				this.globalMetadata.KeyCount.Counts[count]--
 				if v != "" {
 					vCount, ok2 := this.globalMetadata.ValueCount[count]
-					if !ok2 {
-						vCount = &l8api.L8Count{}
-						vCount.Counts = make(map[string]int32)
-						this.globalMetadata.ValueCount[count] = vCount
+					if ok2 {
+						vCount.Counts[v]--
 					}
-					vCount.Counts[v]--
 				}
 			}
 		}
