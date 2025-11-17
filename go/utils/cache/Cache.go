@@ -3,6 +3,7 @@ package cache
 import (
 	"errors"
 	"reflect"
+	"runtime/debug"
 	"sync"
 
 	"github.com/saichler/l8reflect/go/reflect/cloning"
@@ -100,6 +101,7 @@ func (this *Cache) typeFor(any interface{}) (string, error) {
 		return this.modelType, nil
 	}
 	if any == nil {
+		debug.PrintStack()
 		return "", errors.New("Cannot get type for nil interface")
 	}
 	v := reflect.ValueOf(any)
