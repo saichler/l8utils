@@ -8,12 +8,12 @@ import (
 )
 
 func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, err := this.PrimaryKeyFor(v)
+	k, name, err := this.PrimaryKeyFor(v)
 	if err != nil {
 		return nil, err
 	}
 	if k == "" {
-		return nil, errors.New("Interface does not contain the Key attributes")
+		return nil, errors.New("Post Interface does not contain the Key attributes " + name)
 	}
 
 	//Make sure we clone the input value, so the caller don't have a reference to the cache element

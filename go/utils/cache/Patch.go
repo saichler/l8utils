@@ -8,12 +8,12 @@ import (
 )
 
 func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, err := this.PrimaryKeyFor(v)
+	k, name, err := this.PrimaryKeyFor(v)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Patch error for " + name + ": " + err.Error())
 	}
 	if k == "" {
-		return nil, errors.New("Interface does not contain the Key attributes")
+		return nil, errors.New("Patch Interface does not contain the Key attributes " + name)
 	}
 
 	this.mtx.Lock()

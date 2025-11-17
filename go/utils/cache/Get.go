@@ -10,15 +10,16 @@ func (this *Cache) Get(v interface{}) (interface{}, error) {
 	var item interface{}
 	var e error
 	var k string
+	var name string
 	var ok bool
 
-	k, e = this.PrimaryKeyFor(v)
+	k, name, e = this.PrimaryKeyFor(v)
 	if e != nil {
 		return item, e
 	}
 
 	if k == "" {
-		e = errors.New("Interface does not contain the Key attributes")
+		e = errors.New("Interface does not contain the Key attributes for " + name)
 		return item, e
 	}
 
