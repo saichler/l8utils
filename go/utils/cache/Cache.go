@@ -116,6 +116,7 @@ func (this *Cache) typeFor(any interface{}) (string, error) {
 
 func (this *Cache) PrimaryKeyFor(any interface{}) (string, string, error) {
 	if any == nil {
+		debug.PrintStack()
 		return "", "", errors.New("Cannot get key for nil interface")
 	}
 

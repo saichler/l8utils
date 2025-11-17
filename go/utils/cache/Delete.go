@@ -2,6 +2,7 @@ package cache
 
 import (
 	"errors"
+	"runtime/debug"
 
 	"github.com/saichler/l8types/go/types/l8notify"
 )
@@ -26,6 +27,7 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 	if this.cacheEnabled() {
 		item, ok = this.iCache.delete(k)
 		if !ok {
+			debug.PrintStack()
 			return n, errors.New("Delete Key " + k + " not found for " + name)
 		}
 	}
