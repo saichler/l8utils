@@ -7,7 +7,7 @@ import (
 )
 
 func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, err := this.PrimaryKeyFor(v)
+	k, name, err := this.PrimaryKeyFor(v)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 	if this.cacheEnabled() {
 		item, ok = this.iCache.delete(k)
 		if !ok {
-			return n, errors.New("Key " + k + " not found")
+			return n, errors.New("Delete Key " + k + " not found for " + name)
 		}
 	}
 

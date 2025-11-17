@@ -35,9 +35,9 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	this.store = store
 	this.r = r
 
-	_, err := this.PrimaryKeyFor(sampleElement)
+	_, name, err := this.PrimaryKeyFor(sampleElement)
 	if err != nil {
-		panic(err)
+		panic("Error in initialized elements " + name + " " + err.Error())
 	}
 
 	loadedFromStore := false
@@ -54,8 +54,9 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 
 	if !loadedFromStore && this.store != nil {
 		for _, item := range initElements {
-			k, er := this.PrimaryKeyFor(item)
+			k, n, er := this.PrimaryKeyFor(item)
 			if er != nil {
+				r.Logger().Error("#1 Init item", n, " error:", err.Error())
 				continue
 			}
 			this.store.Put(k, item)
@@ -64,8 +65,9 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 
 	if !loadedFromStore && this.cacheEnabled() && initElements != nil {
 		for _, item := range initElements {
-			k, er := this.PrimaryKeyFor(item)
+			k, n, er := this.PrimaryKeyFor(item)
 			if er != nil {
+				r.Logger().Error("#2 Init item", n, " error:", err.Error())
 				continue
 			}
 			this.iCache.put(k, item)
@@ -108,49 +110,50 @@ func (this *Cache) typeFor(any interface{}) (string, error) {
 	return this.modelType, nil
 }
 
-func (this *Cache) PrimaryKeyFor(any interface{}) (string, error) {
+func (this *Cache) PrimaryKeyFor(any interface{}) (string, string, error) {
 	if any == nil {
-		return "", errors.New("Cannot get key for nil interface")
+		return "", "", errors.New("Cannot get key for nil interface")
 	}
 
 	v := reflect.ValueOf(any)
 	if v.Kind() != reflect.Ptr {
-		return "", errors.New("Cannot get key for non-pointer interface")
+		return "", "", errors.New("Cannot get key for non-pointer interface")
 	}
 	v = v.Elem()
+	name := v.Type().Name()
 
 	if this.keyFieldNames == nil {
 		typ, err := this.typeFor(any)
 		if err != nil {
-			return "", err
+			return "", name, err
 		}
 		node, ok := this.r.Introspector().Node(typ)
 		if !ok {
-			return "", errors.New("Could not find an interospector node for type " + typ)
+			return "", name, errors.New("Could not find an interospector node for type " + typ)
 		}
 		pk := introspecting.PrimaryKeyDecorator(node)
 		if pk == nil {
-			return "", errors.New("No primary key decorator is defined for type " + typ)
+			return "", name, errors.New("No primary key decorator is defined for type " + typ)
 		}
 		this.keyFieldNames = pk.([]string)
 	}
 
 	if len(this.keyFieldNames) == 0 {
-		return "", errors.New("Lost of keys is empty for type " + this.modelType)
+		return "", name, errors.New("Lost of keys is empty for type " + this.modelType)
 	} else if len(this.keyFieldNames) == 1 {
-		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface()).String(), nil
+		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface()).String(), name, nil
 	} else if len(this.keyFieldNames) == 2 {
 		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface(),
-			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), nil
+			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), name, nil
 	} else if len(this.keyFieldNames) == 3 {
 		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface(),
-			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), nil
+			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), name, nil
 	}
 	result := strings.New()
 	for i := 0; i < len(this.keyFieldNames); i++ {
 		result.Add(result.StringOf(v.FieldByName(this.keyFieldNames[0]).Interface()))
 	}
-	return result.String(), nil
+	return result.String(), name, nil
 }
 
 func allElementsInCache(i interface{}) (bool, interface{}) {
