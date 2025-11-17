@@ -2,6 +2,7 @@ package cache
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"runtime/debug"
 	"sync"
@@ -101,6 +102,7 @@ func (this *Cache) typeFor(any interface{}) (string, error) {
 		return this.modelType, nil
 	}
 	if any == nil {
+		fmt.Println("Stack trace:")
 		debug.PrintStack()
 		return "", errors.New("Cannot get type for nil interface")
 	}
