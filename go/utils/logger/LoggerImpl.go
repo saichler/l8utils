@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8utils/go/utils/ipsegment"
 	"github.com/saichler/l8utils/go/utils/queues"
 	"golang.org/x/sys/unix"
 )
@@ -122,7 +123,7 @@ const (
 func SetLogToFile(alias string) {
 	hostname := os.Getenv("HOSTNAME")
 	if hostname == "" {
-		hostname = "localhost"
+		hostname = ipsegment.MachineIP
 	}
 
 	os.MkdirAll(filepath.Join(PATH_TO_LOGS, hostname), 0777)
