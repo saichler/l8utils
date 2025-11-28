@@ -158,6 +158,11 @@ func keyFor(names []string, v reflect.Value, modelType string, returnError bool)
 		return "", nil
 	}
 	switch len(names) {
+	case 0:
+		if returnError {
+			return "", errors.New("Primary Key Decorator  is empty for type " + modelType)
+		}
+		return "", nil
 	case 1:
 		return strings.New(v.FieldByName(names[0]).Interface()).String(), nil
 	case 2:
