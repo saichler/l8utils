@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/saichler/l8reflect/go/reflect/cloning"
-	"github.com/saichler/l8reflect/go/reflect/introspecting"
+	"github.com/saichler/l8reflect/go/reflect/helping"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/strings"
 )
@@ -16,13 +16,14 @@ import (
 var cloner = cloning.NewCloner()
 
 type Cache struct {
-	iCache        *internalCache
-	mtx           *sync.RWMutex
-	cond          *sync.Cond
-	store         ifs.IStorage
-	modelType     string
-	keyFieldNames []string
-	r             ifs.IResources
+	iCache               *internalCache
+	mtx                  *sync.RWMutex
+	cond                 *sync.Cond
+	store                ifs.IStorage
+	modelType            string
+	primaryKeyFieldNames []string
+	uniqueKeyFieldNames  []string
+	r                    ifs.IResources
 
 	notifySequence uint32
 	serviceName    string
@@ -37,17 +38,18 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	this.store = store
 	this.r = r
 
-	_, name, err := this.PrimaryKeyFor(sampleElement)
+	_, _, err := this.KeysFor(sampleElement)
 	if err != nil {
-		panic("Error in initialized elements " + name + " " + err.Error())
+		panic("Error in initialized elements " + err.Error())
 	}
 
 	loadedFromStore := false
 
 	if this.store != nil {
 		items := this.store.Collect(allElementsInCache)
-		for k, v := range items {
-			this.iCache.put(k, v)
+		for _, v := range items {
+			pk, uk, _ := this.KeysFor(v)
+			this.iCache.put(pk, uk, v)
 		}
 		if len(items) > 0 {
 			loadedFromStore = true
@@ -56,23 +58,23 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 
 	if !loadedFromStore && this.store != nil {
 		for _, item := range initElements {
-			k, n, er := this.PrimaryKeyFor(item)
+			pk, _, er := this.KeysFor(item)
 			if er != nil {
-				r.Logger().Error("#1 Init item", n, " error:", err.Error())
+				r.Logger().Error(er.Error())
 				continue
 			}
-			this.store.Put(k, item)
+			this.store.Put(pk, item)
 		}
 	}
 
 	if !loadedFromStore && this.cacheEnabled() && initElements != nil {
 		for _, item := range initElements {
-			k, n, er := this.PrimaryKeyFor(item)
+			pk, uk, er := this.KeysFor(item)
 			if er != nil {
-				r.Logger().Error("#2 Init item", n, " error:", err.Error())
+				r.Logger().Error("#2 Init item", " error:", er.Error())
 				continue
 			}
-			this.iCache.put(k, item)
+			this.iCache.put(pk, uk, item)
 		}
 	}
 	addTotalMetadata(this)
@@ -114,51 +116,64 @@ func (this *Cache) typeFor(any interface{}) (string, error) {
 	return this.modelType, nil
 }
 
-func (this *Cache) PrimaryKeyFor(any interface{}) (string, string, error) {
+func (this *Cache) KeysFor(any interface{}) (string, string, error) {
 	if any == nil {
-		debug.PrintStack()
-		return "", "", errors.New("Cannot get key for nil interface")
+		return "", "", errors.New("Cannot get keys for nil interface")
 	}
 
 	v := reflect.ValueOf(any)
 	if v.Kind() != reflect.Ptr {
-		return "", "", errors.New("Cannot get key for non-pointer interface")
+		return "", "", errors.New("Cannot get keys for non-pointer interface")
 	}
 	v = v.Elem()
-	name := v.Type().Name()
 
-	if this.keyFieldNames == nil {
+	if this.primaryKeyFieldNames == nil {
 		typ, err := this.typeFor(any)
 		if err != nil {
-			return "", name, err
+			return "", "", err
 		}
 		node, ok := this.r.Introspector().Node(typ)
 		if !ok {
-			return "", name, errors.New("Could not find an interospector node for type " + typ)
+			return "", "", errors.New("Could not find an interospector node for type " + typ)
 		}
-		pk := introspecting.PrimaryKeyDecorator(node)
+		pk := helping.PrimaryKeyDecorator(node)
+		uk := helping.UniqueKeyDecorator(node)
 		if pk == nil {
-			return "", name, errors.New("No primary key decorator is defined for type " + typ)
+			return "", "", errors.New("No primary key decorator is defined for type " + typ)
 		}
-		this.keyFieldNames = pk.([]string)
+		this.primaryKeyFieldNames = pk.([]string)
+		this.uniqueKeyFieldNames, _ = uk.([]string)
 	}
 
-	if len(this.keyFieldNames) == 0 {
-		return "", name, errors.New("Lost of keys is empty for type " + this.modelType)
-	} else if len(this.keyFieldNames) == 1 {
-		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface()).String(), name, nil
-	} else if len(this.keyFieldNames) == 2 {
-		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface(),
-			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), name, nil
-	} else if len(this.keyFieldNames) == 3 {
-		return strings.New(v.FieldByName(this.keyFieldNames[0]).Interface(),
-			v.FieldByName(this.keyFieldNames[1]).Interface()).String(), name, nil
+	pkValue, err := keyFor(this.primaryKeyFieldNames, v, this.modelType, true)
+	ukValue, _ := keyFor(this.uniqueKeyFieldNames, v, this.modelType, false)
+	return pkValue, ukValue, err
+}
+
+func keyFor(names []string, v reflect.Value, modelType string, returnError bool) (string, error) {
+	if names == nil || len(names) == 0 {
+		if returnError {
+			return "", errors.New("Primary Key Decorator  is empty for type " + modelType)
+		}
+		return "", nil
 	}
-	result := strings.New()
-	for i := 0; i < len(this.keyFieldNames); i++ {
-		result.Add(result.StringOf(v.FieldByName(this.keyFieldNames[0]).Interface()))
+	switch len(names) {
+	case 1:
+		return strings.New(v.FieldByName(names[0]).Interface()).String(), nil
+	case 2:
+		strings.New(v.FieldByName(names[0]).Interface(), v.FieldByName(names[1]).Interface()).String()
+	case 3:
+		strings.New(v.FieldByName(names[0]).Interface(),
+			v.FieldByName(names[1]).Interface(),
+			v.FieldByName(names[2]).Interface()).String()
+	default:
+		result := strings.New()
+		for i := 0; i < len(names); i++ {
+			result.Add(result.StringOf(v.FieldByName(names[i]).Interface()))
+		}
+		return result.String(), nil
 	}
-	return result.String(), name, nil
+	return "", errors.New("Unexpected code")
 }
 
 func allElementsInCache(i interface{}) (bool, interface{}) {

@@ -8,12 +8,12 @@ import (
 )
 
 func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, name, err := this.PrimaryKeyFor(v)
+	pk, uk, err := this.KeysFor(v)
 	if err != nil {
-		return nil, errors.New("Patch error for " + name + ": " + err.Error())
+		return nil, errors.New("Patch error " + err.Error())
 	}
-	if k == "" {
-		return nil, errors.New("Patch Interface does not contain the Key attributes " + name)
+	if pk == "" {
+		return nil, errors.New("Patch Interface does not contain the Key attributes")
 	}
 
 	this.mtx.Lock()
@@ -24,9 +24,9 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 	var ok bool
 
 	if this.cacheEnabled() {
-		item, ok = this.iCache.get(k)
+		item, ok = this.iCache.get(pk, "")
 	} else {
-		item, e = this.store.Get(k)
+		item, e = this.store.Get(pk)
 		ok = e == nil
 	}
 
@@ -37,12 +37,12 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 
 		if this.cacheEnabled() {
 			//Place the new Item clone in the cache
-			this.iCache.put(k, vClone)
+			this.iCache.put(pk, uk, vClone)
 		}
 
 		if this.store != nil {
 			//place the new item clone in the store
-			e = this.store.Put(k, vClone)
+			e = this.store.Put(pk, vClone)
 		}
 
 		if !createNotification {
@@ -51,7 +51,7 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 
 		//Clone the value for the notification
 		itemClone := cloner.Clone(v)
-		n, e = this.createAddNotification(itemClone, k)
+		n, e = this.createAddNotification(itemClone, pk)
 		return n, e
 	}
 
@@ -73,7 +73,7 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 
 	//Remove the item from the stats to make sure if one of the attributes
 	//that are going to change affect the stats
-	this.iCache.removeFromMetadata(k)
+	this.iCache.removeFromMetadata(pk)
 
 	//Apply the changes to the existing item in the cache
 	for _, change := range changes {
@@ -84,13 +84,13 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 	this.iCache.addToMetadata(item)
 
 	if this.store != nil {
-		e = this.store.Put(k, item)
+		e = this.store.Put(pk, item)
 	}
 
 	if !createNotification {
 		return n, e
 	}
 
-	n, e = this.createUpdateNotification(changes, k)
+	n, e = this.createUpdateNotification(changes, pk)
 	return n, e
 }

@@ -9,17 +9,17 @@ import (
 func (this *Cache) Get(v interface{}) (interface{}, error) {
 	var item interface{}
 	var e error
-	var k string
-	var name string
+	var pk string
+	var uk string
 	var ok bool
 
-	k, name, e = this.PrimaryKeyFor(v)
-	if e != nil {
+	pk, uk, e = this.KeysFor(v)
+	if e != nil && uk == "" {
 		return item, e
 	}
 
-	if k == "" {
-		e = errors.New("Interface does not contain the Key attributes for " + name)
+	if pk == "" && uk == "" {
+		e = errors.New("Interface does not contain the Key attributes")
 		return item, e
 	}
 
@@ -27,13 +27,13 @@ func (this *Cache) Get(v interface{}) (interface{}, error) {
 	defer this.mtx.RUnlock()
 
 	if this.cacheEnabled() {
-		item, ok = this.iCache.get(k)
+		item, ok = this.iCache.get(pk, uk)
 		if ok {
 			itemClone := cloner.Clone(item)
 			return itemClone, e
 		}
 	} else {
-		item, e = this.store.Get(k)
+		item, e = this.store.Get(pk)
 		if e == nil {
 			return item, e
 		}

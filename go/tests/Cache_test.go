@@ -733,7 +733,7 @@ func TestCachePrimaryKeyForNil(t *testing.T) {
 
 	c := cache.NewCache(model, nil, nil, res)
 
-	_, err := c.PrimaryKeyFor(nil)
+	_, _, err := c.PrimaryKeyFor(nil)
 	if err == nil {
 		t.Error("Expected error for nil interface")
 	}

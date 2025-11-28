@@ -8,12 +8,12 @@ import (
 )
 
 func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, name, err := this.PrimaryKeyFor(v)
+	pk, uk, err := this.KeysFor(v)
 	if err != nil {
 		return nil, err
 	}
-	if k == "" {
-		return nil, errors.New("Post Interface does not contain the Key attributes " + name)
+	if pk == "" {
+		return nil, errors.New("Post Interface does not contain the Key attributes ")
 	}
 
 	//Make sure we clone the input value, so the caller don't have a reference to the cache element
@@ -28,9 +28,9 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 	defer this.mtx.Unlock()
 
 	if this.cacheEnabled() {
-		item, ok = this.iCache.get(k)
+		item, ok = this.iCache.get(pk, uk)
 	} else {
-		item, e = this.store.Get(k)
+		item, e = this.store.Get(pk)
 		ok = e == nil
 	}
 
@@ -40,17 +40,17 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 		itemClone := cloner.Clone(v)
 		if this.cacheEnabled() {
 			//Place the value in the cache
-			this.iCache.put(k, v)
+			this.iCache.put(pk, uk, v)
 		}
 		if this.store != nil {
-			e = this.store.Put(k, v)
+			e = this.store.Put(pk, v)
 			if e != nil {
 				return n, e
 			}
 		}
 		//Create the notification using the clone outside the current go routine
 		if createNotification {
-			n, e = this.createAddNotification(itemClone, k)
+			n, e = this.createAddNotification(itemClone, pk)
 			return n, e
 		}
 		return n, e
@@ -62,11 +62,11 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 
 	if this.cacheEnabled() {
 		//Place the value in the cache
-		this.iCache.put(k, vClone)
+		this.iCache.put(pk, uk, vClone)
 	}
 
 	if this.store != nil {
-		e = this.store.Put(k, vClone)
+		e = this.store.Put(pk, vClone)
 		if e != nil {
 			return n, e
 		}
@@ -94,6 +94,6 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 		return nil, nil
 	}
 
-	n, e = this.createReplaceNotification(item, v, k)
+	n, e = this.createReplaceNotification(item, v, pk)
 	return n, e
 }

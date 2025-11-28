@@ -10,13 +10,16 @@ import (
 )
 
 type internalCache struct {
-	cache          map[string]interface{}
-	addedOrder     []string
-	key2order      map[string]int
-	stamp          int64
-	queries        map[string]*internalQuery
-	metadataFunc   map[string]func(interface{}) (bool, string)
-	globalMetadata *l8api.L8MetaData
+	cache           map[string]interface{}
+	UniqueToPrimary map[string]string
+	PrimaryToUnique map[string]string
+	hasExtraKeys    bool
+	addedOrder      []string
+	key2order       map[string]int
+	stamp           int64
+	queries         map[string]*internalQuery
+	metadataFunc    map[string]func(interface{}) (bool, string)
+	globalMetadata  *l8api.L8MetaData
 }
 
 func newInternalCache() *internalCache {
@@ -26,6 +29,8 @@ func newInternalCache() *internalCache {
 	iq.key2order = make(map[string]int)
 	iq.queries = make(map[string]*internalQuery)
 	iq.globalMetadata = newMetadata()
+	iq.UniqueToPrimary = make(map[string]string)
+	iq.PrimaryToUnique = make(map[string]string)
 	return iq
 }
 
@@ -80,25 +85,33 @@ func addToMetadata(value interface{}, metadataFunc map[string]func(interface{}) 
 	}
 }
 
-func (this *internalCache) put(key string, value interface{}) {
-	_, ok := this.removeFromMetadata(key)
-	this.cache[key] = value
+func (this *internalCache) put(pk, uk string, value interface{}) {
+	_, ok := this.removeFromMetadata(pk)
+	this.cache[pk] = value
+	this.putUnique(pk, uk)
 	if !ok {
-		this.addedOrder = append(this.addedOrder, key)
+		this.addedOrder = append(this.addedOrder, pk)
 		this.stamp = time.Now().Unix()
-		this.key2order[key] = len(this.addedOrder) - 1
+		this.key2order[pk] = len(this.addedOrder) - 1
 	}
 	this.addToMetadata(value)
 }
 
-func (this *internalCache) get(key string) (interface{}, bool) {
-	item, ok := this.cache[key]
+func (this *internalCache) get(pk, uk string) (interface{}, bool) {
+	if pk == "" && uk == "" {
+		return nil, false
+	}
+	if pk == "" && uk != "" {
+		pk = this.UniqueToPrimary[uk]
+	}
+	item, ok := this.cache[pk]
 	return item, ok
 }
 
-func (this *internalCache) delete(key string) (interface{}, bool) {
-	item, ok := this.removeFromMetadata(key)
-	delete(this.cache, key)
+func (this *internalCache) delete(pk, uk string) (interface{}, bool) {
+	item, ok := this.removeFromMetadata(pk)
+	delete(this.cache, pk)
+	this.deleteUnique(pk, uk)
 	this.stamp = time.Now().Unix()
 	return item, ok
 }

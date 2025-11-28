@@ -7,11 +7,11 @@ import (
 )
 
 func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
-	k, name, err := this.PrimaryKeyFor(v)
+	pk, uk, err := this.KeysFor(v)
 	if err != nil {
 		return nil, err
 	}
-	if k == "" {
+	if pk == "" {
 		return nil, errors.New("Interface does not contain the Key attributes")
 	}
 
@@ -24,15 +24,14 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 	var ok bool
 
 	if this.cacheEnabled() {
-		item, ok = this.iCache.delete(k)
+		item, ok = this.iCache.delete(pk, uk)
 		if !ok {
-			//debug.PrintStack()
-			return n, errors.New("Delete Key " + k + " not found for " + name)
+			return n, errors.New("Delete Key " + pk + " not found")
 		}
 	}
 
 	if this.store != nil {
-		item, e = this.store.Delete(k)
+		item, e = this.store.Delete(pk)
 		if e != nil {
 			return n, e
 		}
@@ -42,6 +41,6 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 		return n, e
 	}
 
-	n, e = this.createDeleteNotification(item, k)
+	n, e = this.createDeleteNotification(item, pk)
 	return n, e
 }
