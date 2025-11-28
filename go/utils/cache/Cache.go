@@ -166,11 +166,11 @@ func keyFor(names []string, v reflect.Value, modelType string, returnError bool)
 	case 1:
 		return strings.New(v.FieldByName(names[0]).Interface()).String(), nil
 	case 2:
-		strings.New(v.FieldByName(names[0]).Interface(), v.FieldByName(names[1]).Interface()).String()
+		return strings.New(v.FieldByName(names[0]).Interface(), v.FieldByName(names[1]).Interface()).String(), nil
 	case 3:
-		strings.New(v.FieldByName(names[0]).Interface(),
+		return strings.New(v.FieldByName(names[0]).Interface(),
 			v.FieldByName(names[1]).Interface(),
-			v.FieldByName(names[2]).Interface()).String()
+			v.FieldByName(names[2]).Interface()).String(), nil
 	default:
 		result := strings.New()
 		for i := 0; i < len(names); i++ {
