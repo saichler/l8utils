@@ -30,6 +30,7 @@ func newResources() ifs.IResources {
 	res.Set(in)
 	node, _ := res.Introspector().Inspect(testtypes.TestProto{})
 	helping.AddPrimaryKeyDecorator(node, "MyString")
+	helping.AddUniqueKeyDecorator(node, "MyInt32")
 	return res
 }
 

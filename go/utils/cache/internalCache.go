@@ -16,6 +16,7 @@ type internalCache struct {
 	hasExtraKeys    bool
 	addedOrder      []string
 	key2order       map[string]int
+	deleteCount     int
 	stamp           int64
 	queries         map[string]*internalQuery
 	metadataFunc    map[string]func(interface{}) (bool, string)
@@ -110,10 +111,46 @@ func (this *internalCache) get(pk, uk string) (interface{}, bool) {
 
 func (this *internalCache) delete(pk, uk string) (interface{}, bool) {
 	item, ok := this.removeFromMetadata(pk)
+	if !ok {
+		return item, ok
+	}
 	delete(this.cache, pk)
 	this.deleteUnique(pk, uk)
+
+	// Mark as tombstone in addedOrder
+	if idx, exists := this.key2order[pk]; exists {
+		this.addedOrder[idx] = ""
+		delete(this.key2order, pk)
+		this.deleteCount++
+	}
+
 	this.stamp = time.Now().Unix()
+	this.cleanupOrder()
 	return item, ok
+}
+
+func (this *internalCache) cleanupOrder() {
+	// Trigger cleanup when tombstones exceed threshold:
+	// - More than 100 tombstones, OR
+	// - Tombstones are more than 25% of the slice
+	if this.deleteCount < 100 && (len(this.addedOrder) == 0 || this.deleteCount < len(this.addedOrder)/4) {
+		return
+	}
+
+	// Create new slice without tombstones
+	newOrder := make([]string, 0, len(this.addedOrder)-this.deleteCount)
+	newKey2Order := make(map[string]int, len(this.addedOrder)-this.deleteCount)
+
+	for _, pk := range this.addedOrder {
+		if pk != "" { // Skip tombstones
+			newKey2Order[pk] = len(newOrder)
+			newOrder = append(newOrder, pk)
+		}
+	}
+
+	this.addedOrder = newOrder
+	this.key2order = newKey2Order
+	this.deleteCount = 0
 }
 
 func (this *internalCache) size() int {

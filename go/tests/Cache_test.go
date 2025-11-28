@@ -1122,3 +1122,316 @@ func TestNewCacheWithElementsAndStorage(t *testing.T) {
 		t.Errorf("Expected 2 items in storage, got %d", len(storage.data))
 	}
 }
+
+// ============================================================================
+// Unique Key Tests
+// ============================================================================
+
+// Test Get by unique key when primary key is not provided
+func TestCacheGetByUniqueKey(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 12345 // This is the unique key
+
+	c := cache.NewCache(model1, nil, nil, res)
+	_, err := c.Post(model1, false)
+	if err != nil {
+		t.Fatalf("Failed to post: %v", err)
+	}
+
+	// Create a lookup model with only the unique key set (empty primary key)
+	lookupModel := &testtypes.TestProto{
+		MyString: "",      // Empty primary key
+		MyInt32:  12345,   // Unique key
+	}
+
+	retrieved, err := c.Get(lookupModel)
+	if err != nil {
+		t.Fatalf("Expected to retrieve by unique key, got error: %v", err)
+	}
+	if retrieved == nil {
+		t.Fatal("Expected to retrieve item by unique key")
+	}
+
+	if retrievedModel, ok := retrieved.(*testtypes.TestProto); ok {
+		if retrievedModel.MyString != model1.MyString {
+			t.Errorf("Expected MyString '%s', got '%s'", model1.MyString, retrievedModel.MyString)
+		}
+	}
+}
+
+// Test that unique key maps are populated on Post
+func TestCacheUniqueKeyMapsOnPost(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 111
+
+	model2 := createModel(2)
+	model2.MyInt32 = 222
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+	c.Post(model2, false)
+
+	// Retrieve by unique key for both
+	lookup1 := &testtypes.TestProto{MyString: "", MyInt32: 111}
+	lookup2 := &testtypes.TestProto{MyString: "", MyInt32: 222}
+
+	retrieved1, err1 := c.Get(lookup1)
+	retrieved2, err2 := c.Get(lookup2)
+
+	if err1 != nil || retrieved1 == nil {
+		t.Error("Failed to retrieve model1 by unique key")
+	}
+	if err2 != nil || retrieved2 == nil {
+		t.Error("Failed to retrieve model2 by unique key")
+	}
+
+	// Verify correct items retrieved
+	if r1, ok := retrieved1.(*testtypes.TestProto); ok {
+		if r1.MyString != "string-1" {
+			t.Errorf("Expected string-1, got %s", r1.MyString)
+		}
+	}
+	if r2, ok := retrieved2.(*testtypes.TestProto); ok {
+		if r2.MyString != "string-2" {
+			t.Errorf("Expected string-2, got %s", r2.MyString)
+		}
+	}
+}
+
+// Test unique key cleanup on Delete
+func TestCacheUniqueKeyCleanupOnDelete(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 999
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+
+	// Verify we can get by unique key
+	lookup := &testtypes.TestProto{MyString: "", MyInt32: 999}
+	_, err := c.Get(lookup)
+	if err != nil {
+		t.Fatal("Should be able to get by unique key before delete")
+	}
+
+	// Delete the item
+	c.Delete(model1, false)
+
+	// Verify unique key lookup fails
+	_, err = c.Get(lookup)
+	if err == nil {
+		t.Error("Expected error when getting by unique key after delete")
+	}
+}
+
+// Test unique key cleanup when deleting with only primary key
+func TestCacheUniqueKeyCleanupDeleteByPrimaryKey(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 888
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+
+	// Delete using only primary key (empty unique key in delete request)
+	deleteModel := &testtypes.TestProto{MyString: "string-1", MyInt32: 0}
+	_, err := c.Delete(deleteModel, false)
+	if err != nil {
+		t.Fatalf("Delete failed: %v", err)
+	}
+
+	// Verify unique key lookup fails (the bug we fixed)
+	lookup := &testtypes.TestProto{MyString: "", MyInt32: 888}
+	_, err = c.Get(lookup)
+	if err == nil {
+		t.Error("Unique key should have been cleaned up on delete")
+	}
+}
+
+// Test unique key update on Post replace
+func TestCacheUniqueKeyUpdateOnReplace(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 100
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+
+	// Replace with new unique key value
+	model1Updated := createModel(1)
+	model1Updated.MyInt32 = 200
+
+	c.Post(model1Updated, false)
+
+	// Old unique key should not work
+	oldLookup := &testtypes.TestProto{MyString: "", MyInt32: 100}
+	_, err := c.Get(oldLookup)
+	if err == nil {
+		t.Error("Old unique key should not work after replace")
+	}
+
+	// New unique key should work
+	newLookup := &testtypes.TestProto{MyString: "", MyInt32: 200}
+	retrieved, err := c.Get(newLookup)
+	if err != nil {
+		t.Errorf("New unique key should work after replace: %v", err)
+	}
+	if retrieved == nil {
+		t.Error("Expected to retrieve item by new unique key")
+	}
+}
+
+// Test addedOrder cleanup after multiple deletes
+func TestCacheCleanupOrderAfterDeletes(t *testing.T) {
+	res := newResources()
+	model := createModel(1)
+
+	c := cache.NewCache(model, nil, nil, res)
+
+	// Add 150 items
+	for i := 1; i <= 150; i++ {
+		newModel := createModel(i)
+		c.Post(newModel, false)
+	}
+
+	if c.Size() != 150 {
+		t.Errorf("Expected 150 items, got %d", c.Size())
+	}
+
+	// Delete 110 items (should trigger cleanup at 100 tombstones)
+	for i := 1; i <= 110; i++ {
+		deleteModel := createModel(i)
+		_, err := c.Delete(deleteModel, false)
+		if err != nil {
+			t.Fatalf("Delete failed for item %d: %v", i, err)
+		}
+	}
+
+	if c.Size() != 40 {
+		t.Errorf("Expected 40 items after delete, got %d", c.Size())
+	}
+
+	// Verify remaining items are still accessible
+	for i := 111; i <= 150; i++ {
+		getModel := createModel(i)
+		retrieved, err := c.Get(getModel)
+		if err != nil {
+			t.Errorf("Failed to get item %d after cleanup: %v", i, err)
+		}
+		if retrieved == nil {
+			t.Errorf("Item %d should still exist after cleanup", i)
+		}
+	}
+}
+
+// Test that Fetch works correctly after cleanup
+func TestCacheFetchAfterCleanup(t *testing.T) {
+	res := newResources()
+	model := createModel(1)
+
+	c := cache.NewCache(model, nil, nil, res)
+
+	// Add 120 items
+	for i := 1; i <= 120; i++ {
+		newModel := createModel(i)
+		c.Post(newModel, false)
+	}
+
+	// Delete first 105 items (triggers cleanup)
+	for i := 1; i <= 105; i++ {
+		deleteModel := createModel(i)
+		c.Delete(deleteModel, false)
+	}
+
+	// Fetch all remaining items
+	q := createIQuery("select * from TestProto", res)
+	elems, _ := c.Fetch(0, 0, q)
+
+	if len(elems) != 15 {
+		t.Errorf("Expected 15 items from fetch, got %d", len(elems))
+	}
+}
+
+// Test concurrent add and delete with unique keys
+func TestCacheUniqueKeyConcurrentOperations(t *testing.T) {
+	res := newResources()
+	model := createModel(1)
+
+	c := cache.NewCache(model, nil, nil, res)
+
+	// Add items
+	for i := 1; i <= 50; i++ {
+		newModel := createModel(i)
+		newModel.MyInt32 = int32(i * 1000)
+		c.Post(newModel, false)
+	}
+
+	// Delete odd items
+	for i := 1; i <= 50; i += 2 {
+		deleteModel := createModel(i)
+		c.Delete(deleteModel, false)
+	}
+
+	// Verify even items still accessible by unique key
+	for i := 2; i <= 50; i += 2 {
+		lookup := &testtypes.TestProto{MyString: "", MyInt32: int32(i * 1000)}
+		retrieved, err := c.Get(lookup)
+		if err != nil {
+			t.Errorf("Failed to get item %d by unique key: %v", i, err)
+		}
+		if retrieved == nil {
+			t.Errorf("Item %d should be accessible by unique key", i)
+		}
+	}
+
+	// Verify odd items not accessible
+	for i := 1; i <= 50; i += 2 {
+		lookup := &testtypes.TestProto{MyString: "", MyInt32: int32(i * 1000)}
+		_, err := c.Get(lookup)
+		if err == nil {
+			t.Errorf("Item %d should NOT be accessible after delete", i)
+		}
+	}
+}
+
+// Test Get with both primary and unique key
+func TestCacheGetWithBothKeys(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 555
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+
+	// Get with both keys set - primary key takes precedence
+	lookup := &testtypes.TestProto{MyString: "string-1", MyInt32: 555}
+	retrieved, err := c.Get(lookup)
+	if err != nil {
+		t.Fatalf("Failed to get with both keys: %v", err)
+	}
+	if retrieved == nil {
+		t.Fatal("Expected to retrieve item")
+	}
+}
+
+// Test that unique key with empty value is ignored
+func TestCacheUniqueKeyEmptyValue(t *testing.T) {
+	res := newResources()
+	model1 := createModel(1)
+	model1.MyInt32 = 0 // Zero value for unique key
+
+	c := cache.NewCache(model1, nil, nil, res)
+	c.Post(model1, false)
+
+	// Should still be retrievable by primary key
+	lookup := &testtypes.TestProto{MyString: "string-1"}
+	retrieved, err := c.Get(lookup)
+	if err != nil {
+		t.Fatalf("Failed to get by primary key: %v", err)
+	}
+	if retrieved == nil {
+		t.Fatal("Expected to retrieve item by primary key")
+	}
+}
