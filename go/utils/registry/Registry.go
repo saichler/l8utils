@@ -121,3 +121,7 @@ func (this *RegistryImpl) NewOf(any interface{}) interface{} {
 	r, _ := info.NewInstance()
 	return r
 }
+
+func (this *RegistryImpl) TypeList() *l8api.L8TypeList {
+	return nil
+}

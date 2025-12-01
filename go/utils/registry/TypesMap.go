@@ -1,8 +1,10 @@
 package registry
 
 import (
-	"github.com/saichler/l8utils/go/utils/maps"
 	"reflect"
+
+	"github.com/saichler/l8types/go/types/l8api"
+	"github.com/saichler/l8utils/go/utils/maps"
 )
 
 type TypesMap struct {
@@ -39,4 +41,13 @@ func (m *TypesMap) Del(key string) bool {
 
 func (m *TypesMap) Contains(key string) bool {
 	return m.impl.Contains(key)
+}
+
+func (m *TypesMap) TypeList() *l8api.L8TypeList {
+	typeList := &l8api.L8TypeList{}
+	typeList.List = make([]string, 0)
+	m.impl.Iterate(func(k, v interface{}) {
+		typeList.List = append(typeList.List, k.(string))
+	})
+	return typeList
 }
