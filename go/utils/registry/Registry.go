@@ -123,5 +123,5 @@ func (this *RegistryImpl) NewOf(any interface{}) interface{} {
 }
 
 func (this *RegistryImpl) TypeList() *l8api.L8TypeList {
-	return nil
+	return this.types.TypeList()
 }
