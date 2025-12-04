@@ -87,7 +87,7 @@ func (this *ShallowSecurityProvider) Message(string) (*ifs.Message, error) {
 	return &ifs.Message{}, nil
 }
 
-func (this *ShallowSecurityProvider) TFASetup(userid string) (string, []byte, error) {
+func (this *ShallowSecurityProvider) TFASetup(userid string, nic ifs.IVNic) (string, []byte, error) {
 	return "", nil, nil
 }
 
