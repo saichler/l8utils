@@ -86,3 +86,11 @@ func (this *ShallowSecurityProvider) ValidateToken(token string) (string, bool) 
 func (this *ShallowSecurityProvider) Message(string) (*ifs.Message, error) {
 	return &ifs.Message{}, nil
 }
+
+func (this *ShallowSecurityProvider) TFASetup(string) (string, []byte, error) {
+	return "", nil, nil
+}
+
+func (this *ShallowSecurityProvider) TFAVerify(string, string) error {
+	return nil
+}
