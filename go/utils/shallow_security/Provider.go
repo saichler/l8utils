@@ -90,7 +90,12 @@ func (this *ShallowSecurityProvider) Message(string) (*ifs.Message, error) {
 func (this *ShallowSecurityProvider) TFASetup(userid string, nic ifs.IVNic) (string, []byte, error) {
 	return "", nil, nil
 }
-
 func (this *ShallowSecurityProvider) TFAVerify(userid string, code string, bearer string, nic ifs.IVNic) error {
 	return nil
+}
+func (this *ShallowSecurityProvider) Captcha() []byte {
+	return nil
+}
+func (this *ShallowSecurityProvider) Register(userId, password, captcha string) bool {
+	return true
 }
