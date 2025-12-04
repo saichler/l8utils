@@ -77,8 +77,8 @@ func (this *ShallowSecurityProvider) CanDoAction(action ifs.Action, o ifs.IEleme
 func (this *ShallowSecurityProvider) ScopeView(o ifs.IElements, uuid string, token string, salts ...string) ifs.IElements {
 	return o
 }
-func (this *ShallowSecurityProvider) Authenticate(user string, pass string) (string, error) {
-	return "bearer token", nil
+func (this *ShallowSecurityProvider) Authenticate(user string, pass string) (string, bool, error) {
+	return "bearer token", false, nil
 }
 func (this *ShallowSecurityProvider) ValidateToken(token string) (string, bool) {
 	return ifs.NewUuid(), true
@@ -87,10 +87,10 @@ func (this *ShallowSecurityProvider) Message(string) (*ifs.Message, error) {
 	return &ifs.Message{}, nil
 }
 
-func (this *ShallowSecurityProvider) TFASetup(string) (string, []byte, error) {
+func (this *ShallowSecurityProvider) TFASetup(userid string) (string, []byte, error) {
 	return "", nil, nil
 }
 
-func (this *ShallowSecurityProvider) TFAVerify(string, string) error {
+func (this *ShallowSecurityProvider) TFAVerify(userid string, code string, bearer string) error {
 	return nil
 }
