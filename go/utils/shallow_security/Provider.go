@@ -91,6 +91,6 @@ func (this *ShallowSecurityProvider) TFASetup(userid string) (string, []byte, er
 	return "", nil, nil
 }
 
-func (this *ShallowSecurityProvider) TFAVerify(userid string, code string, bearer string) error {
+func (this *ShallowSecurityProvider) TFAVerify(userid string, code string, bearer string, nic ifs.IVNic) error {
 	return nil
 }
