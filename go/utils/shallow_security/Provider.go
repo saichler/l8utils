@@ -96,6 +96,6 @@ func (this *ShallowSecurityProvider) TFAVerify(userid string, code string, beare
 func (this *ShallowSecurityProvider) Captcha() []byte {
 	return nil
 }
-func (this *ShallowSecurityProvider) Register(userId, password, captcha string) bool {
+func (this *ShallowSecurityProvider) Register(userId, password, captcha string, vnic ifs.IVNic) bool {
 	return true
 }
