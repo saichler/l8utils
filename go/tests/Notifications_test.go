@@ -3,7 +3,6 @@ package tests
 import (
 	"testing"
 
-	"github.com/saichler/l8reflect/go/reflect/helping"
 	"github.com/saichler/l8reflect/go/reflect/introspecting"
 	"github.com/saichler/l8reflect/go/reflect/updating"
 	"github.com/saichler/l8reflect/go/tests/utils"
@@ -28,9 +27,8 @@ func newResources() ifs.IResources {
 	res.Set(&l8sysconfig.L8SysConfig{})
 	in := introspecting.NewIntrospect(res.Registry())
 	res.Set(in)
-	node, _ := res.Introspector().Inspect(testtypes.TestProto{})
-	helping.AddPrimaryKeyDecorator(node, "MyString")
-	helping.AddUniqueKeyDecorator(node, "MyInt32")
+	res.Introspector().Decorators().AddPrimaryKeyDecorator(&testtypes.TestProto{}, "MyString")
+	res.Introspector().Decorators().AddUniqueKeyDecorator(&testtypes.TestProto{}, "MyInt32")
 	return res
 }
 
