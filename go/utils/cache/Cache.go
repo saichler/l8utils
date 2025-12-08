@@ -2,9 +2,7 @@ package cache
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
-	"runtime/debug"
 	"sync"
 
 	"github.com/saichler/l8reflect/go/reflect/cloning"
@@ -36,6 +34,7 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	this.cond = sync.NewCond(this.mtx)
 	this.store = store
 	this.r = r
+	this.modelType = reflect.ValueOf(sampleElement).Elem().Type().Name()
 
 	_, _, err := this.KeysFor(sampleElement)
 	if err != nil {
@@ -96,23 +95,6 @@ func (this *Cache) Size() int {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
 	return this.iCache.size()
-}
-
-func (this *Cache) typeFor(any interface{}) (string, error) {
-	if this.modelType != "" {
-		return this.modelType, nil
-	}
-	if any == nil {
-		fmt.Println("Stack trace:")
-		debug.PrintStack()
-		return "", errors.New("Cannot get type for nil interface")
-	}
-	v := reflect.ValueOf(any)
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-	this.modelType = v.Type().Name()
-	return this.modelType, nil
 }
 
 func (this *Cache) KeysFor(any interface{}) (string, string, error) {
