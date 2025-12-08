@@ -8,9 +8,8 @@ import (
 	"sync"
 
 	"github.com/saichler/l8reflect/go/reflect/cloning"
-	"github.com/saichler/l8reflect/go/reflect/helping"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8utils/go/utils/strings"
+	"github.com/saichler/l8types/go/types/l8reflect"
 )
 
 var cloner = cloning.NewCloner()
@@ -128,57 +127,20 @@ func (this *Cache) KeysFor(any interface{}) (string, string, error) {
 	v = v.Elem()
 
 	if this.primaryKeyFieldNames == nil {
-		typ, err := this.typeFor(any)
+		node, _, err := this.r.Introspector().Decorators().NodeFor(any)
 		if err != nil {
 			return "", "", err
 		}
-		node, ok := this.r.Introspector().Node(typ)
-		if !ok {
-			return "", "", errors.New("Could not find an interospector node for type " + typ)
+		this.primaryKeyFieldNames, err = this.r.Introspector().Decorators().Fields(node, l8reflect.L8DecoratorType_Primary)
+		if err != nil {
+			return "", "", err
 		}
-		pk := helping.PrimaryKeyDecorator(node)
-		uk := helping.UniqueKeyDecorator(node)
-		if pk == nil {
-			return "", "", errors.New("No primary key decorator is defined for type " + typ)
-		}
-		this.primaryKeyFieldNames = pk.([]string)
-		this.uniqueKeyFieldNames, _ = uk.([]string)
+		this.uniqueKeyFieldNames, err = this.r.Introspector().Decorators().Fields(node, l8reflect.L8DecoratorType_Unique)
 	}
 
-	pkValue, err := keyFor(this.primaryKeyFieldNames, v, this.modelType, true)
-	ukValue, _ := keyFor(this.uniqueKeyFieldNames, v, this.modelType, false)
+	pkValue, err := this.r.Introspector().Decorators().KeyForValue(this.primaryKeyFieldNames, v, this.modelType, true)
+	ukValue, _ := this.r.Introspector().Decorators().KeyForValue(this.uniqueKeyFieldNames, v, this.modelType, false)
 	return pkValue, ukValue, err
-}
-
-func keyFor(names []string, v reflect.Value, modelType string, returnError bool) (string, error) {
-	if names == nil || len(names) == 0 {
-		if returnError {
-			return "", errors.New("Primary Key Decorator  is empty for type " + modelType)
-		}
-		return "", nil
-	}
-	switch len(names) {
-	case 0:
-		if returnError {
-			return "", errors.New("Primary Key Decorator  is empty for type " + modelType)
-		}
-		return "", nil
-	case 1:
-		return strings.New(v.FieldByName(names[0]).Interface()).String(), nil
-	case 2:
-		return strings.New(v.FieldByName(names[0]).Interface(), v.FieldByName(names[1]).Interface()).String(), nil
-	case 3:
-		return strings.New(v.FieldByName(names[0]).Interface(),
-			v.FieldByName(names[1]).Interface(),
-			v.FieldByName(names[2]).Interface()).String(), nil
-	default:
-		result := strings.New()
-		for i := 0; i < len(names); i++ {
-			result.Add(result.StringOf(v.FieldByName(names[i]).Interface()))
-		}
-		return result.String(), nil
-	}
-	return "", errors.New("Unexpected code")
 }
 
 func allElementsInCache(i interface{}) (bool, interface{}) {
