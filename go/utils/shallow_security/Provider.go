@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
-
 	"github.com/saichler/l8types/go/aes"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/nets"
@@ -98,4 +97,8 @@ func (this *ShallowSecurityProvider) Captcha() []byte {
 }
 func (this *ShallowSecurityProvider) Register(userId, password, captcha string, vnic ifs.IVNic) error {
 	return nil
+}
+
+func (this *ShallowSecurityProvider) Credential(crId, cId string, vnic ifs.IVNic) (string, string, string, string, error) {
+	return "", "", "", "", nil
 }
