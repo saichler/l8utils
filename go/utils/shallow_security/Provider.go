@@ -99,6 +99,6 @@ func (this *ShallowSecurityProvider) Register(userId, password, captcha string, 
 	return nil
 }
 
-func (this *ShallowSecurityProvider) Credential(crId, cId string, vnic ifs.IVNic) (string, string, string, string, error) {
+func (this *ShallowSecurityProvider) Credential(crId, cId string, r ifs.IResources) (string, string, string, string, error) {
 	return "", "", "", "", nil
 }
