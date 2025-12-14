@@ -10,6 +10,7 @@ import (
 
 // Global map that map a type/kind to a method that converts string to that type
 var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind, ifs.IRegistry) (reflect.Value, error))
+var zeroValue = reflect.Zero(reflect.TypeOf(0))
 
 const (
 	errorValue = "Failed to convert string to instance:"
@@ -345,7 +346,7 @@ func InstanceOf(str string, registry ifs.IRegistry) (interface{}, error) {
 // Conver string to a reflect.value
 func FromString(str string, registry ifs.IRegistry) (reflect.Value, error) {
 	if str == "" || str == "{0}" || str == "nil" {
-		return reflect.ValueOf(nil), nil
+		return zeroValue, nil
 	}
 	v, k := parseStringForKinds(str)
 	f := fromstrings[k[0]]
