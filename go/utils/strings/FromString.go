@@ -10,7 +10,7 @@ import (
 
 // Global map that map a type/kind to a method that converts string to that type
 var fromstrings = make(map[reflect.Kind]func(string, []reflect.Kind, ifs.IRegistry) (reflect.Value, error))
-var zeroValue = reflect.Zero(reflect.TypeOf(0))
+var zeroValue = reflect.Zero(reflect.TypeOf(""))
 
 const (
 	errorValue = "Failed to convert string to instance:"
