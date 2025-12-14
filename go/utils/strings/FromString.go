@@ -344,7 +344,7 @@ func InstanceOf(str string, registry ifs.IRegistry) (interface{}, error) {
 
 // Conver string to a reflect.value
 func FromString(str string, registry ifs.IRegistry) (reflect.Value, error) {
-	if str == "" || str == "{0}" {
+	if str == "" || str == "{0}" || str == "nil" {
 		return reflect.ValueOf(nil), nil
 	}
 	v, k := parseStringForKinds(str)
