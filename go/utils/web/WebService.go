@@ -138,7 +138,6 @@ func (this *WebService) DeSerialize(ws *l8web.L8WebService, r ifs.IRegistry) err
 			this.AddEndpoint(body.(proto.Message), ifs.Action(k), resp.(proto.Message))
 		}
 	}
-	this.webService = ws
 	return nil
 }
 
