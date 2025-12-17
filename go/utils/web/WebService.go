@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/base64"
+	"errors"
 	"os"
 	"reflect"
 	"strconv"
@@ -12,54 +13,19 @@ import (
 )
 
 type WebService struct {
-	serviceName string
-	serviceArea byte
-
-	postBody string
-	postResp string
-
-	putBody string
-	putResp string
-
-	patchBody string
-	patchResp string
-
-	deleteBody string
-	deleteResp string
-
-	getBody string
-	getResp string
-
-	plugin string
-	pbs    map[string]proto.Message
-	vnet   uint32
+	webService *l8web.L8WebService
+	plugin     string
+	protos     map[string]proto.Message
 }
 
-func New(serviceName string, serviceArea byte,
-	postBody, postResp,
-	putBody, putResp,
-	patchBody, patchResp,
-	deleteBody, deleteResp,
-	getBody, getResp proto.Message) ifs.IWebService {
+func New(serviceName string, serviceArea byte, vnet uint32) ifs.IWebService {
 	webService := &WebService{}
-	webService.serviceName = serviceName
-	webService.serviceArea = serviceArea
-	webService.pbs = make(map[string]proto.Message)
-
-	webService.postBody = webService.typeOf(postBody)
-	webService.postResp = webService.typeOf(postResp)
-
-	webService.putBody = webService.typeOf(putBody)
-	webService.putResp = webService.typeOf(putResp)
-
-	webService.patchBody = webService.typeOf(patchBody)
-	webService.patchResp = webService.typeOf(patchResp)
-
-	webService.deleteBody = webService.typeOf(deleteBody)
-	webService.deleteResp = webService.typeOf(deleteResp)
-
-	webService.getBody = webService.typeOf(getBody)
-	webService.getResp = webService.typeOf(getResp)
+	webService.webService = &l8web.L8WebService{}
+	webService.webService.ServiceName = serviceName
+	webService.webService.ServiceArea = int32(serviceArea)
+	webService.webService.Endpoints = make(map[string]*l8web.L8WebServiceEndpoint)
+	webService.protos = make(map[string]proto.Message)
+	webService.webService.Vnet = vnet
 
 	filename := serviceName + "-" + strconv.Itoa(int(serviceArea)) + "-registry.so"
 	_, err := os.Stat(filename)
@@ -73,61 +39,69 @@ func New(serviceName string, serviceArea byte,
 	return webService
 }
 
+func (this *WebService) Protos(bodyType string, action ifs.Action) (proto.Message, proto.Message, error) {
+	endpoint, ok := this.webService.Endpoints[bodyType]
+	if !ok {
+		return nil, nil, errors.New("endpoint not found for " + bodyType)
+	}
+	respType, ok := endpoint.Actions[int32(action)]
+	if !ok {
+		return nil, nil, errors.New("action not found for " + bodyType)
+	}
+	body := this.protos[bodyType]
+	resp := this.protos[respType]
+	return body, resp, nil
+}
+
+func (this *WebService) AddEndpoint(body proto.Message, action ifs.Action, resp proto.Message) {
+	if body == nil {
+		body = &l8web.L8Empty{}
+	}
+	if resp == nil {
+		resp = &l8web.L8Empty{}
+	}
+	bodyType := this.typeOf(body)
+	bodyEndpoint, ok := this.webService.Endpoints[bodyType]
+	if !ok {
+		bodyEndpoint = &l8web.L8WebServiceEndpoint{}
+		bodyEndpoint.Actions = make(map[int32]string)
+		this.webService.Endpoints[bodyType] = bodyEndpoint
+	}
+	respType := this.typeOf(resp)
+	bodyEndpoint.Actions[int32(action)] = respType
+
+	this.protos[bodyType] = body
+	this.protos[respType] = resp
+}
+
 func (this *WebService) typeOf(pb proto.Message) string {
 	if pb == nil {
 		return ""
 	}
 	v := reflect.ValueOf(pb).Elem()
-	this.pbs[v.Type().Name()] = pb
 	return v.Type().Name()
 }
 
 func (this *WebService) Serialize() *l8web.L8WebService {
-	r := &l8web.L8WebService{}
-	r.ServiceName = this.serviceName
-	r.ServiceArea = int32(this.serviceArea)
-
-	r.PostRespType = this.postResp
-	r.PostBodyType = this.postBody
-
-	r.PutRespType = this.putResp
-	r.PutBodyType = this.putBody
-
-	r.PatchRespType = this.patchResp
-	r.PatchBodyType = this.patchBody
-
-	r.DeleteRespType = this.deleteResp
-	r.DeleteBodyType = this.deleteBody
-
-	r.GetRespType = this.getResp
-	r.GetBodyType = this.getBody
-	if this.plugin != "" {
-		r.Plugin = &l8web.L8Plugin{Data: this.plugin}
-	}
-	r.Vnet = this.vnet
-	return r
+	return this.webService
 }
 
 func (this *WebService) DeSerialize(ws *l8web.L8WebService) {
-	this.serviceArea = byte(ws.ServiceArea)
-	this.serviceName = ws.ServiceName
+	this.webService = ws
+}
 
-	this.postBody = ws.PostBodyType
-	this.postResp = ws.PostRespType
+func (this *WebService) ServiceName() string {
+	return this.webService.ServiceName
+}
 
-	this.putBody = ws.PutBodyType
-	this.putResp = ws.PutRespType
+func (this *WebService) ServiceArea() byte {
+	return byte(this.webService.ServiceArea)
+}
 
-	this.patchBody = ws.PatchBodyType
-	this.patchResp = ws.PatchRespType
+func (this *WebService) Vnet() uint32 {
+	return this.webService.Vnet
+}
 
-	this.deleteBody = ws.DeleteBodyType
-	this.deleteResp = ws.DeleteRespType
-
-	this.getBody = ws.GetBodyType
-	this.getResp = ws.GetRespType
-	if ws.Plugin != nil {
-		this.plugin = ws.Plugin.Data
-	}
-	this.vnet = ws.Vnet
+func (this *WebService) Plugin() string {
+	return this.plugin
 }
