@@ -3,12 +3,14 @@ package web
 import (
 	"encoding/base64"
 	"errors"
+	"github.com/saichler/l8utils/go/utils/strings"
 	"os"
 	"reflect"
 	"strconv"
 
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8web"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -23,7 +25,7 @@ func New(serviceName string, serviceArea byte, vnet uint32) ifs.IWebService {
 	webService.webService = &l8web.L8WebService{}
 	webService.webService.ServiceName = serviceName
 	webService.webService.ServiceArea = int32(serviceArea)
-	webService.webService.Endpoints = make(map[string]*l8web.L8WebServiceEndpoint)
+	webService.webService.Endpoints = make(map[int32]*l8web.L8WebServiceEndpoint)
 	webService.protos = make(map[string]proto.Message)
 	webService.webService.Vnet = vnet
 
@@ -39,17 +41,42 @@ func New(serviceName string, serviceArea byte, vnet uint32) ifs.IWebService {
 	return webService
 }
 
-func (this *WebService) Protos(bodyType string, action ifs.Action) (proto.Message, proto.Message, error) {
-	endpoint, ok := this.webService.Endpoints[bodyType]
+func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Message, proto.Message, error) {
+	endpoint, ok := this.webService.Endpoints[int32(action)]
 	if !ok {
-		return nil, nil, errors.New("endpoint not found for " + bodyType)
+		msg := strings.New("endpoint not found for action ", this.ServiceName(), " area ", this.ServiceArea(), " ", strconv.Itoa(int(action)))
+		return nil, nil, errors.New(msg.String())
 	}
-	respType, ok := endpoint.Actions[int32(action)]
-	if !ok {
-		return nil, nil, errors.New("action not found for " + bodyType)
-	}
+
+	bodyType := endpoint.PrimaryBody
+
 	body := this.protos[bodyType]
-	resp := this.protos[respType]
+	body = reflect.New(reflect.ValueOf(body).Elem().Type()).Interface().(proto.Message)
+	err := protojson.Unmarshal([]byte(bodyData), body)
+	var resp proto.Message
+
+	if err != nil {
+		bodyType = ""
+		for k, v := range endpoint.Body2Response {
+			if k != endpoint.PrimaryBody {
+				body = this.protos[k]
+				body = reflect.New(reflect.ValueOf(body).Elem().Type()).Interface().(proto.Message)
+				if k != endpoint.PrimaryBody {
+					err = protojson.Unmarshal([]byte(bodyData), body)
+					if err == nil {
+						resp = this.protos[v]
+						resp = reflect.New(reflect.ValueOf(resp).Elem().Type()).Interface().(proto.Message)
+						bodyType = k
+						break
+					}
+				}
+			}
+		}
+	}
+	if bodyType == "" {
+		msg := strings.New("cannot find any matching body type ", this.ServiceName(), " area ", this.ServiceArea(), " ", strconv.Itoa(int(action)))
+		return nil, nil, errors.New(msg.String())
+	}
 	return body, resp, nil
 }
 
@@ -61,14 +88,16 @@ func (this *WebService) AddEndpoint(body proto.Message, action ifs.Action, resp 
 		resp = &l8web.L8Empty{}
 	}
 	bodyType := this.typeOf(body)
-	bodyEndpoint, ok := this.webService.Endpoints[bodyType]
+
+	actionEndpoint, ok := this.webService.Endpoints[int32(action)]
 	if !ok {
-		bodyEndpoint = &l8web.L8WebServiceEndpoint{}
-		bodyEndpoint.Actions = make(map[int32]string)
-		this.webService.Endpoints[bodyType] = bodyEndpoint
+		actionEndpoint = &l8web.L8WebServiceEndpoint{}
+		actionEndpoint.Body2Response = make(map[string]string)
+		actionEndpoint.PrimaryBody = bodyType
+		this.webService.Endpoints[int32(action)] = actionEndpoint
 	}
 	respType := this.typeOf(resp)
-	bodyEndpoint.Actions[int32(action)] = respType
+	actionEndpoint.Body2Response[bodyType] = respType
 
 	this.protos[bodyType] = body
 	this.protos[respType] = resp
