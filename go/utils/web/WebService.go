@@ -115,8 +115,31 @@ func (this *WebService) Serialize() *l8web.L8WebService {
 	return this.webService
 }
 
-func (this *WebService) DeSerialize(ws *l8web.L8WebService) {
+func (this *WebService) DeSerialize(ws *l8web.L8WebService, r ifs.IRegistry) error {
+	for k, v := range ws.Endpoints {
+		for bodyType, respType := range v.Body2Response {
+			info, e := r.Info(bodyType)
+			if e != nil {
+				return e
+			}
+			body, e := info.NewInstance()
+			if e != nil {
+				return e
+			}
+
+			info, e = r.Info(respType)
+			if e != nil {
+				return e
+			}
+			resp, e := info.NewInstance()
+			if e != nil {
+				return e
+			}
+			this.AddEndpoint(body.(proto.Message), ifs.Action(k), resp.(proto.Message))
+		}
+	}
 	this.webService = ws
+	return nil
 }
 
 func (this *WebService) ServiceName() string {

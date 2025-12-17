@@ -3,21 +3,19 @@ package tests
 import (
 	"testing"
 
+	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/testtypes"
 	"github.com/saichler/l8utils/go/utils/web"
 )
 
 func TestWebServiceNew(t *testing.T) {
 	// Create a new web service
-	ws := web.New(
-		"test-service",
-		byte(1),
-		&testtypes.TestProto{}, &testtypes.TestProto{}, // POST
-		&testtypes.TestProto{}, &testtypes.TestProto{}, // PUT
-		&testtypes.TestProto{}, &testtypes.TestProto{}, // PATCH
-		&testtypes.TestProto{}, &testtypes.TestProto{}, // DELETE
-		&testtypes.TestProto{}, &testtypes.TestProto{}, // GET
-	)
+	ws := web.New("test-service", byte(1), 0)
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.POST, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.PUT, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.PATCH, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.DELETE, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.GET, &testtypes.TestProto{})
 
 	// Test getters
 	if ws.ServiceName() != "test-service" {
@@ -28,81 +26,55 @@ func TestWebServiceNew(t *testing.T) {
 		t.Errorf("Expected service area 1, got %d", ws.ServiceArea())
 	}
 
-	// Test that type names are set
-	if ws.PostBody() != "TestProto" {
-		t.Errorf("Expected PostBody 'TestProto', got '%s'", ws.PostBody())
+	if ws.Vnet() != 0 {
+		t.Errorf("Expected vnet 0, got %d", ws.Vnet())
 	}
 
-	if ws.PostResp() != "TestProto" {
-		t.Errorf("Expected PostResp 'TestProto', got '%s'", ws.PostResp())
+	// Test that endpoints are registered
+	l8ws := ws.Serialize()
+	if len(l8ws.Endpoints) != 5 {
+		t.Errorf("Expected 5 endpoints, got %d", len(l8ws.Endpoints))
 	}
 
-	if ws.PutBody() != "TestProto" {
-		t.Errorf("Expected PutBody 'TestProto', got '%s'", ws.PutBody())
-	}
-
-	if ws.PutResp() != "TestProto" {
-		t.Errorf("Expected PutResp 'TestProto', got '%s'", ws.PutResp())
-	}
-
-	if ws.PatchBody() != "TestProto" {
-		t.Errorf("Expected PatchBody 'TestProto', got '%s'", ws.PatchBody())
-	}
-
-	if ws.PatchResp() != "TestProto" {
-		t.Errorf("Expected PatchResp 'TestProto', got '%s'", ws.PatchResp())
-	}
-
-	if ws.DeleteBody() != "TestProto" {
-		t.Errorf("Expected DeleteBody 'TestProto', got '%s'", ws.DeleteBody())
-	}
-
-	if ws.DeleteResp() != "TestProto" {
-		t.Errorf("Expected DeleteResp 'TestProto', got '%s'", ws.DeleteResp())
-	}
-
-	if ws.GetBody() != "TestProto" {
-		t.Errorf("Expected GetBody 'TestProto', got '%s'", ws.GetBody())
-	}
-
-	if ws.GetResp() != "TestProto" {
-		t.Errorf("Expected GetResp 'TestProto', got '%s'", ws.GetResp())
+	// Verify POST endpoint
+	postEndpoint := l8ws.Endpoints[int32(ifs.POST)]
+	if postEndpoint == nil {
+		t.Error("Expected POST endpoint to exist")
+	} else {
+		if postEndpoint.PrimaryBody != "TestProto" {
+			t.Errorf("Expected POST primary body 'TestProto', got '%s'", postEndpoint.PrimaryBody)
+		}
+		if postEndpoint.Body2Response["TestProto"] != "TestProto" {
+			t.Errorf("Expected POST response 'TestProto', got '%s'", postEndpoint.Body2Response["TestProto"])
+		}
 	}
 }
 
 func TestWebServiceNilValues(t *testing.T) {
-	// Create a web service with nil values
-	ws := web.New(
-		"test-service",
-		byte(1),
-		nil, nil, // POST
-		nil, nil, // PUT
-		nil, nil, // PATCH
-		nil, nil, // DELETE
-		nil, nil, // GET
-	)
+	// Create a web service with nil body/response values
+	ws := web.New("test-service", byte(1), 0)
+	ws.AddEndpoint(nil, ifs.POST, nil)
 
-	// Test that empty strings are returned for nil values
-	if ws.PostBody() != "" {
-		t.Errorf("Expected empty PostBody, got '%s'", ws.PostBody())
-	}
-
-	if ws.PostResp() != "" {
-		t.Errorf("Expected empty PostResp, got '%s'", ws.PostResp())
+	// Test that L8Empty is used for nil values
+	l8ws := ws.Serialize()
+	postEndpoint := l8ws.Endpoints[int32(ifs.POST)]
+	if postEndpoint == nil {
+		t.Error("Expected POST endpoint to exist")
+	} else {
+		if postEndpoint.PrimaryBody != "L8Empty" {
+			t.Errorf("Expected POST primary body 'L8Empty', got '%s'", postEndpoint.PrimaryBody)
+		}
+		if postEndpoint.Body2Response["L8Empty"] != "L8Empty" {
+			t.Errorf("Expected POST response 'L8Empty', got '%s'", postEndpoint.Body2Response["L8Empty"])
+		}
 	}
 }
 
 func TestWebServiceSerialize(t *testing.T) {
 	// Create a web service
-	ws := web.New(
-		"test-service",
-		byte(1),
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-	)
+	ws := web.New("test-service", byte(1), 100)
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.POST, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.GET, &testtypes.TestProto{})
 
 	// Serialize
 	l8ws := ws.Serialize()
@@ -116,49 +88,58 @@ func TestWebServiceSerialize(t *testing.T) {
 		t.Errorf("Expected service area 1, got %d", l8ws.ServiceArea)
 	}
 
-	if l8ws.PostBodyType != "TestProto" {
-		t.Errorf("Expected PostBodyType 'TestProto', got '%s'", l8ws.PostBodyType)
+	if l8ws.Vnet != 100 {
+		t.Errorf("Expected vnet 100, got %d", l8ws.Vnet)
 	}
 
-	if l8ws.PostRespType != "TestProto" {
-		t.Errorf("Expected PostRespType 'TestProto', got '%s'", l8ws.PostRespType)
+	if len(l8ws.Endpoints) != 2 {
+		t.Errorf("Expected 2 endpoints, got %d", len(l8ws.Endpoints))
+	}
+
+	// Verify POST endpoint structure
+	postEndpoint := l8ws.Endpoints[int32(ifs.POST)]
+	if postEndpoint == nil {
+		t.Error("Expected POST endpoint to exist")
+	} else {
+		if postEndpoint.PrimaryBody != "TestProto" {
+			t.Errorf("Expected POST primary body 'TestProto', got '%s'", postEndpoint.PrimaryBody)
+		}
 	}
 }
 
-func TestWebServiceDeSerialize(t *testing.T) {
-	// Create a web service
-	ws := web.New(
-		"original-service",
-		byte(1),
-		nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
-	)
+func TestWebServiceVnet(t *testing.T) {
+	// Test vnet getter
+	ws := web.New("test-service", byte(1), 12345)
 
-	// Create a serialized version manually
-	ws2 := web.New(
-		"test-service",
-		byte(2),
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-		&testtypes.TestProto{}, &testtypes.TestProto{},
-	)
-
-	l8ws := ws2.Serialize()
-
-	// Deserialize into the first web service
-	ws.DeSerialize(l8ws)
-
-	// Verify deserialization
-	if ws.ServiceName() != "test-service" {
-		t.Errorf("Expected service name 'test-service', got '%s'", ws.ServiceName())
+	if ws.Vnet() != 12345 {
+		t.Errorf("Expected vnet 12345, got %d", ws.Vnet())
 	}
+}
 
-	if ws.ServiceArea() != byte(2) {
-		t.Errorf("Expected service area 2, got %d", ws.ServiceArea())
-	}
+func TestWebServiceMultipleBodyTypes(t *testing.T) {
+	// Test adding multiple body types to the same action
+	ws := web.New("test-service", byte(1), 0)
+	ws.AddEndpoint(&testtypes.TestProto{}, ifs.POST, &testtypes.TestProto{})
+	ws.AddEndpoint(&testtypes.TestProtoSub{}, ifs.POST, &testtypes.TestProtoSub{})
 
-	if ws.PostBody() != "TestProto" {
-		t.Errorf("Expected PostBody 'TestProto', got '%s'", ws.PostBody())
+	l8ws := ws.Serialize()
+	postEndpoint := l8ws.Endpoints[int32(ifs.POST)]
+	if postEndpoint == nil {
+		t.Error("Expected POST endpoint to exist")
+	} else {
+		// Primary body should be the first one added
+		if postEndpoint.PrimaryBody != "TestProto" {
+			t.Errorf("Expected POST primary body 'TestProto', got '%s'", postEndpoint.PrimaryBody)
+		}
+		// Both body types should be in the map
+		if len(postEndpoint.Body2Response) != 2 {
+			t.Errorf("Expected 2 body types, got %d", len(postEndpoint.Body2Response))
+		}
+		if postEndpoint.Body2Response["TestProto"] != "TestProto" {
+			t.Errorf("Expected TestProto response 'TestProto', got '%s'", postEndpoint.Body2Response["TestProto"])
+		}
+		if postEndpoint.Body2Response["TestProtoSub"] != "TestProtoSub" {
+			t.Errorf("Expected TestProtoSub response 'TestProtoSub', got '%s'", postEndpoint.Body2Response["TestProtoSub"])
+		}
 	}
 }
