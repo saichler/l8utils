@@ -3,7 +3,6 @@ package web
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"github.com/saichler/l8utils/go/utils/strings"
 	"os"
 	"reflect"
@@ -49,6 +48,8 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 		return nil, nil, errors.New(msg.String())
 	}
 
+	bodyError := make(map[string]string)
+
 	bodyType := endpoint.PrimaryBody
 
 	body := this.protos[bodyType]
@@ -57,7 +58,7 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 	var resp proto.Message
 
 	if err != nil {
-		fmt.Println("Error for ", bodyType, " is ", err.Error())
+		bodyError[bodyType] = err.Error()
 		bodyType = ""
 		for k, v := range endpoint.Body2Response {
 			if k != endpoint.PrimaryBody {
@@ -71,13 +72,20 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 						bodyType = k
 						break
 					}
-					fmt.Println("Error for ", bodyType, " is ", err.Error())
+					bodyError[bodyType] = err.Error()
 				}
 			}
 		}
 	}
 	if bodyType == "" {
 		msg := strings.New("cannot find any matching body type ", this.ServiceName(), " area ", this.ServiceArea(), " ", strconv.Itoa(int(action)))
+		msg.Add(" ")
+		for k, v := range bodyError {
+			msg.Add(k)
+			msg.Add("-")
+			msg.Add(v)
+			msg.Add(" ")
+		}
 		return nil, nil, errors.New(msg.String())
 	}
 	return body, resp, nil
