@@ -3,6 +3,7 @@ package web
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"github.com/saichler/l8utils/go/utils/strings"
 	"os"
 	"reflect"
@@ -56,6 +57,7 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 	var resp proto.Message
 
 	if err != nil {
+		fmt.Println("Error for ", bodyType, " is ", err.Error())
 		bodyType = ""
 		for k, v := range endpoint.Body2Response {
 			if k != endpoint.PrimaryBody {
@@ -69,6 +71,7 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 						bodyType = k
 						break
 					}
+					fmt.Println("Error for ", bodyType, " is ", err.Error())
 				}
 			}
 		}
