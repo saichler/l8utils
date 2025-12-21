@@ -7,8 +7,6 @@ import (
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8notify"
-	"github.com/saichler/l8types/go/types/l8reflect"
-	"reflect"
 )
 
 func CreateNotificationSet(t l8notify.L8NotificationType, serviceName, key string, serviceArea byte, modelType, source string,
@@ -120,13 +118,6 @@ func ItemOf(n *l8notify.L8NotificationSet, resources ifs.IResources) (interface{
 		if err != nil {
 			return nil, err
 		}
-
-		node, _ := resources.Introspector().Node(n.ModelType)
-		fields, err := resources.Introspector().Decorators().Fields(node, l8reflect.L8DecoratorType_Primary)
-		if err != nil {
-			panic(err)
-		}
-		reflect.ValueOf(root).Elem().FieldByName(fields[0]).Set(reflect.ValueOf(n.ModelKey))
 
 		for _, notif := range n.NotificationList {
 			p, e := properties.PropertyOf(notif.PropertyId, resources)

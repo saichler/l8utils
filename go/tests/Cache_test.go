@@ -3,6 +3,7 @@ package tests
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
@@ -1433,5 +1434,106 @@ func TestCacheUniqueKeyEmptyValue(t *testing.T) {
 	}
 	if retrieved == nil {
 		t.Fatal("Expected to retrieve item by primary key")
+	}
+}
+
+// Test TTL cleanup removes unused queries
+func TestCacheTTLCleanup(t *testing.T) {
+	res := newResources()
+	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
+	defer c.Close()
+
+	// Add some items
+	for i := 1; i <= 5; i++ {
+		c.Post(createModel(i), false)
+	}
+
+	// Perform different queries to create cached query entries
+	q1 := createIQuery("select * from TestProto", res)
+	q2 := createIQuery("select * from TestProto where MyString=*", res)
+	q3 := createIQuery("select * from TestProto where MyInt32>0", res)
+
+	c.Fetch(0, 25, q1)
+	c.Fetch(0, 25, q2)
+	c.Fetch(0, 25, q3)
+
+	// Verify queries are cached
+	queryCount := c.QueryCount()
+	if queryCount != 3 {
+		t.Errorf("Expected 3 cached queries, got %d", queryCount)
+	}
+
+	// Wait so queries become "old" (need > TTL seconds, using 2s sleep for TTL=1)
+	time.Sleep(time.Second * 2)
+
+	// Cleanup with TTL=1 second should remove all queries (they're all older than 1 second now)
+	removed := c.CleanupQueriesNow(1)
+	if removed != 3 {
+		t.Errorf("Expected to remove 3 queries, removed %d", removed)
+	}
+
+	// Verify all queries are removed
+	queryCount = c.QueryCount()
+	if queryCount != 0 {
+		t.Errorf("Expected 0 cached queries after cleanup, got %d", queryCount)
+	}
+}
+
+// Test TTL cleanup keeps recently used queries
+func TestCacheTTLCleanupKeepsRecentQueries(t *testing.T) {
+	res := newResources()
+	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
+	defer c.Close()
+
+	// Add some items
+	for i := 1; i <= 5; i++ {
+		c.Post(createModel(i), false)
+	}
+
+	// Perform a query
+	q1 := createIQuery("select * from TestProto", res)
+	c.Fetch(0, 25, q1)
+
+	// Verify query is cached
+	if c.QueryCount() != 1 {
+		t.Errorf("Expected 1 cached query, got %d", c.QueryCount())
+	}
+
+	// Cleanup with large TTL should keep the query (it was just used)
+	removed := c.CleanupQueriesNow(3600) // 1 hour TTL
+	if removed != 0 {
+		t.Errorf("Expected to remove 0 queries with large TTL, removed %d", removed)
+	}
+
+	// Query should still be cached
+	if c.QueryCount() != 1 {
+		t.Errorf("Expected 1 cached query after cleanup, got %d", c.QueryCount())
+	}
+}
+
+// Test that fetching a query updates its lastUsed time
+func TestCacheTTLQueryAccessUpdatesLastUsed(t *testing.T) {
+	res := newResources()
+	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
+	defer c.Close()
+
+	// Add some items
+	for i := 1; i <= 5; i++ {
+		c.Post(createModel(i), false)
+	}
+
+	// Perform a query
+	q1 := createIQuery("select * from TestProto", res)
+	c.Fetch(0, 25, q1)
+
+	// With TTL=0, cleanup would remove the query
+	// But first, access it again to update lastUsed
+	c.Fetch(0, 25, q1)
+
+	// Now with TTL=1 second, the query should NOT be removed
+	// because it was just accessed
+	removed := c.CleanupQueriesNow(1)
+	if removed != 0 {
+		t.Errorf("Expected recently accessed query to be kept, but %d were removed", removed)
 	}
 }

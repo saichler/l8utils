@@ -25,6 +25,7 @@ type Cache struct {
 	notifySequence uint32
 	serviceName    string
 	serviceArea    byte
+	cleaner        *ttlCleaner
 }
 
 func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.IStorage, r ifs.IResources) *Cache {
@@ -76,6 +77,11 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 		}
 	}
 	addTotalMetadata(this)
+
+	// Start TTL cleaner for query cache
+	this.cleaner = newTTLCleaner(this)
+	this.cleaner.start()
+
 	return this
 }
 
@@ -143,4 +149,10 @@ func (this *Cache) Source() string {
 
 func (this *Cache) ModelType() string {
 	return this.modelType
+}
+
+func (this *Cache) Close() {
+	if this.cleaner != nil {
+		this.cleaner.stop()
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"net"
 	"sort"
+	"time"
 
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8api"
@@ -15,12 +16,14 @@ type internalQuery struct {
 	stamp    int64
 	hash     string
 	metadata *l8api.L8MetaData
+	lastUsed int64
 }
 
 func newInternalQuery(query ifs.IQuery) *internalQuery {
 	iq := &internalQuery{query: query}
 	iq.hash = query.Hash()
 	iq.metadata = newMetadata()
+	iq.lastUsed = time.Now().Unix()
 	return iq
 }
 

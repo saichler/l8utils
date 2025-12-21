@@ -3,6 +3,7 @@ package cache
 import (
 	"reflect"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/saichler/l8types/go/ifs"
@@ -167,6 +168,9 @@ func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interfac
 		dq = newInternalQuery(q)
 		this.queries[q.Hash()] = dq
 	}
+
+	// Update last used time for TTL tracking
+	atomic.StoreInt64(&dq.lastUsed, time.Now().Unix())
 
 	//If the query timestamp has changed, it means elements were added/removed
 	//so we need re-cresate the sorted set
