@@ -192,10 +192,10 @@ func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interfac
 		noCriteriaOrSort = (!qrt.IsValid() || qrt.IsNil()) && strings.TrimSpace(q.SortBy()) == ""
 		//Query does not have criteria so use the added order for keys
 		if noCriteriaOrSort {
-			dq.prepare(this.cache, this.addedOrder, this.stamp, this.metadataFunc)
+			dq.prepare(this.cache, this.addedOrder, this.stamp, q.Descending(), this.metadataFunc)
 		} else {
 			//We need to create a dataset sorted by the sortby and filter by the criteria
-			dq.prepare(this.cache, nil, this.stamp, this.metadataFunc)
+			dq.prepare(this.cache, nil, this.stamp, q.Descending(), this.metadataFunc)
 		}
 	}
 

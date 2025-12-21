@@ -16,6 +16,7 @@ package cache
 import (
 	"encoding/binary"
 	"net"
+	"reflect"
 	"sort"
 	"time"
 
@@ -40,7 +41,7 @@ func newInternalQuery(query ifs.IQuery) *internalQuery {
 	return iq
 }
 
-func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []string, stamp int64, metadataFunc map[string]func(interface{}) (bool, string)) {
+func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []string, stamp int64, descending bool, metadataFunc map[string]func(interface{}) (bool, string)) {
 	this.stamp = stamp
 
 	data := make([]string, 0)
@@ -66,7 +67,12 @@ func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []st
 			v1 := this.query.SortByValue(cache[data[i]])
 			v2 := this.query.SortByValue(cache[data[j]])
 			if v1 != nil && v2 != nil {
-				return lessThan(v1, v2)
+				reuslt := lessThan(v1, v2)
+				if descending {
+					return !reuslt
+				} else {
+					return reuslt
+				}
 			}
 		}
 		//We just sort according to the key
@@ -129,5 +135,26 @@ func lessThan(a interface{}, b interface{}) bool {
 			return v1 < v2
 		}
 	}
+
+	// Handle custom types (like protobuf enums) using reflection
+	va := reflect.ValueOf(a)
+	vb := reflect.ValueOf(b)
+
+	// Both must have the same underlying kind
+	if va.Kind() != vb.Kind() {
+		return false
+	}
+
+	switch va.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return va.Int() < vb.Int()
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return va.Uint() < vb.Uint()
+	case reflect.Float32, reflect.Float64:
+		return va.Float() < vb.Float()
+	case reflect.String:
+		return va.String() < vb.String()
+	}
+
 	return false
 }
