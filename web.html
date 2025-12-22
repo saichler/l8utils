@@ -575,7 +575,7 @@
         <div class="hero-content parallax-base">
             <img src="Layer8Logo.gif" alt="Layer 8 Logo" style="width: 75px; height: 75px; margin-bottom: 2rem; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
             <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem;">
-                <span style="background: #d4af37; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">v1.1 Nov 2025</span>
+                <span style="background: #d4af37; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">v1.2 Dec 2025</span>
                 <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">Go 1.24.9</span>
                 <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">78%+ Coverage</span>
             </div>
@@ -583,7 +583,7 @@
             <p class="hero-subtitle">Enterprise Microservices Utilities</p>
             <p class="hero-description">
                 Comprehensive collection of high-performance utilities designed for modern microservices architecture.<br>
-                Now featuring enhanced cache statistics, dynamic type instantiation, and improved notification systems.
+                Now featuring query TTL support, enhanced cache statistics, dynamic type instantiation, and improved notification systems.
             </p>
             <a href="#features" class="cta-button">Explore Features</a>
         </div>
@@ -617,7 +617,7 @@
                 <div class="feature-card fade-in">
                     <div class="feature-icon cache">💾</div>
                     <h3>Advanced Cache System</h3>
-                    <p>In-memory cache with storage integration, CRUD operations, enhanced statistics with TotalStats, Collect() for data aggregation, dynamic stat functions, and query support with pagination (78.1% test coverage).</p>
+                    <p>In-memory cache with storage integration, CRUD operations, enhanced statistics with TotalStats, Collect() for data aggregation, query TTL with automatic cleanup, dynamic stat functions, and query support with pagination and sorting (78.1% test coverage).</p>
                 </div>
                 <div class="feature-card fade-in">
                     <div class="feature-icon notify">📢</div>
@@ -638,8 +638,18 @@
         <div class="container">
             <h2 class="section-title fade-in">Recent Updates</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                <div class="feature-card fade-in" style="border-left: 4px solid #e74c3c;">
+                    <h3 style="color: #e74c3c;">🚀 December 2025 Release</h3>
+                    <ul style="list-style: none; padding-left: 0; line-height: 2;">
+                        <li>✅ <strong>Query TTL Support</strong> - Automatic TTL-based cleanup for cached queries</li>
+                        <li>✅ <strong>Query Sorting Fix</strong> - Fixed sorting behavior for consistent ordering</li>
+                        <li>✅ <strong>Web Service Refactoring</strong> - Improved architecture and code organization</li>
+                        <li>✅ <strong>Performance Analysis</strong> - Comprehensive scalability recommendations</li>
+                        <li>✅ <strong>Bug Fixes</strong> - Root key, zero value, and nil handling improvements</li>
+                    </ul>
+                </div>
                 <div class="feature-card fade-in" style="border-left: 4px solid #d4af37;">
-                    <h3 style="color: #d4af37;">🚀 November 2025 Release</h3>
+                    <h3 style="color: #d4af37;">🔧 November 2025 Release</h3>
                     <ul style="list-style: none; padding-left: 0; line-height: 2;">
                         <li>✅ <strong>VNet Support</strong> - Virtual Network integration in WebService</li>
                         <li>✅ <strong>File Logging Fixed</strong> - Enhanced file logging with better error handling</li>
@@ -656,16 +666,6 @@
                         <li>✅ <strong>Cache.Collect()</strong> - Data aggregation</li>
                         <li>✅ <strong>Enhanced Type System</strong> - Model type integration</li>
                         <li>✅ <strong>Source Management</strong> - Component tracking</li>
-                    </ul>
-                </div>
-                <div class="feature-card fade-in" style="border-left: 4px solid #8e44ad;">
-                    <h3 style="color: #8e44ad;">🔧 Test Coverage & Quality</h3>
-                    <ul style="list-style: none; padding-left: 0; line-height: 2;">
-                        <li>📈 <strong>Cache Package</strong> - 78.1% test coverage</li>
-                        <li>📈 <strong>Notifications</strong> - 87.8% test coverage</li>
-                        <li>⚡ <strong>Performance</strong> - Optimized ByteQueue operations</li>
-                        <li>🔒 <strong>Security</strong> - Enhanced certificate management</li>
-                        <li>🛠️ <strong>Type Safety</strong> - Fixed interface implementations</li>
                     </ul>
                 </div>
             </div>
@@ -738,8 +738,16 @@ func main() {
             <div class="fade-in">
                 <h3>Advanced Cache Features</h3>
                 <div class="code-block">
-                    <pre>// Enhanced cache with statistics tracking
-cache := cache.NewCache(&MyModel{}, storage, nil, resources)
+                    <pre>// Enhanced cache with statistics tracking and TTL
+cache := cache.NewCache(&MyModel{}, initElements, storage, resources)
+defer cache.Close() // Stop TTL cleaner on shutdown
+
+// Query with pagination (queries cached with 30s TTL by default)
+results := cache.Fetch(0, 25, query)
+
+// Query cache management (NEW in Dec 2025!)
+queryCount := cache.QueryCount()           // Monitor cached queries
+cache.CleanupQueriesNow(60)               // Manual cleanup with custom TTL
 
 // Register custom statistics functions
 cache.AddStatFunc("active", func(item interface{}) bool {
@@ -762,7 +770,7 @@ registry := registry.NewRegistry()
 registry.Register(&MyModel{})
 newInstance := registry.NewOf(&MyModel{}) // Dynamically create new instance
 
-// WebService with VNet support (NEW!)
+// WebService with VNet support
 service := web.NewWebService("user-service", serviceArea)
 service.SetVnet(8080) // Set VNet port for distributed networking
 service.HandlePost(userCreateHandler)

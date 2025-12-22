@@ -12,7 +12,14 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 ## Recent Updates
 
-### Latest Changes (November 2025)
+### Latest Changes (December 2025)
+- **Query TTL Support**: Added automatic TTL-based cleanup for cached queries with configurable expiration (30s default)
+- **Query Sorting Fix**: Fixed sorting behavior in cache queries for consistent ordering
+- **Web Service Refactoring**: Improved web service architecture with better code organization
+- **Performance Analysis**: Comprehensive performance analysis document added with scalability recommendations
+- **Bug Fixes**: Fixed missing root key handling, zero value handling, nil support improvements
+
+### November 2025 Updates
 - **VNet Support**: Added VNet (Virtual Network) support to WebService for enhanced networking capabilities
 - **Logging Enhancements**: Fixed and improved file logging functionality with better error handling
 - **Shared Resources**: Added new shared resource utilities (`NewResources`) for centralized resource management
@@ -45,7 +52,8 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
   - Enhanced statistics tracking with named stat functions and automatic totals
   - Collection operations with `Collect()` for data aggregation
   - Clone-based isolation for concurrent access
-  - Query support with pagination and filtering
+  - Query support with pagination, filtering, and sorting
+  - Query TTL with automatic cleanup (configurable, 30s default)
   - Dynamic stat functions registration with `AddStatFunc()`
 
 - **Notifications**: Comprehensive notification system for distributed state management
@@ -219,11 +227,11 @@ resources := utils.NewResources("my-service", 8080, 30)
 ```
 
 ### Cache
-High-performance in-memory cache with optional storage persistence:
+High-performance in-memory cache with optional storage persistence and query TTL:
 
 ```go
 // Create cache with storage backend
-cache := cache.NewCache(&MyModel{}, storage, nil, resources)
+cache := cache.NewCache(&MyModel{}, initElements, storage, resources)
 
 // CRUD operations
 cache.Post(item, true)  // Add with notification
@@ -232,8 +240,13 @@ cache.Put(key, updatedItem, true)
 cache.Patch(key, changes, true)
 cache.Delete(key, true)
 
-// Query with pagination
+// Query with pagination (queries cached with 30s TTL by default)
 results := cache.Fetch(0, 25, query)
+
+// Query cache management
+queryCount := cache.QueryCount()           // Monitor cached queries
+cache.CleanupQueriesNow(60)               // Manual cleanup with custom TTL
+defer cache.Close()                        // Stop TTL cleaner on shutdown
 
 // Enhanced statistics tracking
 cache.AddStatFunc("active", func(item interface{}) bool {
@@ -368,6 +381,14 @@ changes := createChanges(oldModel, newModel, resources)
 5. Open a Pull Request
 
 ## Recent Commits
+
+### December 2025
+- `038ab24` - Fix sorting in queries - Fixed query result sorting
+- `65c752f` - Add TTL to cache query - Automatic query cache cleanup with TTL support
+- `c7794a3` - Fix missing root key - Improved key handling
+- `8296546` - Refactor web - Improved web service architecture
+- `0b87c4e` - Fix zeroValue - Fixed zero value handling
+- `156e414` - Add support for nil - Improved nil handling
 
 ### November 2025
 - `2119a29` - Add vnet to web - Added VNet support to WebService
