@@ -19,6 +19,9 @@ import (
 	"github.com/saichler/l8utils/go/utils/strings"
 )
 
+// Get retrieves an item from the cache by extracting its key from the provided value.
+// Returns a cloned copy of the cached item to prevent external mutation.
+// If the item is not found, returns an error. Thread-safe for concurrent access.
 func (this *Cache) Get(v interface{}) (interface{}, error) {
 	var item interface{}
 	var e error

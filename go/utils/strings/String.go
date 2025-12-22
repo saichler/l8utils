@@ -11,6 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package strings provides efficient string building and manipulation utilities.
+// It wraps bytes.Buffer to provide a fluent API for string concatenation with
+// automatic type conversion from various primitive types.
+//
+// Key features:
+//   - Efficient string concatenation using bytes.Buffer
+//   - Automatic conversion of primitives to strings (int, float, bool, etc.)
+//   - Fluent API with method chaining support
+//   - Optional space insertion between concatenated values
 package strings
 
 import (
@@ -88,6 +97,7 @@ func (s *String) Bytes() []byte {
 	return s.buff.Bytes()
 }
 
+// AddBytes appends raw bytes to the string buffer.
 func (s *String) AddBytes(bytes []byte) {
 	s.init()
 	s.buff.Write(bytes)

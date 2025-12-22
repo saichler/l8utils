@@ -11,6 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package queues provides thread-safe queue implementations for concurrent data processing.
+// It includes a generic Queue for interface{} values and a ByteQueue optimized for
+// byte slice processing with priority support.
+//
+// Both implementations use condition variables for efficient blocking operations,
+// allowing producers to wait when the queue is full and consumers to wait when empty.
+//
+// Key features:
+//   - Thread-safe operations using sync.RWMutex and sync.Cond
+//   - Configurable maximum size with backpressure support
+//   - Graceful shutdown with queue clearing
+//   - Non-blocking Poll operations for optional retrieval
 package queues
 
 import (

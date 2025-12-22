@@ -11,6 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package certs provides TLS/SSL certificate generation utilities for secure communication.
+// It supports creating self-signed Certificate Authorities (CA) and signed certificates
+// with RSA key pairs for server and client authentication.
+//
+// Key features:
+//   - Self-signed CA creation with 4096-bit RSA keys
+//   - Certificate generation signed by CA
+//   - PEM-encoded file output for certificates and private keys
+//   - Pre-configured Layer 8 certificate generation helpers
 package certs
 
 import (
@@ -28,6 +37,9 @@ import (
 	"time"
 )
 
+// CreateCA generates a self-signed Certificate Authority with the specified metadata.
+// Creates {filenamePrefix}.ca and {filenamePrefix}.caKey files containing the PEM-encoded
+// certificate and private key. Returns an error if the CA already exists.
 func CreateCA(filenamePrefix, org, country, county, city, street, zipcode, email string, years int) (*x509.Certificate, *rsa.PrivateKey, error) {
 	_, e := os.Stat(filenamePrefix + ".ca")
 	if e != nil {
@@ -87,6 +99,9 @@ func CreateCA(filenamePrefix, org, country, county, city, street, zipcode, email
 	}
 }
 
+// CreateCrt generates a certificate signed by the provided CA for the specified IP address.
+// Creates {filenamePrefix}.crt and {filenamePrefix}.crtKey files. The port is used as
+// the certificate serial number. Returns an error if the certificate already exists.
 func CreateCrt(filenamePrefix, org, country, county, city, street, zipcode, email, ip, secret string, port int64, years int, ca *x509.Certificate, caKey *rsa.PrivateKey) error {
 	_, e := os.Stat(filenamePrefix + ".crt")
 	if e != nil {
@@ -144,11 +159,13 @@ func CreateCrt(filenamePrefix, org, country, county, city, street, zipcode, emai
 	}
 }
 
+// CreateLayer8CA creates a CA with pre-configured Layer 8 organization details.
 func CreateLayer8CA(certName string) (*x509.Certificate, *rsa.PrivateKey, error) {
 	return CreateCA(certName, "Layer8", "USA", "Santa Clara",
 		"San Jose", "1993 Curtner Ave", "95124", "saichler@gmail.com", 10)
 }
 
+// CreateLayer8Crt creates both a Layer 8 CA and a certificate for the specified host/port.
 func CreateLayer8Crt(certName, host string, port int64) error {
 	ca, caKey, err := CreateLayer8CA(certName)
 	if err != nil {

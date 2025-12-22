@@ -11,6 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package requests provides request/response coordination for asynchronous operations.
+// It tracks pending requests and matches incoming responses using message source and number.
+//
+// Key features:
+//   - Thread-safe request tracking using sync.Map
+//   - Configurable timeout per request with automatic cleanup
+//   - Duplicate request detection and rejection
+//   - Context cancellation support
+//   - Transaction-aware response handling
 package requests
 
 import (
@@ -29,10 +38,12 @@ var (
 	ErrDuplicateRequest = errors.New("duplicate request")
 )
 
+// Requests manages pending request/response pairs using a lock-free sync.Map.
 type Requests struct {
 	pending sync.Map // map[string]*Request - eliminates mutex bottleneck
 }
 
+// Request represents a pending request awaiting a response with timeout support.
 type Request struct {
 	msgSource      string
 	msgNum         uint32
@@ -47,10 +58,13 @@ type Request struct {
 	requests       *Requests // reference to parent for auto-cleanup
 }
 
+// NewRequests creates a new request tracker.
 func NewRequests() *Requests {
 	return &Requests{}
 }
 
+// NewRequest creates and registers a new pending request. Returns ErrDuplicateRequest if
+// a request with the same msgNum and msgSource already exists.
 func (this *Requests) NewRequest(msgNum uint32, msgSource string, timeoutInSeconds int, log ifs.ILogger) (*Request, error) {
 	key := requestKey(msgSource, msgNum)
 
@@ -71,6 +85,7 @@ func (this *Requests) NewRequest(msgNum uint32, msgSource string, timeoutInSecon
 	return request, nil
 }
 
+// GetRequest retrieves a pending request by its message number and source.
 func (this *Requests) GetRequest(msgNum uint32, msgSource string) *Request {
 	key := requestKey(msgSource, msgNum)
 	val, ok := this.pending.Load(key)
@@ -80,19 +95,23 @@ func (this *Requests) GetRequest(msgNum uint32, msgSource string) *Request {
 	return val.(*Request)
 }
 
+// DelRequest removes a request from tracking.
 func (this *Requests) DelRequest(msgNum uint32, msgSource string) {
 	key := requestKey(msgSource, msgNum)
 	this.pending.Delete(key)
 }
 
+// MsgNum returns the message number for this request.
 func (this *Request) MsgNum() uint32 {
 	return this.msgNum
 }
 
+// MsgSource returns the message source identifier.
 func (this *Request) MsgSource() string {
 	return this.msgSource
 }
 
+// Response returns the received response or a timeout error if applicable.
 func (this *Request) Response() ifs.IElements {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
@@ -103,6 +122,8 @@ func (this *Request) Response() ifs.IElements {
 	return this.response
 }
 
+// Wait blocks until a response is received or the timeout expires.
+// Automatically cleans up the request from tracking when done.
 func (this *Request) Wait() ifs.IElements {
 	ctx, cancel := context.WithTimeout(context.Background(), this.timeout)
 	this.cancel = cancel
@@ -123,6 +144,8 @@ func (this *Request) Wait() ifs.IElements {
 	}
 }
 
+// SetResponse delivers a response to the waiting caller. For transactions,
+// only the final response (with End != 0) completes the request.
 func (this *Request) SetResponse(resp ifs.IElements) {
 	if this == nil || resp == nil {
 		return

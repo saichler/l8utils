@@ -20,6 +20,10 @@ import (
 	"github.com/saichler/l8types/go/types/l8notify"
 )
 
+// Post adds a new item to the cache. If the item already exists, it performs a replace
+// operation instead. The input value is cloned before storage to prevent external mutation.
+// If createNotification is true, generates an Add or Replace notification for distributed sync.
+// Returns the notification set (if created) and any error encountered.
 func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {

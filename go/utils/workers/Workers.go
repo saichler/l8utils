@@ -11,25 +11,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package workers provides a simple worker pool for concurrent task execution with
+// configurable concurrency limits. It ensures that no more than a specified number
+// of workers run simultaneously.
+//
+// Key features:
+//   - Configurable maximum concurrent workers
+//   - Automatic worker coordination using condition variables
+//   - Simple IWorker interface for task implementation
 package workers
 
 import "sync"
 
+// Workers manages a pool of concurrent workers with a maximum limit.
+// It uses a condition variable to block new workers when at capacity.
 type Workers struct {
 	limit   int
 	running int
 	cond    *sync.Cond
 }
 
+// IWorker defines the interface for tasks that can be executed by the worker pool.
 type IWorker interface {
 	Run()
 }
 
+// Worker wraps an IWorker with a reference to its parent pool for cleanup.
 type Worker struct {
 	worker  IWorker
 	workers *Workers
 }
 
+// NewWorkers creates a new worker pool with the specified maximum concurrency limit.
 func NewWorkers(limit int) *Workers {
 	return &Workers{limit: limit, cond: sync.NewCond(&sync.Mutex{})}
 }
@@ -43,6 +56,7 @@ func (this *Workers) canStart() {
 	this.running++
 }
 
+// Run submits a worker for execution. Blocks if the pool is at capacity until a slot opens.
 func (this *Workers) Run(worker IWorker) {
 	this.canStart()
 	w := &Worker{worker: worker, workers: this}

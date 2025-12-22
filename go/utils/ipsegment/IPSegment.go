@@ -11,6 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package ipsegment provides network interface and IP address detection utilities.
+// It determines whether IP addresses are local or external and identifies the machine's
+// primary network IP address across different operating systems.
+//
+// Key features:
+//   - Local vs external IP classification
+//   - Automatic machine IP detection on initialization
+//   - Cross-platform support (Linux, macOS, Windows, Android)
+//   - Interface name to IP address mapping
+//   - Subnet-based IP categorization
 package ipsegment
 
 import (
@@ -26,7 +36,10 @@ import (
 	"github.com/saichler/l8utils/go/utils/strings"
 )
 
+// IpSegment is the global IP segment detector, initialized automatically on package load.
 var IpSegment = newIpAddressSegment()
+
+// MachineIP holds the detected external IP address of this machine.
 var MachineIP = "127.0.0.1"
 
 // IPSegment Let the switching know if the incoming ip belongs to this machine/vm or is it external machine/vm.
@@ -112,6 +125,7 @@ func IP(ip string) string {
 }
 
 // Iterate over the machine interfaces and map the ip to the interface name
+// LocalIps returns a map of IP addresses to their interface names for all local interfaces.
 func LocalIps() (map[string]string, error) {
 	if runtime.GOOS == "android" {
 		return map[string]string{"127.0.0.1": "eth0"}, nil
@@ -137,7 +151,7 @@ func LocalIps() (map[string]string, error) {
 	return result, nil
 }
 
-// OSInfo represents operating system information
+// OSInfo contains detected operating system information.
 type OSInfo struct {
 	Name    string
 	Version string

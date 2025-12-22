@@ -11,6 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package main provides a basic security provider implementation for Layer 8 services.
+// ShallowSecurityProvider implements ISecurityProvider with minimal security features
+// using AES encryption with an MD5-derived key. This is intended for development and
+// testing purposes rather than production use.
+//
+// Key features:
+//   - Basic connection validation with shared secret
+//   - AES encryption/decryption for data
+//   - Permissive authentication (always allows access)
+//   - Placeholder implementations for TFA and registration
 package main
 
 import (
@@ -27,11 +37,14 @@ import (
 	"strings"
 )
 
+// ShallowSecurityProvider implements ISecurityProvider with basic AES encryption.
+// Uses a hardcoded secret for key derivation - suitable for testing only.
 type ShallowSecurityProvider struct {
 	secret string
 	key    string
 }
 
+// NewShallowSecurityProvider creates a new provider with a hardcoded secret.
 func NewShallowSecurityProvider() *ShallowSecurityProvider {
 	sp := &ShallowSecurityProvider{}
 	hash := md5.New()
@@ -43,6 +56,7 @@ func NewShallowSecurityProvider() *ShallowSecurityProvider {
 	return sp
 }
 
+// CanDial establishes a TCP connection to the specified host and port.
 func (this *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn, error) {
 	if strings.Contains(host, ":") {
 		host = "[" + host + "]"
@@ -50,10 +64,12 @@ func (this *ShallowSecurityProvider) CanDial(host string, port uint32) (net.Conn
 	return net.Dial("tcp", host+":"+strconv.Itoa(int(port)))
 }
 
+// CanAccept always allows incoming connections (permissive).
 func (this *ShallowSecurityProvider) CanAccept(conn net.Conn) error {
 	return nil
 }
 
+// ValidateConnection verifies the connection by exchanging encrypted secrets.
 func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *l8sysconfig.L8SysConfig) error {
 	err := nets.WriteEncrypted(conn, []byte(this.secret), config, this)
 	if err != nil {
@@ -75,23 +91,29 @@ func (this *ShallowSecurityProvider) ValidateConnection(conn net.Conn, config *l
 	return nets.ExecuteProtocol(conn, config, this)
 }
 
+// Encrypt encrypts data using AES with the derived key.
 func (this *ShallowSecurityProvider) Encrypt(data []byte) (string, error) {
 	return aes.Encrypt(data, this.key)
 }
 
+// Decrypt decrypts AES-encrypted data using the derived key.
 func (this *ShallowSecurityProvider) Decrypt(data string) ([]byte, error) {
 	return aes.Decrypt(data, this.key)
 }
 
+// CanDoAction always permits any action (permissive authorization).
 func (this *ShallowSecurityProvider) CanDoAction(action ifs.Action, o ifs.IElements, uuid string, token string, salts ...string) error {
 	return nil
 }
+// ScopeView returns the original elements without filtering (permissive).
 func (this *ShallowSecurityProvider) ScopeView(o ifs.IElements, uuid string, token string, salts ...string) ifs.IElements {
 	return o
 }
+// Authenticate always succeeds with a dummy bearer token (testing only).
 func (this *ShallowSecurityProvider) Authenticate(user string, pass string) (string, bool, bool, error) {
 	return "bearer token", false, false, nil
 }
+// ValidateToken always validates tokens successfully (permissive).
 func (this *ShallowSecurityProvider) ValidateToken(token string) (string, bool) {
 	return ifs.NewUuid(), true
 }

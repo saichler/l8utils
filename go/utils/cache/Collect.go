@@ -13,6 +13,10 @@
 
 package cache
 
+// Collect iterates over all cached items and applies the filter function to each.
+// The filter function receives a cloned copy of each item and returns a boolean
+// indicating whether to include it and an optional transformed value.
+// Returns a map of primary keys to the filtered/transformed values.
 func (this *Cache) Collect(f func(interface{}) (bool, interface{})) map[string]interface{} {
 	result := map[string]interface{}{}
 	this.mtx.RLock()

@@ -11,6 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package web provides RESTful web service definition and request handling utilities.
+// It enables defining service endpoints with protocol buffer request/response types
+// and supports multiple body types per action for flexible API design.
+//
+// Key features:
+//   - Define HTTP endpoints with protobuf body/response types
+//   - Automatic JSON-to-protobuf unmarshaling for request bodies
+//   - Support for multiple request body types per endpoint
+//   - VNet (Virtual Network) integration for service-to-service communication
+//   - Plugin registry loading for service extensions
 package web
 
 import (
@@ -27,12 +37,16 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// WebService defines a RESTful service with typed endpoints using protocol buffers.
+// Each endpoint maps an action to request/response protobuf types.
 type WebService struct {
 	webService *l8web.L8WebService
 	plugin     string
 	protos     map[string]proto.Message
 }
 
+// New creates a new WebService with the specified name, area, and VNet port.
+// Automatically loads the registry plugin if available.
 func New(serviceName string, serviceArea byte, vnet uint32) ifs.IWebService {
 	webService := &WebService{}
 	webService.webService = &l8web.L8WebService{}
@@ -54,6 +68,8 @@ func New(serviceName string, serviceArea byte, vnet uint32) ifs.IWebService {
 	return webService
 }
 
+// Protos parses the JSON request body and returns the appropriate request/response proto types.
+// Tries the primary body type first, then falls back to alternative types if parsing fails.
 func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Message, proto.Message, error) {
 	endpoint, ok := this.webService.Endpoints[int32(action)]
 	if !ok {
@@ -104,6 +120,8 @@ func (this *WebService) Protos(bodyData string, action ifs.Action) (proto.Messag
 	return body, resp, nil
 }
 
+// AddEndpoint registers a new endpoint mapping an action to body and response types.
+// Multiple body types can be registered for the same action.
 func (this *WebService) AddEndpoint(body proto.Message, action ifs.Action, resp proto.Message) {
 	if body == nil {
 		body = &l8web.L8Empty{}
@@ -135,10 +153,12 @@ func (this *WebService) typeOf(pb proto.Message) string {
 	return v.Type().Name()
 }
 
+// Serialize returns the underlying L8WebService protobuf for transmission.
 func (this *WebService) Serialize() *l8web.L8WebService {
 	return this.webService
 }
 
+// DeSerialize reconstructs the WebService from a serialized L8WebService using the registry.
 func (this *WebService) DeSerialize(ws *l8web.L8WebService, r ifs.IRegistry) error {
 	for k, v := range ws.Endpoints {
 		for bodyType, respType := range v.Body2Response {
@@ -165,18 +185,22 @@ func (this *WebService) DeSerialize(ws *l8web.L8WebService, r ifs.IRegistry) err
 	return nil
 }
 
+// ServiceName returns the name of this web service.
 func (this *WebService) ServiceName() string {
 	return this.webService.ServiceName
 }
 
+// ServiceArea returns the service area identifier.
 func (this *WebService) ServiceArea() byte {
 	return byte(this.webService.ServiceArea)
 }
 
+// Vnet returns the VNet port for service-to-service communication.
 func (this *WebService) Vnet() uint32 {
 	return this.webService.Vnet
 }
 
+// Plugin returns the base64-encoded plugin binary if available.
 func (this *WebService) Plugin() string {
 	return this.plugin
 }

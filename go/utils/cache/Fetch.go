@@ -18,6 +18,10 @@ import (
 	"github.com/saichler/l8types/go/types/l8api"
 )
 
+// Fetch retrieves a paginated slice of items from the cache matching the query criteria.
+// The start parameter specifies the starting index and blockSize determines the page size.
+// Results are cloned to prevent external mutation. Metadata is returned only on the first page.
+// Query results may be cached internally with TTL-based expiration for performance.
 func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8MetaData) {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()

@@ -20,6 +20,9 @@ import (
 	"github.com/saichler/l8types/go/ifs"
 )
 
+// ByteQueue is a priority-based byte slice queue with 8 priority levels (0-7).
+// Higher priority items are dequeued first using O(1) bit operations.
+// It supports backpressure when full and graceful shutdown.
 type ByteQueue struct {
 	name         string
 	queues       [][][]byte
@@ -31,6 +34,8 @@ type ByteQueue struct {
 	size         int
 }
 
+// NewByteQueue creates a new priority-based byte queue with the specified maximum size.
+// The queue supports 8 priority levels (0-7) determined by the priority byte in each message.
 func NewByteQueue(name string, maxSize int) *ByteQueue {
 	bq := &ByteQueue{
 		name:         name,
@@ -48,6 +53,9 @@ func NewByteQueue(name string, maxSize int) *ByteQueue {
 	return bq
 }
 
+// Add enqueues a byte slice at its designated priority level.
+// Priority is extracted from the byte at ifs.PPriority position (upper 4 bits).
+// Blocks if the queue is at maximum capacity until space is available.
 func (this *ByteQueue) Add(data []byte) {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
@@ -73,6 +81,8 @@ func (this *ByteQueue) Add(data []byte) {
 	this.cond.Broadcast()
 }
 
+// Next dequeues and returns the highest priority item. Blocks if the queue is empty.
+// Returns nil if the queue has been shut down.
 func (this *ByteQueue) Next() []byte {
 	for this.active {
 		var item []byte
@@ -90,10 +100,12 @@ func (this *ByteQueue) Next() []byte {
 	return nil
 }
 
+// Active returns true if the queue has not been shut down.
 func (this *ByteQueue) Active() bool {
 	return this.active
 }
 
+// Shutdown stops the queue, clears all pending items, and wakes blocked goroutines.
 func (this *ByteQueue) Shutdown() {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
@@ -134,18 +146,21 @@ func (this *ByteQueue) clear() {
 	this.size = 0
 }
 
+// Size returns the total number of items across all priority levels.
 func (this *ByteQueue) Size() int {
 	this.rwMtx.RLock()
 	defer this.rwMtx.RUnlock()
 	return this.size
 }
 
+// Clear removes all items from all priority levels.
 func (this *ByteQueue) Clear() {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
 	this.clear()
 }
 
+// IsEmpty returns true if there are no items in any priority level.
 func (this *ByteQueue) IsEmpty() bool {
 	this.rwMtx.RLock()
 	defer this.rwMtx.RUnlock()

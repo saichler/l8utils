@@ -11,10 +11,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package tasks provides a dual-queue task scheduling system with configurable worker limits.
+// Tasks can be categorized into T1 and T2 tiers with independent tracking and execution.
+// This is a work-in-progress implementation.
+//
+// Key features:
+//   - Dual task queues (T1 and T2) for priority/categorization
+//   - Configurable maximum concurrent workers
+//   - Task deduplication via T1Id and T2Id tracking
 package tasks
 
 import "sync"
 
+// Tasks manages dual task queues with worker pool coordination.
 type Tasks struct {
 	name       string
 	maxWorkers int
@@ -28,6 +37,7 @@ type Tasks struct {
 	runningT2 map[string]bool
 }
 
+// ITask defines the interface for executable tasks with tier identification.
 type ITask interface {
 	Execute()
 	T1Id() string
@@ -35,6 +45,7 @@ type ITask interface {
 	Timeout() int64
 }
 
+// NewTasks creates a new dual-queue task manager with the specified worker limit.
 func NewTasks(name string, maxWorkers int) *Tasks {
 	this := &Tasks{}
 	this.name = name
@@ -51,6 +62,7 @@ func NewTasks(name string, maxWorkers int) *Tasks {
 	return this
 }
 
+// AddTask queues a task for execution (work in progress).
 func (this *Tasks) AddTask(task ITask) {
 	/*
 		this.mtx.Lock()

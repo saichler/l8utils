@@ -20,6 +20,10 @@ import (
 	"github.com/saichler/l8types/go/types/l8notify"
 )
 
+// Patch applies partial updates to an existing cache item. Unlike Put, Patch only modifies
+// the fields present in the input value, preserving other existing fields. If the item
+// doesn't exist, it creates a new entry. If createNotification is true, generates an
+// Update notification containing only the changed properties for distributed sync.
 func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {

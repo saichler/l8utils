@@ -19,6 +19,9 @@ import (
 	"github.com/saichler/l8types/go/types/l8notify"
 )
 
+// Delete removes an item from the cache by extracting its key from the provided value.
+// If createNotification is true, generates a Delete notification for distributed sync.
+// Returns an error if the item does not exist in the cache.
 func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {

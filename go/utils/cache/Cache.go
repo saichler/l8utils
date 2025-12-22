@@ -11,6 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package cache provides a high-performance, thread-safe in-memory cache with optional
+// persistent storage integration. It supports CRUD operations (Post, Get, Put, Patch, Delete),
+// automatic change notifications, query caching with TTL-based cleanup, and clone-based
+// isolation for concurrent access safety.
+//
+// The cache uses reflection to extract primary and unique keys from stored elements,
+// enabling efficient lookups. It integrates with the Layer 8 notification system to
+// broadcast state changes across distributed services.
+//
+// Key features:
+//   - Thread-safe operations using sync.RWMutex
+//   - Optional persistent storage layer integration
+//   - Automatic cloning to prevent external mutation of cached data
+//   - Built-in notification generation for Post, Put, Patch, and Delete operations
+//   - Query result caching with configurable TTL (default 30 seconds)
+//   - Statistics tracking for monitoring cache usage
 package cache
 
 import (
@@ -25,6 +41,10 @@ import (
 
 var cloner = cloning.NewCloner()
 
+// Cache is a thread-safe in-memory cache with optional persistent storage backing.
+// It supports CRUD operations with automatic notification generation for distributed
+// state synchronization. The cache uses cloning to ensure callers cannot mutate
+// cached data directly, providing isolation and thread-safety.
 type Cache struct {
 	iCache               *internalCache
 	mtx                  *sync.RWMutex
@@ -41,6 +61,10 @@ type Cache struct {
 	cleaner        *ttlCleaner
 }
 
+// NewCache creates a new Cache instance. The sampleElement is used to determine
+// the type and key field names for cached items. If initElements are provided and
+// the store is empty, they will be used to initialize the cache. The cache automatically
+// starts a TTL cleaner goroutine for query cache maintenance.
 func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.IStorage, r ifs.IResources) *Cache {
 	this := &Cache{}
 	this.iCache = newInternalCache()
@@ -98,6 +122,8 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	return this
 }
 
+// SetNotificationsFor configures the cache to generate notifications for the specified
+// service. The serviceName and serviceArea identify the service in the notification routing.
 func (this *Cache) SetNotificationsFor(serviceName string, serviceArea byte) {
 	this.serviceName = serviceName
 	this.serviceArea = serviceArea
@@ -110,12 +136,16 @@ func (this *Cache) cacheEnabled() bool {
 	return this.store.CacheEnabled()
 }
 
+// Size returns the number of items currently in the cache.
 func (this *Cache) Size() int {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
 	return this.iCache.size()
 }
 
+// KeysFor extracts the primary key and unique key from the given item using reflection.
+// It uses decorator metadata to identify which fields comprise the keys. Returns the
+// primary key, unique key, and any error encountered during extraction.
 func (this *Cache) KeysFor(any interface{}) (string, string, error) {
 	if any == nil {
 		return "", "", errors.New("Cannot get keys for nil interface")
@@ -148,22 +178,28 @@ func allElementsInCache(i interface{}) (bool, interface{}) {
 	return true, i
 }
 
+// ServiceName returns the service name configured for notifications.
 func (this *Cache) ServiceName() string {
 	return this.serviceName
 }
 
+// ServiceArea returns the service area configured for notifications.
 func (this *Cache) ServiceArea() byte {
 	return this.serviceArea
 }
 
+// Source returns the local UUID identifying this cache instance as the notification source.
 func (this *Cache) Source() string {
 	return this.r.SysConfig().LocalUuid
 }
 
+// ModelType returns the type name of elements stored in this cache.
 func (this *Cache) ModelType() string {
 	return this.modelType
 }
 
+// Close stops the TTL cleaner goroutine and releases cache resources.
+// This should be called when the cache is no longer needed.
 func (this *Cache) Close() {
 	if this.cleaner != nil {
 		this.cleaner.stop()

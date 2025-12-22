@@ -11,6 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package maps provides thread-safe map implementations for concurrent access.
+// SyncMap wraps a standard Go map with sync.RWMutex for safe concurrent reads and writes.
+//
+// Key features:
+//   - Thread-safe Put, Get, Delete, and Contains operations
+//   - Size tracking and iteration support
+//   - Nil-safe operations (methods handle nil receiver gracefully)
+//   - ValuesAsList and KeysAsList for extracting typed slices with optional filtering
 package maps
 
 import (
@@ -18,11 +26,14 @@ import (
 	"sync"
 )
 
+// SyncMap is a thread-safe map implementation using sync.RWMutex.
+// All operations are safe for concurrent access from multiple goroutines.
 type SyncMap struct {
 	m map[interface{}]interface{}
 	s *sync.RWMutex
 }
 
+// NewSyncMap creates a new empty thread-safe map.
 func NewSyncMap() *SyncMap {
 	mm := &SyncMap{}
 	mm.m = make(map[interface{}]interface{})
@@ -30,6 +41,7 @@ func NewSyncMap() *SyncMap {
 	return mm
 }
 
+// Put stores a key-value pair. Returns true if this is a new key, false if updating existing.
 func (this *SyncMap) Put(key, value interface{}) bool {
 	if this == nil {
 		return false
@@ -41,6 +53,7 @@ func (this *SyncMap) Put(key, value interface{}) bool {
 	return !ok
 }
 
+// Get retrieves a value by key. Returns the value and whether it was found.
 func (this *SyncMap) Get(key interface{}) (interface{}, bool) {
 	if this == nil {
 		return nil, false
@@ -51,6 +64,7 @@ func (this *SyncMap) Get(key interface{}) (interface{}, bool) {
 	return v, ok
 }
 
+// Contains returns true if the key exists in the map.
 func (this *SyncMap) Contains(key interface{}) bool {
 	if this == nil {
 		return false
@@ -61,6 +75,7 @@ func (this *SyncMap) Contains(key interface{}) bool {
 	return ok
 }
 
+// Delete removes a key and returns its value and whether it existed.
 func (this *SyncMap) Delete(key interface{}) (interface{}, bool) {
 	if this == nil {
 		return nil, false
@@ -72,6 +87,7 @@ func (this *SyncMap) Delete(key interface{}) (interface{}, bool) {
 	return v, ok
 }
 
+// Size returns the number of entries in the map.
 func (this *SyncMap) Size() int {
 	if this == nil {
 		return 0
@@ -81,6 +97,7 @@ func (this *SyncMap) Size() int {
 	return len(this.m)
 }
 
+// Clean removes all entries and returns the old map contents.
 func (this *SyncMap) Clean() map[interface{}]interface{} {
 	if this == nil {
 		return nil
@@ -92,6 +109,7 @@ func (this *SyncMap) Clean() map[interface{}]interface{} {
 	return result
 }
 
+// ValuesAsList returns map values as a typed slice. Optional filter excludes non-matching values.
 func (this *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
 	if this == nil {
 		return false
@@ -119,6 +137,7 @@ func (this *SyncMap) ValuesAsList(typ reflect.Type, filter func(interface{}) boo
 	return newSlice.Interface()
 }
 
+// KeysAsList returns map keys as a typed slice. Optional filter excludes non-matching keys.
 func (this *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bool) interface{} {
 	if this == nil {
 		return false
@@ -146,6 +165,7 @@ func (this *SyncMap) KeysAsList(typ reflect.Type, filter func(interface{}) bool)
 	return newSlice.Interface()
 }
 
+// Iterate calls the provided function for each key-value pair while holding a read lock.
 func (this *SyncMap) Iterate(do func(k, v interface{})) {
 	if this == nil {
 		return
