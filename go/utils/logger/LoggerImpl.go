@@ -29,17 +29,11 @@ package logger
 
 import (
 	"errors"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8utils/go/utils/ipsegment"
 	"github.com/saichler/l8utils/go/utils/queues"
-	"golang.org/x/sys/unix"
 )
 
 // ILogMethod defines the interface for custom log output implementations.
@@ -162,33 +156,3 @@ func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 const (
 	PATH_TO_LOGS = "/data/logs"
 )
-
-// SetLogToFile redirects stderr and stdout to log files in /data/logs/{hostname}/.
-// Creates separate .err and .log files using the provided alias.
-func SetLogToFile(alias string) {
-	hostname := os.Getenv("HOSTNAME")
-	if hostname == "" {
-		hostname = ipsegment.MachineIP
-	}
-
-	os.MkdirAll(filepath.Join(PATH_TO_LOGS, hostname), 0777)
-
-	errorFileName := filepath.Join(PATH_TO_LOGS, hostname, alias+".err")
-	logFileName := filepath.Join(PATH_TO_LOGS, hostname, alias+".log")
-
-	errorFile, err := os.Create(errorFileName)
-	logFile, err := os.Create(logFileName)
-
-	if err == nil {
-		err = unix.Dup2(int(errorFile.Fd()), int(os.Stderr.Fd()))
-		if err != nil {
-			log.Fatalf("Failed to redirect stderr: %v", err)
-		}
-		err = unix.Dup2(int(logFile.Fd()), int(os.Stdout.Fd()))
-		if err != nil {
-			log.Fatalf("Failed to redirect stdout: %v", err)
-		}
-	} else {
-		fmt.Println("Failed to create error file:", err)
-	}
-}
