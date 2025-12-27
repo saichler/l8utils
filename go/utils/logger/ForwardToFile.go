@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 )
 
 // SetLogToFile redirects stderr and stdout to log files in /data/logs/{alias}/.
@@ -44,4 +45,31 @@ func SetLogToFile(alias string) {
 		log.Fatalf("Failed to redirect stdout: %v", err)
 	}
 	logFile.Close()
+}
+
+// DumpPprofToFile writes heap profile data to /data/logs/{alias}/{alias}.dat.
+// Creates the directory if it doesn't exist.
+func DumpPprofToFile(alias string) error {
+	if alias == "" {
+		return os.ErrInvalid
+	}
+
+	dir := filepath.Join(PATH_TO_LOGS, alias)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	datFileName := filepath.Join(dir, alias+".dat")
+
+	datFile, err := os.Create(datFileName)
+	if err != nil {
+		return err
+	}
+	defer datFile.Close()
+
+	if err := pprof.WriteHeapProfile(datFile); err != nil {
+		return err
+	}
+
+	return nil
 }

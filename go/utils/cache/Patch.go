@@ -41,7 +41,7 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 	var ok bool
 
 	if this.cacheEnabled() {
-		item, ok = this.iCache.get(pk, "")
+		item, ok = this.iCache.get(pk, uk)
 	} else {
 		item, e = this.store.Get(pk)
 		ok = e == nil
@@ -67,8 +67,8 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 		}
 
 		//Clone the value for the notification
-		itemClone := cloner.Clone(v)
-		n, e = this.createAddNotification(itemClone, pk)
+		//itemClone := cloner.Clone(v)
+		n, e = this.createAddNotification(vClone, pk)
 		return n, e
 	}
 
