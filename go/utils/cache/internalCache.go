@@ -175,11 +175,12 @@ func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interfac
 
 	noCriteriaOrSort := true
 
-	dq, ok := this.queries[q.Hash()]
+	hash := q.Hash()
+	dq, ok := this.queries[hash]
 	//This is a new query, so create it
 	if !ok {
 		dq = newInternalQuery(q)
-		this.queries[q.Hash()] = dq
+		this.queries[hash] = dq
 	}
 
 	// Update last used time for TTL tracking
