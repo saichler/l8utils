@@ -59,25 +59,25 @@ func NewByteQueue(name string, maxSize int) *ByteQueue {
 func (this *ByteQueue) Add(data []byte) {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
-	
+
 	// Wait if queue is full using proper condition variable
 	for this.size >= this.maxSize && this.active {
 		this.cond.Wait()
 	}
-	
+
 	if !this.active {
 		return
 	}
-	
+
 	priority := data[ifs.PPriority] >> 4
 	if priority > 7 {
 		priority = 7 // Cap at maximum priority
 	}
-	
+
 	this.queues[priority] = append(this.queues[priority], data)
 	this.priorityMask |= (1 << priority) // Set bit for this priority
 	this.size++
-	
+
 	this.cond.Broadcast()
 }
 
@@ -109,7 +109,7 @@ func (this *ByteQueue) Active() bool {
 func (this *ByteQueue) Shutdown() {
 	this.rwMtx.Lock()
 	defer this.rwMtx.Unlock()
-	
+
 	this.active = false
 	this.clear()
 	this.cond.Broadcast()
@@ -119,21 +119,22 @@ func (this *ByteQueue) next() []byte {
 	if this.priorityMask == 0 {
 		return nil // No items in any queue
 	}
-	
+
 	// Find highest priority with items - O(1) bit operation
 	priority := 7 - bits.LeadingZeros8(this.priorityMask)
-	
+
 	// Dequeue from highest priority - O(1)
 	queue := &this.queues[priority]
 	item := (*queue)[0]
+	(*queue)[0] = nil
 	*queue = (*queue)[1:]
 	this.size--
-	
+
 	// Clear bit if this priority queue becomes empty - O(1)
 	if len(*queue) == 0 {
 		this.priorityMask &^= (1 << priority)
 	}
-	
+
 	this.cond.Broadcast() // Signal waiting producers
 	return item
 }
