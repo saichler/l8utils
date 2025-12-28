@@ -141,7 +141,7 @@ func (this *ByteQueue) next() []byte {
 
 func (this *ByteQueue) clear() {
 	for i := range this.queues {
-		this.queues[i] = this.queues[i][:0] // Keep capacity, reset length
+		this.queues[i] = make([][]byte, 0) // Fresh slice
 	}
 	this.priorityMask = 0
 	this.size = 0
