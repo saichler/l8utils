@@ -11,14 +11,17 @@ type Aggregator struct {
 	queue             *queues.Queue
 	running           bool
 	intervalInSeconds int64
+	timeoutInSeconds  int64
 }
 
-func NewAggregator(vnic ifs.IVNic, intervalInSeconds int64) *Aggregator {
+func NewAggregator(vnic ifs.IVNic, intervalInSeconds, timeoutInSeconds int64) *Aggregator {
 	agg := &Aggregator{}
 	agg.vnic = vnic
 	agg.queue = queues.NewQueue("Aggregator", 100000)
 	agg.running = true
 	agg.intervalInSeconds = intervalInSeconds
+
+	go agg.start()
 	return agg
 }
 
@@ -67,10 +70,12 @@ func (this *Aggregator) flush() {
 		}
 		buff = append(buff, entry.any)
 		method = entry.method
+		destination = entry.destination
 		serviceName = entry.serviceName
 		serviceArea = entry.serviceArea
 		action = entry.action
 	}
+	this.send(method, destination, serviceName, serviceArea, action, buff)
 }
 
 func (this *Aggregator) send(method ifs.VNicMethod, destination, serviceName string, serviceArea byte, action ifs.Action, buff []interface{}) {
@@ -89,6 +94,11 @@ func (this *Aggregator) send(method ifs.VNicMethod, destination, serviceName str
 		err = this.vnic.Proximity(serviceName, serviceArea, action, buff)
 	case ifs.Leader:
 		err = this.vnic.Leader(serviceName, serviceArea, action, buff)
+	case ifs.Request:
+		resp := this.vnic.Request(destination, serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
+		if resp != nil && resp.Error() != nil {
+			err = resp.Error()
+		}
 	}
 	if err != nil {
 		this.vnic.Resources().Logger().Error(err.Error())
