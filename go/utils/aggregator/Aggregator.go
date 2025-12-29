@@ -90,10 +90,32 @@ func (this *Aggregator) send(method ifs.VNicMethod, destination, serviceName str
 		err = this.vnic.Multicast(serviceName, serviceArea, action, buff)
 	case ifs.RoundRobin:
 		err = this.vnic.RoundRobin(serviceName, serviceArea, action, buff)
+	case ifs.RoundRobinRequest:
+		resp := this.vnic.RoundRobinRequest(serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
+		if resp != nil && resp.Error() != nil {
+			err = resp.Error()
+		}
 	case ifs.Proximity:
 		err = this.vnic.Proximity(serviceName, serviceArea, action, buff)
+	case ifs.ProximityRequest:
+		resp := this.vnic.ProximityRequest(serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
+		if resp != nil && resp.Error() != nil {
+			err = resp.Error()
+		}
 	case ifs.Leader:
 		err = this.vnic.Leader(serviceName, serviceArea, action, buff)
+	case ifs.LeaderRequest:
+		resp := this.vnic.LeaderRequest(serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
+		if resp != nil && resp.Error() != nil {
+			err = resp.Error()
+		}
+	case ifs.Local:
+		err = this.vnic.Local(serviceName, serviceArea, action, buff)
+	case ifs.LocalRequest:
+		resp := this.vnic.LocalRequest(serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
+		if resp != nil && resp.Error() != nil {
+			err = resp.Error()
+		}
 	case ifs.Request:
 		resp := this.vnic.Request(destination, serviceName, serviceArea, action, buff, int(this.timeoutInSeconds))
 		if resp != nil && resp.Error() != nil {
