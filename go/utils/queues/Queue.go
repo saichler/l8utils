@@ -87,6 +87,7 @@ func (queue *Queue) Next() interface{} {
 			queue.cond.Wait()
 		} else {
 			item = queue.queue[0]
+			queue.queue[0] = nil
 			queue.queue = queue.queue[1:]
 
 		}

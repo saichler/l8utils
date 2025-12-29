@@ -87,7 +87,6 @@ func (this *RegistryImpl) registerBase() {
 	this.Register(&l8services.L8Services{})
 	this.Register(&l8services.L8ReplicationIndex{})
 	this.Register(&l8services.L8Transaction{})
-	this.Register(&l8services.L8ServiceLink{})
 	this.Register(&l8sysconfig.L8SysConfig{})
 	this.Register(&l8system.L8SystemMessage{})
 	this.Register(&l8web.L8Plugin{})
