@@ -3,6 +3,7 @@ package aggregator
 import (
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/queues"
+	"reflect"
 	"time"
 )
 
@@ -68,7 +69,14 @@ func (this *Aggregator) flush() {
 			this.send(method, destination, serviceName, serviceArea, action, buff)
 			buff = make([]interface{}, 0)
 		}
-		buff = append(buff, entry.any)
+		v := reflect.ValueOf(entry.any)
+		if v.Kind() == reflect.Slice {
+			for i := 0; i < v.Len(); i++ {
+				buff = append(buff, v.Index(i).Interface())
+			}
+		} else {
+			buff = append(buff, entry.any)
+		}
 		method = entry.method
 		destination = entry.destination
 		serviceName = entry.serviceName
