@@ -27,7 +27,12 @@ import (
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
-func FormatLog(level ifs.LogLevel, t int64, args ...interface{}) string {
+func FormatLog(level ifs.LogLevel, t int64, args ...interface{}) (result string) {
+	defer func() {
+		if r := recover(); r != nil {
+			result = LogTimeFormat(t, level) + "<panic formatting log: corrupted argument>"
+		}
+	}()
 	str := strings2.New()
 	str.Add(LogTimeFormat(t, level))
 	if args != nil {
