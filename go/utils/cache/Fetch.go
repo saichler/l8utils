@@ -23,8 +23,8 @@ import (
 // Results are cloned to prevent external mutation. Metadata is returned only on the first page.
 // Query results may be cached internally with TTL-based expiration for performance.
 func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8MetaData) {
-	this.mtx.RLock()
-	defer this.mtx.RUnlock()
+	this.mtx.Lock()
+	defer this.mtx.Unlock()
 	values, metadata := this.iCache.fetch(start, blockSize, q)
 	result := make([]interface{}, len(values))
 	for i, v := range values {
