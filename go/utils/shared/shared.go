@@ -25,7 +25,7 @@ import (
 	"github.com/saichler/l8utils/go/utils/resources"
 )
 
-func NewResources(alias string, vnetPort, keepAlive uint32, logToFile bool, others ...ifs.IResources) ifs.IResources {
+func ResourcesOf(alias string, vnetPort, keepAlive uint32, logToFile bool, others ...ifs.IResources) ifs.IResources {
 	if logToFile {
 		logger.SetLogToFile(alias)
 	}
@@ -43,7 +43,7 @@ func NewResources(alias string, vnetPort, keepAlive uint32, logToFile bool, othe
 		sec, err := sec.LoadSecurityProvider(res)
 		if err != nil {
 			fmt.Println("*** Failed to load security provider! ***")
-			fmt.Println("*** Using Shallow Security Provider!   ***")
+			fmt.Println("*** Using Shallow Security Provider!  ***")
 		}
 		res.Set(sec)
 	}
