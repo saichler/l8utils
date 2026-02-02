@@ -386,6 +386,90 @@ func TestFromStringMap(t *testing.T) {
 	}
 }
 
+func TestMapWithSpecialChars(t *testing.T) {
+	// Map with comma in value
+	m1 := map[string]string{"variables": "price,season", "confidence": "0.95"}
+	s1 := Str.StringOf(m1)
+	v1, e := InstanceOf(s1, globals.Registry())
+	if e != nil {
+		Log.Fail(t, "Did not expect an error:", e.Error())
+		return
+	}
+	r1 := v1.(map[string]string)
+	if r1["variables"] != "price,season" {
+		Log.Fail(t, "Expected 'price,season' but got '"+r1["variables"]+"'")
+		return
+	}
+	if r1["confidence"] != "0.95" {
+		Log.Fail(t, "Expected '0.95' but got '"+r1["confidence"]+"'")
+		return
+	}
+
+	// Map with equals in value
+	m2 := map[string]string{"expr": "a=b", "key": "val"}
+	s2 := Str.StringOf(m2)
+	v2, e := InstanceOf(s2, globals.Registry())
+	if e != nil {
+		Log.Fail(t, "Did not expect an error:", e.Error())
+		return
+	}
+	r2 := v2.(map[string]string)
+	if r2["expr"] != "a=b" {
+		Log.Fail(t, "Expected 'a=b' but got '"+r2["expr"]+"'")
+		return
+	}
+	if r2["key"] != "val" {
+		Log.Fail(t, "Expected 'val' but got '"+r2["key"]+"'")
+		return
+	}
+
+	// Map with backslash in value
+	m3 := map[string]string{"path": "C:\\Users", "key": "val"}
+	s3 := Str.StringOf(m3)
+	v3, e := InstanceOf(s3, globals.Registry())
+	if e != nil {
+		Log.Fail(t, "Did not expect an error:", e.Error())
+		return
+	}
+	r3 := v3.(map[string]string)
+	if r3["path"] != "C:\\Users" {
+		Log.Fail(t, "Expected 'C:\\Users' but got '"+r3["path"]+"'")
+		return
+	}
+	if r3["key"] != "val" {
+		Log.Fail(t, "Expected 'val' but got '"+r3["key"]+"'")
+		return
+	}
+}
+
+func TestSliceWithSpecialChars(t *testing.T) {
+	// Slice with commas in elements
+	sl := []string{"a,b", "c", "d,e"}
+	s := Str.StringOf(sl)
+	v, e := InstanceOf(s, globals.Registry())
+	if e != nil {
+		Log.Fail(t, "Did not expect an error:", e.Error())
+		return
+	}
+	r := v.([]string)
+	if len(r) != 3 {
+		Log.Fail(t, "Expected 3 elements but got", len(r))
+		return
+	}
+	if r[0] != "a,b" {
+		Log.Fail(t, "Expected 'a,b' but got '"+r[0]+"'")
+		return
+	}
+	if r[1] != "c" {
+		Log.Fail(t, "Expected 'c' but got '"+r[1]+"'")
+		return
+	}
+	if r[2] != "d,e" {
+		Log.Fail(t, "Expected 'd,e' but got '"+r[2]+"'")
+		return
+	}
+}
+
 func TestAppendSpace(t *testing.T) {
 	s := &String{AddSpaceWhenAdding: true}
 	s.Add("a")

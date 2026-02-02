@@ -246,16 +246,16 @@ func interfaceFromString(str string, kinds []reflect.Kind, registry ifs.IRegistr
 func mapFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (reflect.Value, error) {
 	str = strings.TrimSpace(str)
 	str = str[1 : len(str)-1]
-	items := strings.Split(str, ",")
+	items := splitOnUnescaped(str, ',')
 	var newMap *reflect.Value
 	for _, item := range items {
-		index := strings.Index(item, "=")
+		index := indexOfUnescaped(item, '=')
 		if index == -1 {
 			return reflect.ValueOf(nil),
 				errors.New("map item '" + item + "' does not contain a '=' sign")
 		}
-		keyStr := strings.TrimSpace(item[0:index])
-		valueStr := strings.TrimSpace(item[index+1:])
+		keyStr := unescapeString(strings.TrimSpace(item[0:index]))
+		valueStr := unescapeString(strings.TrimSpace(item[index+1:]))
 		keyF := fromstrings[kinds[0]]
 		valueF := fromstrings[kinds[1]]
 		if keyF == nil || valueF == nil {
@@ -288,7 +288,7 @@ func sliceFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (
 	if len(str) > 1 && str[0] == '[' {
 		str = str[1 : len(str)-1]
 	}
-	items := strings.Split(str, ",")
+	items := splitOnUnescaped(str, ',')
 
 	itemF := fromstrings[kinds[0]]
 	if itemF == nil {
@@ -316,7 +316,7 @@ func sliceFromString(str string, kinds []reflect.Kind, registry ifs.IRegistry) (
 	newSlice := reflect.MakeSlice(reflect.SliceOf(defaultValue.Type()), len(items), len(items))
 
 	for i, item := range items {
-		v, err := itemF(item, kinds[1:], registry)
+		v, err := itemF(unescapeString(item), kinds[1:], registry)
 		if err != nil {
 			return reflect.ValueOf(nil), errors.New("slice item '" + item + "' error:" + err.Error())
 		}

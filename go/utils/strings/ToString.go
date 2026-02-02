@@ -144,7 +144,7 @@ func sliceToString(value reflect.Value) string {
 			result.Add(",")
 		}
 		elem := value.Index(i)
-		v := toString(elem)
+		v := escapeString(toString(elem), ",")
 		result.Add(v)
 	}
 	result.Add("]")
@@ -164,10 +164,10 @@ func mapToString(value reflect.Value) string {
 			result.Add(",")
 		}
 		val := value.MapIndex(key)
-		kv := toString(key)
+		kv := escapeString(toString(key), ",=")
 		result.Add(kv)
 		result.Add("=")
-		vv := toString(val)
+		vv := escapeString(toString(val), ",=")
 		result.Add(vv)
 	}
 	result.Add("]")
