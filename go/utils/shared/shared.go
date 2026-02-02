@@ -25,7 +25,7 @@ import (
 	"github.com/saichler/l8utils/go/utils/resources"
 )
 
-func ResourcesOf(alias string, vnetPort, keepAlive uint32, logToFile bool, others ...ifs.IResources) ifs.IResources {
+func NewResources(alias string, vnetPort, keepAlive uint32, logToFile bool, others ...ifs.IResources) ifs.IResources {
 	if logToFile {
 		logger.SetLogToFile(alias)
 	}
