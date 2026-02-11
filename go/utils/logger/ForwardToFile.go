@@ -20,7 +20,10 @@ func SetLogToFile(path, alias string) {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		log.Fatalf("Failed to create log directory: %v", err)
 	}
-
+	hostname := os.Getenv("HOSTNAME")
+	if hostname == "" {
+		hostname = alias
+	}
 	errorFileName := filepath.Join(dir, alias+".err")
 	logFileName := filepath.Join(dir, alias+".log")
 
