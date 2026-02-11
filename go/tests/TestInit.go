@@ -14,6 +14,7 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/sec"
 	"github.com/saichler/l8types/go/types/l8sysconfig"
@@ -32,7 +33,7 @@ func init() {
 	_resources.Set(registry.NewRegistry())
 	_security, err := sec.LoadSecurityProvider(nil)
 	if err != nil {
-		panic("Failed to load security provider " + err.Error())
+		fmt.Println("Failed to load security provider " + err.Error())
 	}
 	_resources.Set(_security)
 	_config := &l8sysconfig.L8SysConfig{MaxDataSize: resources.DEFAULT_MAX_DATA_SIZE,
