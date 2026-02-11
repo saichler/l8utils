@@ -25,9 +25,9 @@ import (
 	"github.com/saichler/l8utils/go/utils/resources"
 )
 
-func ResourcesOf(alias string, vnetPort, keepAlive uint32, logToFile bool, others ...ifs.IResources) ifs.IResources {
-	if logToFile {
-		logger.SetLogToFile(alias)
+func ResourcesOf(alias string, vnetPort, keepAlive uint32, logsPath string, others ...ifs.IResources) ifs.IResources {
+	if logsPath != "" {
+		logger.SetLogToFile(logsPath, alias)
 	}
 	log := logger.NewLoggerImpl(&logger.FmtLogMethod{})
 	log.SetLogLevel(ifs.Error_Level)

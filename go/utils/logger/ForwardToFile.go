@@ -11,12 +11,12 @@ import (
 // SetLogToFile redirects stderr and stdout to log files in /data/logs/{alias}/.
 // Creates separate .err and .log files using the provided alias.
 // Uses O_APPEND for multi-process safety.
-func SetLogToFile(alias string) {
+func SetLogToFile(path, alias string) {
 	if alias == "" {
 		panic("SetLogToFile called with empty alias")
 	}
 
-	dir := filepath.Join(PATH_TO_LOGS, alias)
+	dir := filepath.Join(path, alias)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		log.Fatalf("Failed to create log directory: %v", err)
 	}
@@ -49,12 +49,12 @@ func SetLogToFile(alias string) {
 
 // DumpPprofToFile writes heap profile data to /data/logs/{alias}/{alias}.dat.
 // Creates the directory if it doesn't exist.
-func DumpPprofToFile(alias string) error {
+func DumpPprofToFile(path, alias string) error {
 	if alias == "" {
 		return os.ErrInvalid
 	}
 
-	dir := filepath.Join(PATH_TO_LOGS, alias)
+	dir := filepath.Join(path, alias)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}

@@ -152,7 +152,3 @@ func (loggerImpl *LoggerImpl) Fail(t interface{}, args ...interface{}) {
 func (loggerImpl *LoggerImpl) SetLogLevel(level ifs.LogLevel) {
 	loggerImpl.logLevel = level
 }
-
-const (
-	PATH_TO_LOGS = "/data/logs"
-)
