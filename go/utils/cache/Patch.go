@@ -72,12 +72,10 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 		return n, e
 	}
 
-	//Clone the existing item
-	itemClone := cloner.Clone(item)
 	//Create a new updater
 	patchUpdater := updating.NewUpdater(this.r, false, false)
-	//update the item clone with the new element where nil is valid
-	e = patchUpdater.Update(itemClone, v)
+	//Dry update to detect changes without mutating the cached item
+	e = patchUpdater.DryUpdate(item, v)
 	if e != nil {
 		return n, e
 	}
