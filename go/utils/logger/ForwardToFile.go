@@ -3,6 +3,7 @@
 package logger
 
 import (
+	"bytes"
 	"golang.org/x/sys/unix"
 	"log"
 	"os"
@@ -77,4 +78,13 @@ func DumpPprofToFile(path, alias string) error {
 	}
 
 	return nil
+}
+
+// DumpPprofToBytes returns heap profile data as a byte slice.
+func DumpPprofToBytes() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := pprof.WriteHeapProfile(&buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
