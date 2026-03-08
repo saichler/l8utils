@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"time"
 )
 
 // SetLogToFile redirects stderr and stdout to log files in /data/logs/{alias}/.
@@ -80,11 +81,19 @@ func DumpPprofToFile(path, alias string) error {
 	return nil
 }
 
-// DumpPprofToBytes returns heap profile data as a byte slice.
-func DumpPprofToBytes() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := pprof.WriteHeapProfile(&buf); err != nil {
-		return nil, err
+// DumpPprofToBytes collects a 5-second CPU profile and a heap snapshot,
+// returning both as separate byte slices. This call blocks for 5 seconds.
+func DumpPprofToBytes() (heap []byte, cpu []byte, err error) {
+	var cpuBuf bytes.Buffer
+	if err = pprof.StartCPUProfile(&cpuBuf); err != nil {
+		return nil, nil, err
 	}
-	return buf.Bytes(), nil
+	time.Sleep(5 * time.Second)
+	pprof.StopCPUProfile()
+
+	var heapBuf bytes.Buffer
+	if err = pprof.WriteHeapProfile(&heapBuf); err != nil {
+		return nil, cpuBuf.Bytes(), err
+	}
+	return heapBuf.Bytes(), cpuBuf.Bytes(), nil
 }
