@@ -31,6 +31,7 @@ import (
 	"github.com/saichler/l8reflect/go/reflect/updating"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8types/go/types/l8notify"
 )
 
@@ -134,46 +135,63 @@ func CreateUpdateNotification(changes []*updating.Change, serviceName, key strin
 // ItemOf extracts the entity from a notification set by deserializing the appropriate
 // value based on notification type. For Patch notifications, reconstructs the entity
 // from individual property changes.
-func ItemOf(n *l8notify.L8NotificationSet, resources ifs.IResources) (interface{}, error) {
+func ItemOf(n *l8notify.L8NotificationSet, resources ifs.IResources, isTSDBService bool) (interface{}, []*l8notify.L8TSDBNotification, error) {
 	switch n.Type {
 	case l8notify.L8NotificationType_Put:
 		fallthrough
 	case l8notify.L8NotificationType_Post:
 		obj := object.NewDecode(n.NotificationList[0].NewValue, 0, resources.Registry())
 		v, e := obj.Get()
-		return v, e
+		return v, nil, e
 	case l8notify.L8NotificationType_Delete:
 		obj := object.NewDecode(n.NotificationList[0].OldValue, 0, resources.Registry())
 		v, e := obj.Get()
-		return v, e
+		return v, nil, e
 	case l8notify.L8NotificationType_Patch:
 
 		info, err := resources.Registry().Info(n.ModelType)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		root, err := info.NewInstance()
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
+		var tsdb []*l8notify.L8TSDBNotification
 
 		for _, notif := range n.NotificationList {
-			p, e := properties.PropertyOf(notif.PropertyId, resources)
 			var value interface{}
 			if notif.NewValue != nil {
 				obj := object.NewDecode(notif.NewValue, 0, resources.Registry())
 				v, e1 := obj.Get()
 				if e1 != nil {
-					return nil, e1
+					return nil, nil, e1
 				}
 				value = v
 			}
+			if isTSDBService {
+				l8point, ok := value.(*l8api.L8TimeSeriesPoint)
+				if ok {
+					newPoint := &l8notify.L8TSDBNotification{
+						PropertyId: notif.PropertyId,
+						Point:      l8point,
+					}
+					if tsdb == nil {
+						tsdb = []*l8notify.L8TSDBNotification{newPoint}
+					} else {
+						tsdb = append(tsdb, newPoint)
+					}
+					continue
+				}
+			}
+
+			p, e := properties.PropertyOf(notif.PropertyId, resources)
 			_, _, e = p.Set(root, value)
 			if e != nil {
-				return nil, e
+				return nil, nil, e
 			}
 		}
-		return root, nil
+		return root, tsdb, nil
 	}
-	return nil, errors.New("Unknown notification type")
+	return nil, nil, errors.New("Unknown notification type")
 }
