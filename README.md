@@ -1,6 +1,6 @@
 # Layer 8 Utils
 
-[![Go Version](https://img.shields.io/badge/Go-1.24.9-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.25.4-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-green.svg)]()
 
@@ -12,97 +12,95 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 ## Recent Updates
 
-### Latest Changes (December 2025)
+### Latest Changes (March 2026)
+- **TSDB Notifications**: Added TSDB (Time Series Database) notification support for time-series data change tracking
+- **CPU Profiling**: Added CPU usage analysis and memory dump capabilities via pprof integration
+- **Cache Optimization**: Moved Patch operations to use dry run for improved performance
+- **Windows Compatibility**: Fixed platform compatibility issues
+
+### February 2026
+- **Aggregator**: Completed data aggregation utilities with full test coverage
+- **Logging Improvements**: Fixed concurrent panic in logger, corrupted log argument handling, configurable log directory
+- **Shared Resources**: Renamed and consolidated shared resource utilities, uses shallow security as default
+- **Escaping Fixes**: Fixed string escaping issues
+
+### January 2026
+- **Memory Leak Fixes**: Fixed memory leaks in cache and resource management
+- **pprof Integration**: Added pprof heap dump support for memory profiling
+- **Host Name Support**: Added hostname resolution utilities
+
+### December 2025
 - **Query TTL Support**: Added automatic TTL-based cleanup for cached queries with configurable expiration (30s default)
 - **Query Sorting Fix**: Fixed sorting behavior in cache queries for consistent ordering
 - **Web Service Refactoring**: Improved web service architecture with better code organization
-- **Performance Analysis**: Comprehensive performance analysis document added with scalability recommendations
-- **Bug Fixes**: Fixed missing root key handling, zero value handling, nil support improvements
-
-### November 2025 Updates
-- **VNet Support**: Added VNet (Virtual Network) support to WebService for enhanced networking capabilities
-- **Logging Enhancements**: Fixed and improved file logging functionality with better error handling
-- **Shared Resources**: Added new shared resource utilities (`NewResources`) for centralized resource management
-- **Service Integration**: Enhanced integration with l8services for improved microservices support
-
-### October 2025 Updates
-- **Registry Enhancement**: Added `NewOf()` function for dynamic instance creation from registered types
-- **Cache Statistics**: Introduced `TotalStats` feature with automatic total counting for all cache items
-- **Collection Support**: Added `Collect()` functionality for advanced data aggregation in cache
-- **Model Type Integration**: Enhanced type handling and model type support across the framework
-- **Source Management**: Improved source tracking and management in components
-
-### Core Improvements
-- **Cache System**: High-performance in-memory cache with storage integration, CRUD operations, notifications, and query support (78.1% test coverage)
-- **Notification Framework**: Comprehensive notification system for distributed state management with support for Add, Delete, Update, Replace, and Sync operations (87.8% test coverage)
-- **Test Suite Expansion**: Added comprehensive test utilities (createModel, newResources, createChanges) for building robust test suites
-- **Enhanced Security**: Improved certificate management with self-signed certificate support
-- **Interface Improvements**: Fixed interface implementations for better type safety
-- **Token Validation**: Added robust token validation mechanisms
-- **Performance Optimizations**: Enhanced byte queue performance and enlarged queue sizes
 
 ## Features
 
-### 🚀 Core Utilities
+### Core Utilities
 
 - **Cache**: High-performance in-memory cache with storage integration
   - CRUD operations (Post, Get, Put, Patch, Delete)
   - Storage layer integration with persistence support
   - Built-in notification system for change tracking
-  - Enhanced statistics tracking with named stat functions and automatic totals
+  - Statistics tracking with named stat functions and automatic totals
   - Collection operations with `Collect()` for data aggregation
   - Clone-based isolation for concurrent access
   - Query support with pagination, filtering, and sorting
   - Query TTL with automatic cleanup (configurable, 30s default)
-  - Dynamic stat functions registration with `AddStatFunc()`
+  - Dry-run Patch support for optimized updates
 
-- **Notifications**: Comprehensive notification system for distributed state management
+- **Notifications**: Distributed state change notification system
   - Support for Add, Delete, Update, Replace, and Sync notification types
+  - TSDB notification support for time-series data
   - Serialization/deserialization with protocol buffers
   - Change tracking with property-level granularity
   - Sequence numbering for ordering guarantees
   - Service-area based routing support
 
-- **Queues**: High-performance thread-safe queues with priority support
-  - `ByteQueue`: Optimized byte queue with priority handling
-  - `Queue`: Generic queue implementation
-  - Support for concurrent operations and backpressure
+- **Queues**: High-performance thread-safe queues
+  - `ByteQueue`: Optimized byte queue with 8 priority levels and O(1) bit operations
+  - `Queue`: Generic queue implementation for any type
+  - Support for concurrent operations, blocking/non-blocking dequeue
 
-- **Logging**: Flexible logging framework with multiple output methods
-  - File-based logging with rotation
+- **Logging**: Flexible async logging framework
+  - File-based logging with configurable directory
   - Console/fmt logging
-  - Configurable log levels
-  - Asynchronous logging with queue-based processing
+  - Configurable log levels (Trace, Debug, Info, Warning, Error)
+  - Asynchronous queue-based processing (50k entry limit)
+  - pprof integration for CPU and heap profiling
+  - Direct logger implementation for synchronous use
+  - Platform-specific support (Unix and Windows)
 
 - **String Utilities**: Comprehensive string manipulation and conversion
-  - Type-safe string to primitive conversions
+  - Type-safe string to/from primitive conversions
   - String formatting and parsing utilities
-  - Validation helpers
+  - Escape/unescape handling
 
-### 🔐 Security & Infrastructure
+### Security & Infrastructure
 
-- **Certificate Management**: TLS/SSL certificate utilities
-- **Shallow Security**: Basic security providers and authentication utilities
-- **Maps**: Thread-safe map implementations with sync.Map optimizations
+- **Certificate Management**: TLS/SSL certificate utilities with self-signed certificate support
+- **Shallow Security**: Default security provider with token validation
+- **Maps**: Thread-safe `SyncMap` with reflection-based type-safe value/key lists
 
-### 🌐 Web Services
+### Web Services
 
 - **Web Service Framework**: RESTful service utilities
   - HTTP method handlers (GET, POST, PUT, PATCH, DELETE)
-  - Request/response marshaling
-  - Protocol buffer integration
+  - Request/response marshaling with protocol buffer integration
   - VNet (Virtual Network) support for distributed networking
-  - Enhanced service-to-service communication
 
-### 📊 System Management
+### System Management
 
-- **Registry**: Centralized resource and configuration management
-  - Type registration and lookup
-  - Dynamic instance creation with `NewOf()` function
+- **Registry**: Type registration and management
+  - Dynamic instance creation with `NewOf()`
   - Enum registration and management
+  - Layer 8 core types pre-registered
   - Thread-safe operations
-- **Resources**: Resource loading and management utilities
-- **Workers**: Worker pool implementations for concurrent processing
+- **Resources**: Centralized dependency injection container (logger, registry, security, serializers, config, services)
+- **Workers**: Worker pool with configurable concurrency limits and condition-variable coordination
+- **Aggregator**: Data aggregation utilities for collection processing
+- **Tasks**: Task queue management
+- **IP Segment**: IP segment parsing and management
 
 ## Installation
 
@@ -116,21 +114,20 @@ go get github.com/saichler/l8utils/go
 package main
 
 import (
-    "github.com/saichler/l8utils/go/utils"
-    "github.com/saichler/l8utils/go/utils/logger"
+    "github.com/saichler/l8utils/go/utils/shared"
     "github.com/saichler/l8utils/go/utils/queues"
     "github.com/saichler/l8types/go/ifs"
 )
 
 func main() {
-    // Create shared resources with VNet support
-    resources := utils.NewResources("my-service", 8080, 30)
+    // Create shared resources
+    resources := shared.NewResources("my-service", 8080, 30)
 
     // Get logger from resources
     log := resources.Logger()
     log.Info("Application started")
 
-    // Create a high-performance byte queue
+    // Create a high-performance byte queue with 8 priority levels
     queue := queues.NewByteQueue("main-queue", 10000)
     queue.Add([]byte("Hello World"), ifs.PRIORITY_MEDIUM)
 
@@ -146,85 +143,28 @@ func main() {
 ```
 go/
 ├── utils/
-│   ├── cache/          # High-performance cache with storage integration
-│   ├── certs/          # Certificate management
-│   ├── logger/         # Logging framework
-│   ├── maps/           # Thread-safe map implementations
-│   ├── notify/         # Notification system for state changes
-│   ├── queues/         # High-performance queue implementations
-│   ├── registry/       # Resource registry
-│   ├── resources/      # Resource management
-│   ├── shallow_security/ # Basic security utilities
-│   ├── strings/        # String manipulation utilities
-│   ├── web/           # Web service framework
-│   └── workers/       # Worker pool implementations
-└── tests/
-    ├── Cache_test.go         # Cache tests (78.1% coverage)
-    └── Notifications_test.go # Notification tests (87.8% coverage)
+│   ├── aggregator/        # Data aggregation utilities
+│   ├── cache/             # High-performance cache with storage integration
+│   ├── certs/             # TLS/SSL certificate management
+│   ├── ipsegment/         # IP segment parsing and management
+│   ├── logger/            # Async logging framework with pprof support
+│   ├── maps/              # Thread-safe SyncMap implementation
+│   ├── notify/            # Notification system (including TSDB support)
+│   ├── queues/            # Priority queue implementations
+│   ├── registry/          # Type registration and dynamic instantiation
+│   ├── requests/          # HTTP request utilities
+│   ├── resources/         # Centralized resource container
+│   ├── shallow_security/  # Default security provider
+│   ├── shared/            # Pre-configured Resources factory
+│   ├── strings/           # String conversion and escaping
+│   ├── tasks/             # Task queue management
+│   ├── web/               # RESTful web service framework
+│   └── workers/           # Worker pool implementations
+├── tests/                 # All test files (25 files)
+└── vendor/                # Vendored dependencies
 ```
 
 ## Key Components
-
-### ByteQueue
-High-performance, thread-safe queue optimized for byte operations with priority support:
-
-```go
-queue := queues.NewByteQueue("processor", 5000)
-queue.Add(data, ifs.PRIORITY_HIGH)
-result := queue.Poll() // Non-blocking
-result := queue.Next() // Blocking until data available
-```
-
-### Logger
-Asynchronous logging with multiple output methods:
-
-```go
-// Console logging
-logger := logger.NewLoggerImpl(logger.NewFmtLogMethod())
-
-// File logging with automatic file management
-fileLog := logger.NewFileLogMethod("app.log")
-logger := logger.NewLoggerImpl(fileLog)
-
-// Combined logging
-logger := logger.NewLoggerImpl(
-    logger.NewFileLogMethod("app.log"),
-    logger.NewFmtLogMethod(),
-)
-logger.SetLogLevel(ifs.Error_Level)
-logger.Info("Application ready")
-```
-
-### Web Services
-RESTful service utilities with protocol buffer and VNet support:
-
-```go
-// Create web service with VNet support
-service := web.NewWebService("user-service", serviceArea)
-service.SetVnet(8080) // Set VNet port
-
-// Register handlers
-service.HandlePost(userCreateHandler)
-service.HandleGet(userGetHandler)
-service.HandlePut(userUpdateHandler)
-service.HandleDelete(userDeleteHandler)
-```
-
-### Shared Resources
-Centralized resource management with integrated components:
-
-```go
-// Create resources with alias, VNet port, and keep-alive settings
-resources := utils.NewResources("my-service", 8080, 30)
-
-// Resources automatically include:
-// - Logger with error-level default
-// - Registry for type management
-// - Security provider
-// - System configuration
-// - Introspection capabilities
-// - Service manager
-```
 
 ### Cache
 High-performance in-memory cache with optional storage persistence and query TTL:
@@ -237,32 +177,72 @@ cache := cache.NewCache(&MyModel{}, initElements, storage, resources)
 cache.Post(item, true)  // Add with notification
 item := cache.Get(key)
 cache.Put(key, updatedItem, true)
-cache.Patch(key, changes, true)
+cache.Patch(key, changes, true)  // Uses dry run for optimization
 cache.Delete(key, true)
 
 // Query with pagination (queries cached with 30s TTL by default)
 results := cache.Fetch(0, 25, query)
 
 // Query cache management
-queryCount := cache.QueryCount()           // Monitor cached queries
-cache.CleanupQueriesNow(60)               // Manual cleanup with custom TTL
-defer cache.Close()                        // Stop TTL cleaner on shutdown
+queryCount := cache.QueryCount()
+cache.CleanupQueriesNow(60)       // Manual cleanup with custom TTL
+defer cache.Close()                // Stop TTL cleaner on shutdown
 
-// Enhanced statistics tracking
+// Statistics tracking
 cache.AddStatFunc("active", func(item interface{}) bool {
     return item.(*MyModel).Status == "active"
 })
-cache.AddStatFunc("pending", func(item interface{}) bool {
-    return item.(*MyModel).Status == "pending"
-})
-stats := cache.Stats() // Returns map with counts for "Total", "active", "pending"
+stats := cache.Stats() // Returns map with counts for "Total", "active", etc.
 
 // Collection operations
 collection := cache.Collect(predicate)
 ```
 
+### ByteQueue
+High-performance, thread-safe queue with 8 priority levels and O(1) bit operations:
+
+```go
+queue := queues.NewByteQueue("processor", 5000)
+queue.Add(data, ifs.PRIORITY_HIGH)
+result := queue.Poll() // Non-blocking
+result := queue.Next() // Blocking until data available
+```
+
+### Logger
+Asynchronous logging with multiple output methods and pprof integration:
+
+```go
+// Console logging
+log := logger.NewLoggerImpl(logger.NewFmtLogMethod())
+
+// File logging with configurable directory
+fileLog := logger.NewFileLogMethod("app.log")
+log := logger.NewLoggerImpl(fileLog)
+
+// Combined logging
+log := logger.NewLoggerImpl(
+    logger.NewFileLogMethod("app.log"),
+    logger.NewFmtLogMethod(),
+)
+log.SetLogLevel(ifs.Error_Level)
+log.Info("Application ready")
+```
+
+### Web Services
+RESTful service utilities with protocol buffer and VNet support:
+
+```go
+service := web.NewWebService("user-service", serviceArea)
+service.SetVnet(8080)
+
+service.HandlePost(userCreateHandler)
+service.HandleGet(userGetHandler)
+service.HandlePut(userUpdateHandler)
+service.HandleDelete(userDeleteHandler)
+```
+
 ### Notifications
-Create and manage notifications for distributed state synchronization:
+Distributed state change notifications with TSDB support:
 
 ```go
 // Create Add notification
@@ -285,46 +265,40 @@ item, err := notify.ItemOf(notSet, resources)
 Type registration and dynamic instance creation:
 
 ```go
-// Create registry
 registry := registry.NewRegistry()
-
-// Register a type
 registry.Register(&MyModel{})
-
-// Create new instance dynamically
 newInstance := registry.NewOf(&MyModel{})
-
-// Get type information
 info, err := registry.Info("MyModel")
-
-// Register enums
 registry.RegisterEnum("Status", []string{"active", "pending", "completed"})
+```
+
+### Resources
+Centralized dependency injection container:
+
+```go
+resources := shared.NewResources("my-service", 8080, 30)
+
+// Includes: Logger, Registry, Security provider,
+// System configuration, Introspection, Service manager
 ```
 
 ## Testing
 
-The library includes comprehensive test suites with high code coverage:
+### Test Coverage
+The library includes 25 test files covering all major packages:
 
-### Coverage Reports
-- **Cache Package**: 78.1% coverage
-- **Notifications Package**: 87.8% coverage
-- **Overall**: Comprehensive test coverage across all packages
-
-### Test Files
-- **Cache Tests** (`go/tests/Cache_test.go`):
-  - CRUD operations testing
-  - Storage integration tests
-  - Notification system tests
-  - Statistics tracking validation including new TotalStats feature
-  - Collection operations testing
-  - Concurrent access and isolation tests
-
-- **Notification Tests** (`go/tests/Notifications_test.go`):
-  - All notification type tests (Add, Delete, Update, Replace, Sync)
-  - Serialization/deserialization validation
-  - ItemOf extraction tests
-  - Property-level change tracking tests
-  - Sequence and service area validation
+- Cache (CRUD, cloning, queries, notifications, statistics, collections)
+- Queues (blocking/non-blocking, priority ordering, edge cases)
+- Logger (async processing, log levels, direct implementation)
+- Registry (type registration, lookup, dynamic instantiation, enums)
+- Notifications (all types, serialization, property tracking)
+- Resources (container setup, component storage/retrieval)
+- Workers (concurrency, limit enforcement)
+- Certificates (generation, validation)
+- Strings (conversion, parsing, escaping)
+- Aggregator (data aggregation operations)
+- SyncMap (thread-safe operations)
+- Security (shallow security provider, encryption/decryption)
 
 ### Running Tests
 ```bash
@@ -332,77 +306,31 @@ cd go
 ./test.sh  # Runs all tests with coverage reporting
 ```
 
-### Coverage Visualization
-HTML coverage reports are generated at:
-- `go/cover-report.html` - Full coverage report
-- `go/coverage_notify.html` - Notification-specific coverage
-
-Test utilities available:
-```go
-// Create test model instance
-model := createModel(i)
-
-// Create resources with registry and introspection
-resources := newResources()
-
-// Generate changes between models
-changes := createChanges(oldModel, newModel, resources)
-```
-
 ## Dependencies
 
 ### Direct Dependencies
-- **l8reflect** (v0.0.0-20251020202633-feaa244d0a2b): Reflection utilities for dynamic type handling
-- **l8services** (v0.0.0-20251031163521-852f7c020c80): Services framework for microservices management
-- **l8srlz** (v0.0.0-20251027151455-5149a019bed7): Serialization framework for data exchange
-- **l8types** (v0.0.0-20251103131334-82d3444d09d8): Core type definitions and interfaces
-- **Protocol Buffers** (v1.36.10): Message serialization and data exchange
+- **l8types** (v0.0.0-20260313): Core type definitions and interfaces
+- **l8reflect** (v0.0.0-20260306): Reflection utilities for dynamic type handling
+- **l8services** (v0.0.0-20260309): Services framework for microservices management
+- **l8srlz** (v0.0.0-20251226): Serialization framework for data exchange
+- **Protocol Buffers** (v1.36.11): Message serialization
+- **golang.org/x/sys** (v0.42.0): System call support
 
 ### Indirect Dependencies
-- **Google UUID** (v1.6.0): Unique identifier generation and management
-- **l8bus** (v0.0.0-20251031141311-e67190ca68dc): Event bus for distributed messaging
-- **l8ql** (v0.0.0-20251030150208-8a58a1d7ac8a): Query language support
-- **l8test** (v0.0.0-20251030140121-4de54523fc40): Testing utilities
+- **Google UUID** (v1.6.0): Unique identifier generation
+- **l8bus** (v0.0.0-20260310): Event bus for distributed messaging
+- **l8ql** (v0.0.0-20260228): Query language support
+- **l8test** (v0.0.0-20260307): Testing utilities
 
-## Performance Features
+## Design Principles
 
-- Lock-free operations where possible
-- Memory-efficient byte handling
-- Priority-based queue processing
-- Asynchronous logging to prevent I/O blocking
-- Connection pooling and reuse
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Recent Commits
-
-### December 2025
-- `038ab24` - Fix sorting in queries - Fixed query result sorting
-- `65c752f` - Add TTL to cache query - Automatic query cache cleanup with TTL support
-- `c7794a3` - Fix missing root key - Improved key handling
-- `8296546` - Refactor web - Improved web service architecture
-- `0b87c4e` - Fix zeroValue - Fixed zero value handling
-- `156e414` - Add support for nil - Improved nil handling
-
-### November 2025
-- `2119a29` - Add vnet to web - Added VNet support to WebService
-- `64ab2f9` - Fix log to file - Fixed file logging functionality
-- `5ca22f1` - move loader - Reorganized loader components
-- `27fa796` - add shared - Added shared resource utilities
-- `cb17025` - Log to files - Enhanced file logging capabilities
-
-### October 2025
-- `d7f9d0d` - Wait for signal - Added signal handling
-- `fe2c916` - remove default user - Security enhancement
-- `74eaae4` - Add log to files - Initial file logging implementation
-- `046924f` - Add file logs - File logging support
-- `06f7f2d` - update readme - Documentation updates
+- **Interface-driven**: All major components expose interfaces from `l8types`
+- **Thread-safe**: All packages use sync.RWMutex, sync.Cond, or sync.Map
+- **Clone-based isolation**: Cache returns clones to prevent external mutation
+- **Async processing**: Logger and cache use background goroutines with condition variables
+- **Dependency injection**: Resources container enables passing components without global state
+- **Vendored dependencies**: All external deps vendored in `go/vendor/`
+- **Maintainability**: No file exceeds 500 lines; single responsibility per file
 
 ## License
 
