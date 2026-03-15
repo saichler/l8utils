@@ -126,7 +126,7 @@ func TestCreateAddNotification(t *testing.T) {
 	}
 
 	// Test ItemOf with Add notification
-	item, err := notify.ItemOf(notSet, res)
+	item, _, err := notify.ItemOf(notSet, res, false)
 	if err != nil {
 		t.Errorf("Expected no error from ItemOf, got: %v", err)
 	}
@@ -170,7 +170,7 @@ func TestCreateReplaceNotification(t *testing.T) {
 	}
 
 	// Test ItemOf with Replace notification
-	item, err := notify.ItemOf(notSet, res)
+	item, _, err := notify.ItemOf(notSet, res, false)
 	if err != nil {
 		t.Errorf("Expected no error from ItemOf, got: %v", err)
 	}
@@ -212,7 +212,7 @@ func TestCreateDeleteNotification(t *testing.T) {
 	}
 
 	// Test ItemOf with Delete notification
-	item, err := notify.ItemOf(notSet, res)
+	item, _, err := notify.ItemOf(notSet, res, false)
 	if err != nil {
 		t.Errorf("Expected no error from ItemOf, got: %v", err)
 	}
@@ -270,7 +270,7 @@ func TestCreateUpdateNotification(t *testing.T) {
 
 	// Test ItemOf with Update notification
 	// Note: ItemOf for Update notifications may fail with complex types like slices
-	item, err := notify.ItemOf(notSet, res)
+	item, _, err := notify.ItemOf(notSet, res, false)
 	if err != nil {
 		t.Logf("ItemOf returned error (may be expected for complex types): %v", err)
 	} else if item == nil {
@@ -377,7 +377,7 @@ func TestItemOfVariousTypes(t *testing.T) {
 				t.Fatalf("Setup failed: %v", err)
 			}
 
-			item, err := notify.ItemOf(notSet, res)
+			item, _, err := notify.ItemOf(notSet, res, false)
 			if err != nil {
 				t.Errorf("ItemOf failed: %v", err)
 			}
@@ -502,7 +502,7 @@ func TestMultipleChangesInUpdate(t *testing.T) {
 
 	// Verify we can extract the updated item
 	// Note: ItemOf for Update notifications may fail with complex types like slices
-	item, err := notify.ItemOf(notSet, res)
+	item, _, err := notify.ItemOf(notSet, res, false)
 	if err != nil {
 		t.Logf("ItemOf returned error (may be expected for complex types): %v", err)
 	} else if item == nil {

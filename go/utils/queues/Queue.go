@@ -30,6 +30,10 @@ import (
 	"time"
 )
 
+const (
+	NO_LIMIT = -1
+)
+
 // Queue is a simple blocking/thread safe "abstract" queue.
 // The queue entry is an interface
 type Queue struct {
@@ -62,7 +66,7 @@ func NewQueue(queueName string, maxSize int) *Queue {
 func (queue *Queue) Add(any interface{}) {
 	queue.rwMtx.Lock()
 	defer queue.rwMtx.Unlock()
-	if len(queue.queue) >= queue.maxSize && queue.active {
+	if queue.maxSize >= 0 && len(queue.queue) >= queue.maxSize && queue.active {
 		queue.rwMtx.Unlock()
 		for len(queue.queue) >= queue.maxSize && queue.active {
 			queue.cond.Broadcast()
