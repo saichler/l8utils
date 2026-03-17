@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "Directory size summary for: $(pwd)"
+echo "================================"
+echo ""
+
+# Total size of current directory
+echo "Total size:"
+du -sh . 2>/dev/null
+echo ""
+
+# Size of files directly in current directory (not in subdirs)
+FILES_SIZE=$(find . -maxdepth 1 -type f -exec du -ch {} + 2>/dev/null | tail -1 | cut -f1)
+if [ -n "$FILES_SIZE" ]; then
+    echo "Files in current directory: $FILES_SIZE"
+    echo ""
+fi
+
+# Size of all subdirectories (including hidden), sorted by size
+echo "Subdirectory sizes (largest first):"
+du -sh .[!.]* */ 2>/dev/null | sort -hr
+echo ""
+
+# Count of files and directories
+echo "Statistics:"
+echo "  Files: $(find . -type f 2>/dev/null | wc -l)"
+echo "  Directories: $(find . -type d 2>/dev/null | wc -l)"

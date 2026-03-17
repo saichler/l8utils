@@ -1,0 +1,5 @@
+if [ -n "$1" ]; then
+    kubectl get pods -A -o wide | grep "$1"
+else
+    kubectl get pods -A -o wide
+fi

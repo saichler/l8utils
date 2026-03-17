@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <search_pattern>"
+    echo "Example: $0 nginx"
+    exit 1
+fi
+
+SEARCH_PATTERN="$1"
+
+# Get pods matching the pattern
+kubectl get pods -A | grep "$SEARCH_PATTERN" | while read -r namespace pod_name rest; do
+    # Skip the header line if it matches
+    if [[ "$namespace" == "NAMESPACE" ]]; then
+        continue
+    fi
+    
+    echo "Opening logs for pod: $pod_name in namespace: $namespace"
+    
+    # Open a new terminal with kubectl logs command
+    qterminal -e bash -c "kubectl logs -f -n '$namespace' '$pod_name'; exec bash" &
+done
