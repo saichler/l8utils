@@ -13,6 +13,8 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 ## Recent Updates
 
 ### Latest Changes (March 2026)
+- **Scripts**: Added utility scripts for Kubernetes management, Docker operations, and developer tooling
+- **No-Limit Queue**: Added queue mode with no capacity limit
 - **TSDB Notifications**: Added TSDB (Time Series Database) notification support for time-series data change tracking
 - **CPU Profiling**: Added CPU usage analysis and memory dump capabilities via pprof integration
 - **Cache Optimization**: Moved Patch operations to use dry run for improved performance
@@ -21,7 +23,7 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 ### February 2026
 - **Aggregator**: Completed data aggregation utilities with full test coverage
 - **Logging Improvements**: Fixed concurrent panic in logger, corrupted log argument handling, configurable log directory
-- **Shared Resources**: Renamed and consolidated shared resource utilities, uses shallow security as default
+- **Shared Resources**: Renamed and consolidated shared resource utilities
 - **Escaping Fixes**: Fixed string escaping issues
 
 ### January 2026
@@ -59,7 +61,7 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 
 - **Queues**: High-performance thread-safe queues
   - `ByteQueue`: Optimized byte queue with 8 priority levels and O(1) bit operations
-  - `Queue`: Generic queue implementation for any type
+  - `Queue`: Generic queue implementation for any type with optional no-limit mode
   - Support for concurrent operations, blocking/non-blocking dequeue
 
 - **Logging**: Flexible async logging framework
@@ -79,7 +81,6 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
 ### Security & Infrastructure
 
 - **Certificate Management**: TLS/SSL certificate utilities with self-signed certificate support
-- **Shallow Security**: Default security provider with token validation
 - **Maps**: Thread-safe `SyncMap` with reflection-based type-safe value/key lists
 
 ### Web Services
@@ -97,7 +98,7 @@ Layer 8 Utils provides a comprehensive collection of utilities, interfaces, and 
   - Layer 8 core types pre-registered
   - Thread-safe operations
 - **Resources**: Centralized dependency injection container (logger, registry, security, serializers, config, services)
-- **Workers**: Worker pool with configurable concurrency limits and condition-variable coordination
+- **Workers**: Worker pool with configurable concurrency limits, condition-variable coordination, and multi-task execution
 - **Aggregator**: Data aggregation utilities for collection processing
 - **Tasks**: Task queue management
 - **IP Segment**: IP segment parsing and management
@@ -154,14 +155,15 @@ go/
 │   ├── registry/          # Type registration and dynamic instantiation
 │   ├── requests/          # HTTP request utilities
 │   ├── resources/         # Centralized resource container
-│   ├── shallow_security/  # Default security provider
 │   ├── shared/            # Pre-configured Resources factory
 │   ├── strings/           # String conversion and escaping
 │   ├── tasks/             # Task queue management
 │   ├── web/               # RESTful web service framework
-│   └── workers/           # Worker pool implementations
+│   └── workers/           # Worker pool and multi-task implementations
 ├── tests/                 # All test files (25 files)
 └── vendor/                # Vendored dependencies
+scripts/                   # Developer utility scripts (K8s, Docker)
+dockers/generate-proto/    # Protocol buffer generation Docker setup
 ```
 
 ## Key Components
@@ -288,7 +290,7 @@ resources := shared.NewResources("my-service", 8080, 30)
 The library includes 25 test files covering all major packages:
 
 - Cache (CRUD, cloning, queries, notifications, statistics, collections)
-- Queues (blocking/non-blocking, priority ordering, edge cases)
+- Queues (blocking/non-blocking, priority ordering, no-limit mode, edge cases)
 - Logger (async processing, log levels, direct implementation)
 - Registry (type registration, lookup, dynamic instantiation, enums)
 - Notifications (all types, serialization, property tracking)
@@ -298,7 +300,7 @@ The library includes 25 test files covering all major packages:
 - Strings (conversion, parsing, escaping)
 - Aggregator (data aggregation operations)
 - SyncMap (thread-safe operations)
-- Security (shallow security provider, encryption/decryption)
+- Security (encryption/decryption)
 
 ### Running Tests
 ```bash
@@ -309,18 +311,18 @@ cd go
 ## Dependencies
 
 ### Direct Dependencies
-- **l8types** (v0.0.0-20260313): Core type definitions and interfaces
+- **l8types** (v0.0.0-20260315): Core type definitions and interfaces
 - **l8reflect** (v0.0.0-20260306): Reflection utilities for dynamic type handling
-- **l8services** (v0.0.0-20260309): Services framework for microservices management
+- **l8services** (v0.0.0-20260314): Services framework for microservices management
 - **l8srlz** (v0.0.0-20251226): Serialization framework for data exchange
 - **Protocol Buffers** (v1.36.11): Message serialization
 - **golang.org/x/sys** (v0.42.0): System call support
 
 ### Indirect Dependencies
 - **Google UUID** (v1.6.0): Unique identifier generation
-- **l8bus** (v0.0.0-20260310): Event bus for distributed messaging
-- **l8ql** (v0.0.0-20260228): Query language support
-- **l8test** (v0.0.0-20260307): Testing utilities
+- **l8bus** (v0.0.0-20260313): Event bus for distributed messaging
+- **l8ql** (v0.0.0-20260315): Query language support
+- **l8test** (v0.0.0-20260313): Testing utilities
 
 ## Design Principles
 
