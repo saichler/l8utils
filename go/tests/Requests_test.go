@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8utils/go/utils/requests"
 )
 
@@ -84,6 +85,10 @@ func (m *MockElement) IsReplica() bool {
 
 func (m *MockElement) Replica() byte {
 	return 0
+}
+
+func (m *MockElement) Metadata() *l8api.L8MetaData {
+	return nil
 }
 
 // Mock IElements for transaction testing

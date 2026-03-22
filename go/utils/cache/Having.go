@@ -106,7 +106,7 @@ func matchHavingComparator(group map[string]interface{}, comp ifs.IComparator) b
 		return false
 	}
 
-	leftFloat, ok := toFloat64(leftVal)
+	leftFloat, ok := ToFloat64(leftVal)
 	if !ok {
 		return false
 	}

@@ -40,7 +40,7 @@ func (this *internalCache) fetchAggregate(q ifs.IQuery) ([]interface{}, *l8api.L
 
 	// Pack results into metadata
 	metadata := newMetadata()
-	packAggregateResults(groups, q.Aggregates(), q.GroupBy(), metadata)
+	PackAggregateResults(groups, q.Aggregates(), q.GroupBy(), metadata)
 
 	return []interface{}{}, metadata
 }

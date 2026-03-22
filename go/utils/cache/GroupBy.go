@@ -21,16 +21,16 @@ import (
 	"github.com/saichler/l8types/go/types/l8api"
 )
 
-// packAggregateResults writes aggregate results into metadata.KeyCount.Counts.
+// PackAggregateResults writes aggregate results into metadata.KeyCount.Counts.
 // Without GROUP BY: keys are aggregate aliases (e.g., "count", "sumMyInt32").
 // With GROUP BY: keys are "alias:groupValue" (e.g., "count:GroupA", "sumMyInt32:GroupA").
 // For multi-field GROUP BY: "alias:val1|val2".
-func packAggregateResults(groups []map[string]interface{}, aggregates []*l8api.L8AggregateFunction, groupByFields []string, metadata *l8api.L8MetaData) {
+func PackAggregateResults(groups []map[string]interface{}, aggregates []*l8api.L8AggregateFunction, groupByFields []string, metadata *l8api.L8MetaData) {
 	if len(groupByFields) == 0 {
 		// Single group — flat keys
 		if len(groups) == 1 {
 			for _, agg := range aggregates {
-				if val, ok := toFloat64(groups[0][agg.Alias]); ok {
+				if val, ok := ToFloat64(groups[0][agg.Alias]); ok {
 					metadata.KeyCount.Counts[agg.Alias] = val
 				}
 			}
@@ -40,19 +40,19 @@ func packAggregateResults(groups []map[string]interface{}, aggregates []*l8api.L
 
 	// Multiple groups — prefixed keys
 	for _, group := range groups {
-		groupKey := buildGroupKeyString(group, groupByFields)
+		groupKey := BuildGroupKeyString(group, groupByFields)
 		for _, agg := range aggregates {
 			key := agg.Alias + ":" + groupKey
-			if val, ok := toFloat64(group[agg.Alias]); ok {
+			if val, ok := ToFloat64(group[agg.Alias]); ok {
 				metadata.KeyCount.Counts[key] = val
 			}
 		}
 	}
 }
 
-// buildGroupKeyString creates a string key from group-by field values.
+// BuildGroupKeyString creates a string key from group-by field values.
 // Single field: "GroupA". Multiple fields: "Sales|West".
-func buildGroupKeyString(group map[string]interface{}, groupByFields []string) string {
+func BuildGroupKeyString(group map[string]interface{}, groupByFields []string) string {
 	parts := make([]string, 0, len(groupByFields))
 	for _, field := range groupByFields {
 		val := group[field]
@@ -65,8 +65,8 @@ func buildGroupKeyString(group map[string]interface{}, groupByFields []string) s
 	return strings.Join(parts, "|")
 }
 
-// toFloat64 converts any numeric type to float64.
-func toFloat64(v interface{}) (float64, bool) {
+// ToFloat64 converts any numeric type to float64.
+func ToFloat64(v interface{}) (float64, bool) {
 	switch n := v.(type) {
 	case int:
 		return float64(n), true
