@@ -641,7 +641,7 @@ func TestCacheStats(t *testing.T) {
 
 	// Models with i=3,4,5 should have MyInt32 > 100 (150, 200, 250)
 	if highValues != 3 {
-		t.Errorf("Expected 3 high values, got %d", highValues)
+		t.Errorf("Expected 3 high values, got %v", highValues)
 	}
 }
 
@@ -661,7 +661,7 @@ func TestCacheStatsEmpty(t *testing.T) {
 	if len(metadata) > 0 {
 		anyStat, ok := metadata["any_stat"]
 		if ok && anyStat != 0 {
-			t.Errorf("Expected 0 for empty cache, got %d", anyStat)
+			t.Errorf("Expected 0 for empty cache, got %v", anyStat)
 		}
 	}
 }
@@ -691,7 +691,7 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 
 	metadata := c.Metadata()
 	if metadata["even_values"] != 0 {
-		t.Errorf("Expected 0 even values, got %d", metadata["even_values"])
+		t.Errorf("Expected 0 even values, got %v", metadata["even_values"])
 	}
 
 	// Patch to even value
@@ -704,7 +704,7 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 
 	metadata = c.Metadata()
 	if metadata["even_values"] != 1 {
-		t.Errorf("Expected 1 even value after patch, got %d", metadata["even_values"])
+		t.Errorf("Expected 1 even value after patch, got %v", metadata["even_values"])
 	}
 }
 
@@ -728,7 +728,7 @@ func TestCacheStatsAfterDelete(t *testing.T) {
 
 	metadata := c.Metadata()
 	if metadata["count_all"] != 2 {
-		t.Errorf("Expected 2 items, got %d", metadata["count_all"])
+		t.Errorf("Expected 2 items, got %v", metadata["count_all"])
 	}
 
 	// Delete one
@@ -736,7 +736,7 @@ func TestCacheStatsAfterDelete(t *testing.T) {
 
 	metadata = c.Metadata()
 	if metadata["count_all"] != 1 {
-		t.Errorf("Expected 1 item after delete, got %d", metadata["count_all"])
+		t.Errorf("Expected 1 item after delete, got %v", metadata["count_all"])
 	}
 }
 
@@ -808,12 +808,12 @@ func TestCacheStatsMultipleFunctions(t *testing.T) {
 
 	// All should be positive
 	if metadata["positive"] != 5 {
-		t.Errorf("Expected 5 positive values, got %d", metadata["positive"])
+		t.Errorf("Expected 5 positive values, got %v", metadata["positive"])
 	}
 
 	// Items with i=4,5 should be > 100 (120, 150)
 	if metadata["large"] != 2 {
-		t.Errorf("Expected 2 large values, got %d", metadata["large"])
+		t.Errorf("Expected 2 large values, got %v", metadata["large"])
 	}
 }
 
@@ -927,7 +927,7 @@ func TestCacheAddStatFuncWithExistingItems(t *testing.T) {
 
 	// Items with i=2,3 should be > 50 (80, 120)
 	if metadata["over_50"] != 2 {
-		t.Errorf("Expected 2 items over 50, got %d", metadata["over_50"])
+		t.Errorf("Expected 2 items over 50, got %v", metadata["over_50"])
 	}
 }
 
@@ -960,10 +960,10 @@ func TestCacheDeleteWithStats(t *testing.T) {
 
 	metadata := c.Metadata()
 	if metadata["all_items"] != 2 {
-		t.Errorf("Expected 2 items, got %d", metadata["all_items"])
+		t.Errorf("Expected 2 items, got %v", metadata["all_items"])
 	}
 	if metadata["high_int"] != 1 {
-		t.Errorf("Expected 1 high_int, got %d", metadata["high_int"])
+		t.Errorf("Expected 1 high_int, got %v", metadata["high_int"])
 	}
 
 	// Delete the high int item
@@ -971,10 +971,10 @@ func TestCacheDeleteWithStats(t *testing.T) {
 
 	metadata = c.Metadata()
 	if metadata["all_items"] != 1 {
-		t.Errorf("Expected 1 item after delete, got %d", metadata["all_items"])
+		t.Errorf("Expected 1 item after delete, got %v", metadata["all_items"])
 	}
 	if metadata["high_int"] != 0 {
-		t.Errorf("Expected 0 high_int after delete, got %d", metadata["high_int"])
+		t.Errorf("Expected 0 high_int after delete, got %v", metadata["high_int"])
 	}
 }
 

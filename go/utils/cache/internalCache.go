@@ -52,7 +52,7 @@ func newInternalCache() *internalCache {
 func newMetadata() *l8api.L8MetaData {
 	metadata := &l8api.L8MetaData{}
 	metadata.KeyCount = &l8api.L8Count{}
-	metadata.KeyCount.Counts = make(map[string]int32)
+	metadata.KeyCount.Counts = make(map[string]float64)
 	metadata.ValueCount = make(map[string]*l8api.L8Count)
 	return metadata
 }
@@ -90,7 +90,7 @@ func addToMetadata(value interface{}, metadataFunc map[string]func(interface{}) 
 					vCount, ok2 := metadata.ValueCount[count]
 					if !ok2 {
 						vCount = &l8api.L8Count{}
-						vCount.Counts = make(map[string]int32)
+						vCount.Counts = make(map[string]float64)
 						metadata.ValueCount[count] = vCount
 					}
 					vCount.Counts[v]++
@@ -235,7 +235,7 @@ func (this *internalCache) addMetadataFunc(name string, f func(interface{}) (boo
 					vCount, ok2 := this.globalMetadata.ValueCount[name]
 					if !ok2 {
 						vCount = &l8api.L8Count{}
-						vCount.Counts = make(map[string]int32)
+						vCount.Counts = make(map[string]float64)
 						this.globalMetadata.ValueCount[name] = vCount
 					}
 					vCount.Counts[v]++

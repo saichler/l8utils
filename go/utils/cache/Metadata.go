@@ -23,10 +23,10 @@ func (this *Cache) AddMetadataFunc(name string, f func(interface{}) (bool, strin
 	this.iCache.addMetadataFunc(name, f)
 }
 
-func (this *Cache) Metadata() map[string]int32 {
+func (this *Cache) Metadata() map[string]float64 {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
-	result := make(map[string]int32)
+	result := make(map[string]float64)
 	for k, v := range this.iCache.globalMetadata.KeyCount.Counts {
 		result[k] = v
 	}
