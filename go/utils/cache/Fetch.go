@@ -26,6 +26,13 @@ func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
 	values, metadata := this.iCache.fetch(start, blockSize, q)
+
+	// Aggregate queries return empty slice with results in metadata
+	if q.IsAggregate() {
+		metadataClone := cloner.Clone(metadata).(*l8api.L8MetaData)
+		return values, metadataClone
+	}
+
 	result := make([]interface{}, len(values))
 	for i, v := range values {
 		result[i] = cloner.Clone(v)

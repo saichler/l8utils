@@ -173,6 +173,10 @@ func (this *internalCache) size() int {
 
 func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8MetaData) {
 
+	if q.IsAggregate() {
+		return this.fetchAggregate(q)
+	}
+
 	noCriteriaOrSort := true
 
 	hash := q.Hash()
