@@ -46,6 +46,7 @@ type Resources struct {
 	dataListener ifs.IDatatListener
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
 	introspector ifs.IIntrospector
+	sysConfig    *l8sysconfig.L8SysConfig
 }
 
 // NewResources creates a new Resources container with the specified logger.
@@ -59,7 +60,7 @@ func NewResources(logger ifs.ILogger) ifs.IResources {
 
 // AddService registers a new service with the system configuration.
 func (this *Resources) AddService(serviceName string, serviceArea int32) {
-	ifs.AddService(this.security.SystemConfig(), serviceName, serviceArea)
+	ifs.AddService(this.sysConfig, serviceName, serviceArea)
 }
 
 // Set stores a component by detecting its type via interface assertion.
@@ -98,9 +99,10 @@ func (this *Resources) Set(any interface{}) {
 		this.serializers[serializer.Mode()] = serializer
 	}
 
-	_, ok = any.(*l8sysconfig.L8SysConfig)
+	config, ok := any.(*l8sysconfig.L8SysConfig)
 	if ok {
-		panic("Sys config cannot be set")
+		this.sysConfig = config
+		return
 	}
 
 	introspector, ok := any.(ifs.IIntrospector)
@@ -123,6 +125,7 @@ func (this *Resources) Copy(other ifs.IResources) {
 	this.serializers[ifs.BINARY] = other.Serializer(ifs.BINARY)
 	this.introspector = other.Introspector()
 	this.dataListener = other.DataListener()
+	this.sysConfig = other.SysConfig()
 }
 
 // Registry returns the type registry component.
@@ -157,7 +160,7 @@ func (this *Resources) Logger() ifs.ILogger {
 
 // SysConfig returns the system configuration.
 func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
-	return this.security.SystemConfig()
+	return this.sysConfig
 }
 
 // Introspector returns the introspector component.

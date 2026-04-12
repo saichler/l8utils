@@ -24,10 +24,8 @@ import (
 	"github.com/saichler/l8utils/go/utils/resources"
 )
 
-func ResourcesOf(alias string, vnetPort, keepAlive uint32, logsPath string, others ...ifs.IResources) ifs.IResources {
-	if logsPath != "" {
-		logger.SetLogToFile(logsPath, alias)
-	}
+func ResourcesOf(alias string, vnetPort, keepAlive uint32, others ...ifs.IResources) ifs.IResources {
+
 	log := logger.NewLoggerImpl(&logger.FmtLogMethod{})
 	log.SetLogLevel(ifs.Error_Level)
 	res := resources.NewResources(log)
@@ -46,10 +44,15 @@ func ResourcesOf(alias string, vnetPort, keepAlive uint32, logsPath string, othe
 		}
 		res.Set(sec)
 	}
-	
+	res.Set(res.Security().NewSystemConfig())
+
 	res.SysConfig().VnetPort = vnetPort
 	res.SysConfig().LocalAlias = alias
 	res.SysConfig().KeepAliveIntervalSeconds = int64(keepAlive)
+
+	if res.SysConfig().LogConfig != nil && res.SysConfig().LogConfig.LogDirectory != "" {
+		logger.SetLogToFile(res.SysConfig().LogConfig.LogDirectory, alias)
+	}
 
 	res.Set(introspecting.NewIntrospect(res.Registry()))
 	res.Set(manager.NewServices(res))
