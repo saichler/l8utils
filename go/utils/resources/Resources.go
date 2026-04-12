@@ -160,6 +160,9 @@ func (this *Resources) Logger() ifs.ILogger {
 
 // SysConfig returns the system configuration.
 func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
+	if this.sysConfig == nil && this.security != nil {
+		this.sysConfig = this.security.NewSystemConfig()
+	}
 	return this.sysConfig
 }
 
