@@ -23,6 +23,7 @@
 package resources
 
 import (
+	"github.com/saichler/l8types/go/sec"
 	"reflect"
 
 	"github.com/saichler/l8types/go/ifs"
@@ -44,7 +45,6 @@ type Resources struct {
 	security     ifs.ISecurityProvider
 	dataListener ifs.IDatatListener
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
-	config       *l8sysconfig.L8SysConfig
 	introspector ifs.IIntrospector
 }
 
@@ -53,12 +53,13 @@ func NewResources(logger ifs.ILogger) ifs.IResources {
 	r := &Resources{}
 	r.logger = logger
 	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
+	r.security = sec.NewShallowSecurityProvider()
 	return r
 }
 
 // AddService registers a new service with the system configuration.
 func (this *Resources) AddService(serviceName string, serviceArea int32) {
-	ifs.AddService(this.config, serviceName, serviceArea)
+	ifs.AddService(this.security.SystemConfig(), serviceName, serviceArea)
 }
 
 // Set stores a component by detecting its type via interface assertion.
@@ -97,9 +98,9 @@ func (this *Resources) Set(any interface{}) {
 		this.serializers[serializer.Mode()] = serializer
 	}
 
-	config, ok := any.(*l8sysconfig.L8SysConfig)
+	_, ok = any.(*l8sysconfig.L8SysConfig)
 	if ok {
-		this.config = config
+		//this.config = config
 		return
 	}
 
@@ -123,37 +124,43 @@ func (this *Resources) Copy(other ifs.IResources) {
 	this.serializers[ifs.BINARY] = other.Serializer(ifs.BINARY)
 	this.introspector = other.Introspector()
 	this.dataListener = other.DataListener()
-	this.config = other.SysConfig()
 }
 
 // Registry returns the type registry component.
 func (this *Resources) Registry() ifs.IRegistry {
 	return this.registry
 }
+
 // Services returns the services manager component.
 func (this *Resources) Services() ifs.IServices {
 	return this.services
 }
+
 // Security returns the security provider component.
 func (this *Resources) Security() ifs.ISecurityProvider {
 	return this.security
 }
+
 // DataListener returns the data listener component.
 func (this *Resources) DataListener() ifs.IDatatListener {
 	return this.dataListener
 }
+
 // Serializer returns the serializer for the specified mode.
 func (this *Resources) Serializer(mode ifs.SerializerMode) ifs.ISerializer {
 	return this.serializers[mode]
 }
+
 // Logger returns the logger component.
 func (this *Resources) Logger() ifs.ILogger {
 	return this.logger
 }
+
 // SysConfig returns the system configuration.
 func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
-	return this.config
+	return this.security.SystemConfig()
 }
+
 // Introspector returns the introspector component.
 func (this *Resources) Introspector() ifs.IIntrospector {
 	return this.introspector

@@ -39,8 +39,8 @@ func TestResources(t *testing.T) {
 	if r.Services() != nil {
 		t.Error("Services should be nil initially")
 	}
-	if r.Security() != nil {
-		t.Error("Security should be nil initially")
+	if r.Security() == nil {
+		t.Error("Security should be initialized with a shallow security provider")
 	}
 	if r.DataListener() != nil {
 		t.Error("DataListener should be nil initially")
@@ -48,8 +48,8 @@ func TestResources(t *testing.T) {
 	if r.Introspector() != nil {
 		t.Error("Introspector should be nil initially")
 	}
-	if r.SysConfig() != nil {
-		t.Error("SysConfig should be nil initially")
+	if r.SysConfig() == nil {
+		t.Error("SysConfig should be available via the shallow security provider")
 	}
 }
 

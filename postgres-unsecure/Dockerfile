@@ -35,4 +35,4 @@ RUN chmod +x /start-postgres.sh
 
 USER postgres
 
-ENTRYPOINT ["/bin/sh", "-c", "/start-postgres.sh $0 $1 $2 $3 && sleep 3600"]
+#ENTRYPOINT ["/bin/sh", "-c", "/start-postgres.sh $0 $1 $2 $3 && sleep 3600"]
