@@ -100,8 +100,7 @@ func (this *Resources) Set(any interface{}) {
 
 	_, ok = any.(*l8sysconfig.L8SysConfig)
 	if ok {
-		//this.config = config
-		return
+		panic("Sys config cannot be set")
 	}
 
 	introspector, ok := any.(ifs.IIntrospector)
