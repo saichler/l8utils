@@ -23,10 +23,13 @@
 package resources
 
 import (
-	"github.com/saichler/l8types/go/sec"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/sec"
 	"github.com/saichler/l8types/go/types/l8sysconfig"
 )
 
@@ -169,4 +172,66 @@ func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
 // Introspector returns the introspector component.
 func (this *Resources) Introspector() ifs.IIntrospector {
 	return this.introspector
+}
+
+// WebPrefix returns the web endpoint prefix from the system configuration,
+// normalized to the "/xxx/" pattern. Returns an empty string if no prefix is
+// configured.
+func (this *Resources) WebPrefix() string {
+	if this == nil {
+		return "/web/"
+	}
+	sysConfig := this.SysConfig()
+	if sysConfig == nil || sysConfig.WebConfig == nil {
+		return "/web/"
+	}
+	prefix := strings.TrimSpace(sysConfig.WebConfig.EndPointPrefix)
+	if prefix == "" {
+		return "/web/"
+	}
+	prefix = strings.Trim(prefix, "/")
+	if prefix == "" {
+		return "/web/"
+	}
+	return "/" + prefix + "/"
+}
+
+func (this *Resources) DataDirectory() string {
+	dir := "data"
+	if this != nil {
+		if sysConfig := this.SysConfig(); sysConfig != nil {
+			if trimmed := strings.Trim(strings.TrimSpace(sysConfig.DataDirectory), "/"); trimmed != "" {
+				dir = trimmed
+			}
+		}
+	}
+	primary := "/" + dir
+	if err := os.MkdirAll(primary, 0755); err == nil {
+		return primary
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return primary
+	}
+	fallback := filepath.Join(home, dir)
+	if err := os.MkdirAll(fallback, 0755); err != nil {
+		if this != nil && this.logger != nil {
+			this.logger.Error("Failed to create data directory fallback ", fallback, ": ", err.Error())
+		}
+		return primary
+	}
+	return fallback
+}
+
+func (this *Resources) Certs() string {
+	certs := "webcerts"
+	if this == nil {
+		return this.DataDirectory() + "/" + certs
+	}
+	sysConfig := this.SysConfig()
+	if sysConfig == nil || sysConfig.WebConfig == nil || sysConfig.WebConfig.Cert == "" {
+		return this.DataDirectory() + "/" + certs
+	}
+	c := sysConfig.WebConfig.Cert
+	return filepath.Join(this.DataDirectory(), filepath.Base(c))
 }
