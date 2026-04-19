@@ -11,7 +11,8 @@ RUN apt install -y curl
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 RUN bash -c "source /root/.cargo/env; cargo install protobuf-codegen"
-RUN bash -c "chmod -R 777 /root/.cargo/env"
+# Make protoc-gen-rs available to non-root users (needed when docker run --user ... is used)
+RUN cp /root/.cargo/bin/protoc-gen-rs /usr/local/bin/protoc-gen-rs && chmod 755 /usr/local/bin/protoc-gen-rs
 # Add the generating script
 WORKDIR /home
 COPY protoc.sh /home/protoc.sh
