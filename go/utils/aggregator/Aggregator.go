@@ -1,6 +1,7 @@
 package aggregator
 
 import (
+	"fmt"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/queues"
 	"reflect"
@@ -90,6 +91,8 @@ func (this *Aggregator) send(method ifs.VNicMethod, destination, serviceName str
 	if len(buff) == 0 {
 		return
 	}
+	fmt.Printf("[AGG-SEND] method=%v service=(%s,%d) action=%v dest=%q count=%d\n",
+		method, serviceName, serviceArea, action, destination, len(buff))
 	var err error
 	switch method {
 	case ifs.Unicast:
@@ -131,6 +134,9 @@ func (this *Aggregator) send(method ifs.VNicMethod, destination, serviceName str
 		}
 	}
 	if err != nil {
+		fmt.Printf("[AGG-SEND-ERR] service=(%s,%d) err=%s\n", serviceName, serviceArea, err.Error())
 		this.vnic.Resources().Logger().Error(err.Error())
+	} else {
+		fmt.Printf("[AGG-SEND-OK] service=(%s,%d) count=%d\n", serviceName, serviceArea, len(buff))
 	}
 }
