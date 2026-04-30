@@ -128,3 +128,40 @@ func TestSyncMap(t *testing.T) {
 
 	m.Iterate(itf)
 }
+
+// TestSyncMapPutIfAbsent_Insert: empty map → PutIfAbsent inserts and reports new entry.
+func TestSyncMapPutIfAbsent_Insert(t *testing.T) {
+	m := maps.NewSyncMap()
+	if !m.PutIfAbsent("k", "v1") {
+		Log.Fail(t, "PutIfAbsent on empty map should return true")
+		return
+	}
+	v, ok := m.Get("k")
+	if !ok || v != "v1" {
+		Log.Fail(t, "Expected key 'k' to hold 'v1' after PutIfAbsent")
+		return
+	}
+}
+
+// TestSyncMapPutIfAbsent_Preserve: pre-populated key is preserved untouched.
+func TestSyncMapPutIfAbsent_Preserve(t *testing.T) {
+	m := maps.NewSyncMap()
+	m.Put("k", "original")
+	if m.PutIfAbsent("k", "replacement") {
+		Log.Fail(t, "PutIfAbsent on existing key should return false")
+		return
+	}
+	v, _ := m.Get("k")
+	if v != "original" {
+		Log.Fail(t, "Existing value must be preserved by PutIfAbsent, got:", v)
+		return
+	}
+}
+
+// TestSyncMapPutIfAbsent_NilReceiver: nil receiver returns false and does not panic.
+func TestSyncMapPutIfAbsent_NilReceiver(t *testing.T) {
+	var m *maps.SyncMap
+	if m.PutIfAbsent("k", "v") {
+		Log.Fail(t, "PutIfAbsent on nil receiver should return false")
+	}
+}

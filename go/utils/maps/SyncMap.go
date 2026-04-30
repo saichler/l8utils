@@ -53,6 +53,23 @@ func (this *SyncMap) Put(key, value interface{}) bool {
 	return !ok
 }
 
+// PutIfAbsent inserts the key/value pair only when the key is not already present.
+// Returns true if the value was inserted, false if the key already had a value
+// (which is preserved untouched). The check-and-insert is atomic under the
+// map's lock.
+func (this *SyncMap) PutIfAbsent(key, value interface{}) bool {
+	if this == nil {
+		return false
+	}
+	this.s.Lock()
+	defer this.s.Unlock()
+	if _, ok := this.m[key]; ok {
+		return false
+	}
+	this.m[key] = value
+	return true
+}
+
 // Get retrieves a value by key. Returns the value and whether it was found.
 func (this *SyncMap) Get(key interface{}) (interface{}, bool) {
 	if this == nil {

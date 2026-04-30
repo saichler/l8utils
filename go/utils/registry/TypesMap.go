@@ -30,12 +30,21 @@ func NewTypesMap() *TypesMap {
 	return s2t
 }
 
+// Put registers the type under the given key. When the key already has an
+// Info, the existing Info is preserved (along with anything attached to it,
+// such as serializers added via Info.AddSerializer). Returns true only when
+// a new Info was inserted. This honors the documented contract on
+// Registry.RegisterType: "Returns true if this is a new registration, false
+// if the type already exists."
 func (m *TypesMap) Put(key string, value reflect.Type) (bool, error) {
+	if m.impl.Contains(key) {
+		return false, nil
+	}
 	info, err := NewInfo(value)
 	if err != nil {
 		return false, err
 	}
-	return m.impl.Put(key, info), err
+	return m.impl.PutIfAbsent(key, info), nil
 }
 
 func (m *TypesMap) Get(key string) (*Info, bool) {
