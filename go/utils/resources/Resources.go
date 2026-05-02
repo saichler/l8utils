@@ -225,43 +225,17 @@ func (this *Resources) DataDirectory() string {
 }
 
 func (this *Resources) Certificate() (string, string, string) {
-	if this.sysConfig != nil && this.sysConfig.WebConfig != nil {
-		if this.sysConfig.WebConfig.CertLoadDir != "" && this.sysConfig.WebConfig.DomainCertPem == "" {
-			domainFilename := filepath.Join(this.sysConfig.WebConfig.CertLoadDir, "domain.cert.pem")
-			privateKeyFilename := filepath.Join(this.sysConfig.WebConfig.CertLoadDir, "private.key.pem")
-			publicKeyFilename := filepath.Join(this.sysConfig.WebConfig.CertLoadDir, "public.key.pem")
-
-			domainData, err := os.ReadFile(domainFilename)
-			if err != nil {
-				panic("Domain file " + domainFilename + " not found")
-			}
-			this.sysConfig.WebConfig.DomainCertPem = base64.StdEncoding.EncodeToString(domainData)
-
-			privateData, err := os.ReadFile(privateKeyFilename)
-			if err != nil {
-				panic("Private key file " + privateKeyFilename + " not found")
-			}
-			this.sysConfig.WebConfig.PrivateKeyPem = base64.StdEncoding.EncodeToString(privateData)
-
-			publicKeyData, err := os.ReadFile(publicKeyFilename)
-			if err != nil {
-				panic("Public key file " + publicKeyFilename + " not found")
-			}
-			this.sysConfig.WebConfig.PublicKeyPem = base64.StdEncoding.EncodeToString(publicKeyData)
-		}
-		domain, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.DomainCertPem)
-		if err != nil {
-			panic("Failed to decode domain cert: " + err.Error())
-		}
-		privateKey, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.PrivateKeyPem)
-		if err != nil {
-			panic("Failed to decode private key: " + err.Error())
-		}
-		publicKey, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.PublicKeyPem)
-		if err != nil {
-			panic("Failed to decode public key: " + err.Error())
-		}
-		return string(domain), string(privateKey), string(publicKey)
+	domain, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.DomainCertPem)
+	if err != nil {
+		panic("Failed to decode domain cert: " + err.Error())
 	}
-	panic("No certificate found")
+	privateKey, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.PrivateKeyPem)
+	if err != nil {
+		panic("Failed to decode private key: " + err.Error())
+	}
+	publicKey, err := base64.StdEncoding.DecodeString(this.sysConfig.WebConfig.PublicKeyPem)
+	if err != nil {
+		panic("Failed to decode public key: " + err.Error())
+	}
+	return string(domain), string(privateKey), string(publicKey)
 }
