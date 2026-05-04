@@ -59,6 +59,7 @@ type Cache struct {
 	serviceName    string
 	serviceArea    byte
 	cleaner        *ttlCleaner
+	subs           *subscriptions
 }
 
 // NewCache creates a new Cache instance. The sampleElement is used to determine
@@ -72,6 +73,7 @@ func NewCache(sampleElement interface{}, initElements []interface{}, store ifs.I
 	this.cond = sync.NewCond(this.mtx)
 	this.store = store
 	this.r = r
+	this.subs = newSubscriptions()
 	this.modelType = reflect.ValueOf(sampleElement).Elem().Type().Name()
 
 	_, _, err := this.KeysFor(sampleElement)
@@ -196,6 +198,40 @@ func (this *Cache) Source() string {
 // ModelType returns the type name of elements stored in this cache.
 func (this *Cache) ModelType() string {
 	return this.modelType
+}
+
+// RegisterSubscription registers a browser tab (identified by bearer token) for
+// real-time change notifications on this cache's model type. Called by the service
+// handler after Fetch when the query has Register=true.
+func (this *Cache) RegisterSubscription(token, queryHash, queryText string) {
+	this.subs.register(&Subscription{
+		Token:     token,
+		QueryHash: queryHash,
+		QueryText: queryText,
+	})
+}
+
+// UnregisterSubscription removes a subscription for the given token.
+// Called when a WebSocket disconnects or a tab navigates away.
+func (this *Cache) UnregisterSubscription(token string) {
+	this.subs.unregister(token)
+}
+
+// Subscribers returns all active subscriptions for this cache's model type.
+// Called by the service handler after a mutation to determine which tokens to notify.
+func (this *Cache) Subscribers() []*Subscription {
+	return this.subs.subscribers()
+}
+
+// HasSubscribers returns true if any tokens are subscribed to this cache.
+func (this *Cache) HasSubscribers() bool {
+	return this.subs.hasSubscribers()
+}
+
+// EvictStaleSubscriptions removes subscriptions not refreshed within ttlSeconds.
+// Returns the number evicted. Used for testing; in production the TTL cleaner calls this automatically.
+func (this *Cache) EvictStaleSubscriptions(ttlSeconds int64) int {
+	return this.subs.evictStale(ttlSeconds)
 }
 
 // Close stops the TTL cleaner goroutine and releases cache resources.

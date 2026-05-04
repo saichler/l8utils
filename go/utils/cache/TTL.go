@@ -93,6 +93,10 @@ func (t *ttlCleaner) run() {
 			if removed > 0 && t.cache.r != nil {
 				t.cache.r.Logger().Debug("TTL cleanup removed", " queries:", removed)
 			}
+			evicted := t.cache.subs.evictStale(DefaultSubscriptionTTL)
+			if evicted > 0 && t.cache.r != nil {
+				t.cache.r.Logger().Debug("TTL cleanup evicted", " subscriptions:", evicted)
+			}
 		case <-t.stopCh:
 			return
 		}
