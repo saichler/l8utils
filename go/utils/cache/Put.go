@@ -20,7 +20,7 @@ import (
 // Put replaces an existing item in the cache or adds it if not present.
 // This is an alias for Post as they share the same implementation logic.
 // If createNotification is true, generates an appropriate notification for distributed sync.
-func (this *Cache) Put(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
+func (this *Cache) Put(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, *l8notify.L8NotificationSet, error) {
 	//Seems that the post is handling also a put situation, where the item is replaced
 	return this.Post(v, createNotification)
 }

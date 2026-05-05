@@ -24,6 +24,47 @@ func (this *Cache) createNotificationSet(t l8notify.L8NotificationType, key stri
 	return notify.CreateNotificationSet(t, this.serviceName, key, this.serviceArea, this.modelType, this.Source(), changeCount, this.notifySequence)
 }
 
+func (this *Cache) createClientNotification(delta *l8notify.L8NotificationSet) *l8notify.L8NotificationSet {
+	if delta == nil || !this.HasSubscribers() {
+		return nil
+	}
+	cn := &l8notify.L8NotificationSet{}
+	cn.ServiceName = delta.ServiceName
+	cn.ServiceArea = delta.ServiceArea
+	cn.ModelType = delta.ModelType
+	cn.ModelKey = delta.ModelKey
+	cn.Type = delta.Type
+	cn.Source = delta.Source
+	cn.NotificationList = delta.NotificationList
+	cn.AaaIds = this.subscriberAaaIds()
+	return cn
+}
+
+func (this *Cache) createClientNotificationForPatch(item interface{}, key string) *l8notify.L8NotificationSet {
+	if !this.HasSubscribers() {
+		return nil
+	}
+	n, e := this.createAddNotification(item, key)
+	if e != nil {
+		return nil
+	}
+	n.Type = l8notify.L8NotificationType_Patch
+	n.AaaIds = this.subscriberAaaIds()
+	return n
+}
+
+func (this *Cache) subscriberAaaIds() map[string]bool {
+	subs := this.Subscribers()
+	if len(subs) == 0 {
+		return nil
+	}
+	ids := make(map[string]bool, len(subs))
+	for _, s := range subs {
+		ids[s.AAAId] = true
+	}
+	return ids
+}
+
 func (this *Cache) createAddNotification(any interface{}, key string) (*l8notify.L8NotificationSet, error) {
 	defer func() { this.notifySequence++ }()
 	return notify.CreateAddNotification(any, this.serviceName, key, this.serviceArea, this.modelType, this.Source(), 1, this.notifySequence)

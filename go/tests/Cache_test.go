@@ -38,8 +38,8 @@ func TestFetch(t *testing.T) {
 	t1 := createModel(1)
 	t2 := createModel(2)
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
-	c.Post(t1, false)
-	c.Post(t2, false)
+	_, _, _ = c.Post(t1, false)
+	_, _, _ = c.Post(t2, false)
 
 	q := createIQuery("select * from TestProto", res)
 	elems, _ := c.Fetch(0, 25, q)
@@ -152,7 +152,7 @@ func TestCachePost(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(10)
-	notification, err := c.Post(newModel, true)
+	notification, _, _, err := c.Post(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -175,7 +175,7 @@ func TestCachePostNoNotification(t *testing.T) {
 	c := cache.NewCache(model, nil, nil, res)
 
 	newModel := createModel(20)
-	notification, err := c.Post(newModel, false)
+	notification, _, _, err := c.Post(newModel, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -203,7 +203,7 @@ func TestCachePostReplace(t *testing.T) {
 	model1Updated := createModel(1)
 	model1Updated.MyInt32 = 999
 
-	notification, err := c.Post(model1Updated, true)
+	notification, _, _, err := c.Post(model1Updated, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -284,7 +284,7 @@ func TestCachePut(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(30)
-	notification, err := c.Put(newModel, true)
+	notification, _, err := c.Put(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -312,7 +312,7 @@ func TestCachePatch(t *testing.T) {
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 777
 
-	notification, err := c.Patch(patchModel, true)
+	notification, _, _, err := c.Patch(patchModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -343,7 +343,7 @@ func TestCachePatchNewItem(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(40)
-	notification, err := c.Patch(newModel, true)
+	notification, _, _, err := c.Patch(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -369,7 +369,7 @@ func TestCachePatchNoNotification(t *testing.T) {
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 555
 
-	notification, err := c.Patch(patchModel, false)
+	notification, _, _, err := c.Patch(patchModel, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -388,7 +388,7 @@ func TestCacheDelete(t *testing.T) {
 	c := cache.NewCache(model1, initElements, nil, res)
 	c.SetNotificationsFor("test-service", 1)
 
-	notification, err := c.Delete(model1, true)
+	notification, _, _, err := c.Delete(model1, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -417,7 +417,7 @@ func TestCacheDeleteNoNotification(t *testing.T) {
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
 
-	notification, err := c.Delete(model1, false)
+	notification, _, _, err := c.Delete(model1, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -440,7 +440,7 @@ func TestCacheDeleteNotFound(t *testing.T) {
 	c := cache.NewCache(model1, nil, nil, res)
 
 	model999 := createModel(999)
-	notification, err := c.Delete(model999, true)
+	notification, _, _, err := c.Delete(model999, true)
 
 	if err == nil {
 		t.Error("Expected error when deleting non-existent item")
@@ -460,7 +460,7 @@ func TestCacheSetNotificationsFor(t *testing.T) {
 
 	// Test that notifications work after setting
 	newModel := createModel(50)
-	notification, err := c.Post(newModel, true)
+	notification, _, _, err := c.Post(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -490,7 +490,7 @@ func TestCacheNotificationSequence(t *testing.T) {
 	// Post 3 items and collect sequences
 	for i := 1; i <= 3; i++ {
 		newModel := createModel(i * 10)
-		notification, err := c.Post(newModel, true)
+		notification, _, _, err := c.Post(newModel, true)
 		if err != nil {
 			t.Fatalf("Expected no error on post %d, got: %v", i, err)
 		}
@@ -521,7 +521,7 @@ func TestCacheMultipleOperations(t *testing.T) {
 
 	// Post
 	model1 := createModel(1)
-	_, err := c.Post(model1, false)
+	_, _, err := c.Post(model1, false)
 	if err != nil {
 		t.Fatalf("Post failed: %v", err)
 	}
@@ -535,7 +535,7 @@ func TestCacheMultipleOperations(t *testing.T) {
 	// Patch
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 111
-	_, err = c.Patch(patchModel, false)
+	_, _, err = c.Patch(patchModel, false)
 	if err != nil {
 		t.Fatalf("Patch failed: %v", err)
 	}
@@ -553,7 +553,7 @@ func TestCacheMultipleOperations(t *testing.T) {
 
 	// Post another
 	model2 := createModel(2)
-	_, err = c.Post(model2, false)
+	_, _, err = c.Post(model2, false)
 	if err != nil {
 		t.Fatalf("Second post failed: %v", err)
 	}
@@ -564,7 +564,7 @@ func TestCacheMultipleOperations(t *testing.T) {
 	}
 
 	// Delete one
-	_, err = c.Delete(model1, false)
+	_, _, err = c.Delete(model1, false)
 	if err != nil {
 		t.Fatalf("Delete failed: %v", err)
 	}
@@ -585,7 +585,7 @@ func TestCacheMultipleItems(t *testing.T) {
 	// Add 10 items
 	for i := 1; i <= 10; i++ {
 		newModel := createModel(i)
-		_, err := c.Post(newModel, false)
+		_, _, err := c.Post(newModel, false)
 		if err != nil {
 			t.Fatalf("Failed to post model %d: %v", i, err)
 		}
@@ -627,7 +627,7 @@ func TestCacheStats(t *testing.T) {
 	for i := 1; i <= 5; i++ {
 		newModel := createModel(i * 10)
 		newModel.MyInt32 = int32(i * 50)
-		_, err := c.Post(newModel, false)
+		_, _, err := c.Post(newModel, false)
 		if err != nil {
 			t.Fatalf("Failed to post model: %v", err)
 		}
@@ -684,7 +684,7 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 	// Add item with odd value
 	model1 := createModel(1)
 	model1.MyInt32 = 5
-	_, err := c.Post(model1, false)
+	_, _, err := c.Post(model1, false)
 	if err != nil {
 		t.Fatalf("Failed to post: %v", err)
 	}
@@ -697,7 +697,7 @@ func TestCacheStatsAfterPatch(t *testing.T) {
 	// Patch to even value
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 10
-	_, err = c.Patch(patchModel, false)
+	_, _, err = c.Patch(patchModel, false)
 	if err != nil {
 		t.Fatalf("Failed to patch: %v", err)
 	}
@@ -723,8 +723,8 @@ func TestCacheStatsAfterDelete(t *testing.T) {
 	// Add items
 	model1 := createModel(1)
 	model2 := createModel(2)
-	c.Post(model1, false)
-	c.Post(model2, false)
+	_, _, _ = c.Post(model1, false)
+	_, _, _ = c.Post(model2, false)
 
 	metadata := c.Metadata()
 	if metadata["count_all"] != 2 {
@@ -732,7 +732,7 @@ func TestCacheStatsAfterDelete(t *testing.T) {
 	}
 
 	// Delete one
-	c.Delete(model1, false)
+	_, _, _ = c.Delete(model1, false)
 
 	metadata = c.Metadata()
 	if metadata["count_all"] != 1 {
@@ -763,7 +763,7 @@ func TestCachePostNoChanges(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	// Post same model again
-	notification, err := c.Post(model1, true)
+	notification, _, _, err := c.Post(model1, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -801,7 +801,7 @@ func TestCacheStatsMultipleFunctions(t *testing.T) {
 	for i := 1; i <= 5; i++ {
 		newModel := createModel(i * 10)
 		newModel.MyInt32 = int32(i * 30)
-		c.Post(newModel, false)
+		_, _, _ = c.Post(newModel, false)
 	}
 
 	metadata := c.Metadata()
@@ -829,7 +829,7 @@ func TestCachePatchNoChanges(t *testing.T) {
 	// Patch with same values
 	patchModel := createModel(1)
 
-	notification, err := c.Patch(patchModel, true)
+	notification, _, _, err := c.Patch(patchModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -889,7 +889,7 @@ func TestCachePostUpdateReplaceNotification(t *testing.T) {
 	model1Updated.MyInt32 = 150
 	model1Updated.MyString = "different"
 
-	notification, err := c.Post(model1Updated, true)
+	notification, _, _, err := c.Post(model1Updated, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -912,7 +912,7 @@ func TestCacheAddStatFuncWithExistingItems(t *testing.T) {
 	for i := 1; i <= 3; i++ {
 		newModel := createModel(i * 10)
 		newModel.MyInt32 = int32(i * 40)
-		c.Post(newModel, false)
+		_, _, _ = c.Post(newModel, false)
 	}
 
 	// Then add metadata function
@@ -955,8 +955,8 @@ func TestCacheDeleteWithStats(t *testing.T) {
 	model2 := createModel(2)
 	model2.MyInt32 = 20
 
-	c.Post(model1, false)
-	c.Post(model2, false)
+	_, _, _ = c.Post(model1, false)
+	_, _, _ = c.Post(model2, false)
 
 	metadata := c.Metadata()
 	if metadata["all_items"] != 2 {
@@ -967,7 +967,7 @@ func TestCacheDeleteWithStats(t *testing.T) {
 	}
 
 	// Delete the high int item
-	c.Delete(model1, false)
+	_, _, _ = c.Delete(model1, false)
 
 	metadata = c.Metadata()
 	if metadata["all_items"] != 1 {
@@ -1014,7 +1014,7 @@ func TestCacheWithStorageSave(t *testing.T) {
 
 	// Post item
 	newModel := createModel(10)
-	c.Post(newModel, false)
+	_, _, _ = c.Post(newModel, false)
 
 	// Verify it's in storage
 	if len(storage.data) != 1 {
@@ -1032,7 +1032,7 @@ func TestCacheWithStorageDisabled(t *testing.T) {
 
 	// Post item - should go directly to storage
 	newModel := createModel(10)
-	c.Post(newModel, false)
+	_, _, _ = c.Post(newModel, false)
 
 	// Cache size should be 0 since cache is disabled
 	if c.Size() != 0 {
@@ -1055,7 +1055,7 @@ func TestCacheGetFromStorage(t *testing.T) {
 
 	// Post item
 	newModel := createModel(10)
-	c.Post(newModel, false)
+	_, _, _ = c.Post(newModel, false)
 
 	// Get should retrieve from storage
 	retrieved, err := c.Get(newModel)
@@ -1077,10 +1077,10 @@ func TestCacheDeleteFromStorage(t *testing.T) {
 
 	// Post item
 	newModel := createModel(10)
-	c.Post(newModel, false)
+	_, _, _ = c.Post(newModel, false)
 
 	// Delete item
-	c.Delete(newModel, false)
+	_, _, _ = c.Delete(newModel, false)
 
 	// Verify it's gone from storage
 	if len(storage.data) != 0 {
@@ -1099,12 +1099,12 @@ func TestCachePatchUpdatesStorage(t *testing.T) {
 	// Post item
 	model1 := createModel(1)
 	model1.MyInt32 = 100
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Patch item
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 200
-	c.Patch(patchModel, false)
+	_, _, _ = c.Patch(patchModel, false)
 
 	// Verify storage is updated
 	stored, _ := storage.Get("string-1")
@@ -1148,7 +1148,7 @@ func TestCacheGetByUniqueKey(t *testing.T) {
 	model1.MyInt32 = 12345 // This is the unique key
 
 	c := cache.NewCache(model1, nil, nil, res)
-	_, err := c.Post(model1, false)
+	_, _, err := c.Post(model1, false)
 	if err != nil {
 		t.Fatalf("Failed to post: %v", err)
 	}
@@ -1184,8 +1184,8 @@ func TestCacheUniqueKeyMapsOnPost(t *testing.T) {
 	model2.MyInt32 = 222
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
-	c.Post(model2, false)
+	_, _, _ = c.Post(model1, false)
+	_, _, _ = c.Post(model2, false)
 
 	// Retrieve by unique key for both
 	lookup1 := &testtypes.TestProto{MyString: "", MyInt32: 111}
@@ -1221,7 +1221,7 @@ func TestCacheUniqueKeyCleanupOnDelete(t *testing.T) {
 	model1.MyInt32 = 999
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Verify we can get by unique key
 	lookup := &testtypes.TestProto{MyString: "", MyInt32: 999}
@@ -1231,7 +1231,7 @@ func TestCacheUniqueKeyCleanupOnDelete(t *testing.T) {
 	}
 
 	// Delete the item
-	c.Delete(model1, false)
+	_, _, _ = c.Delete(model1, false)
 
 	// Verify unique key lookup fails
 	_, err = c.Get(lookup)
@@ -1247,11 +1247,11 @@ func TestCacheUniqueKeyCleanupDeleteByPrimaryKey(t *testing.T) {
 	model1.MyInt32 = 888
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Delete using only primary key (empty unique key in delete request)
 	deleteModel := &testtypes.TestProto{MyString: "string-1", MyInt32: 0}
-	_, err := c.Delete(deleteModel, false)
+	_, _, err := c.Delete(deleteModel, false)
 	if err != nil {
 		t.Fatalf("Delete failed: %v", err)
 	}
@@ -1271,13 +1271,13 @@ func TestCacheUniqueKeyUpdateOnReplace(t *testing.T) {
 	model1.MyInt32 = 100
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Replace with new unique key value
 	model1Updated := createModel(1)
 	model1Updated.MyInt32 = 200
 
-	c.Post(model1Updated, false)
+	_, _, _ = c.Post(model1Updated, false)
 
 	// Old unique key should not work
 	oldLookup := &testtypes.TestProto{MyString: "", MyInt32: 100}
@@ -1307,7 +1307,7 @@ func TestCacheCleanupOrderAfterDeletes(t *testing.T) {
 	// Add 150 items
 	for i := 1; i <= 150; i++ {
 		newModel := createModel(i)
-		c.Post(newModel, false)
+		_, _, _ = c.Post(newModel, false)
 	}
 
 	if c.Size() != 150 {
@@ -1317,7 +1317,7 @@ func TestCacheCleanupOrderAfterDeletes(t *testing.T) {
 	// Delete 110 items (should trigger cleanup at 100 tombstones)
 	for i := 1; i <= 110; i++ {
 		deleteModel := createModel(i)
-		_, err := c.Delete(deleteModel, false)
+		_, _, err := c.Delete(deleteModel, false)
 		if err != nil {
 			t.Fatalf("Delete failed for item %d: %v", i, err)
 		}
@@ -1350,13 +1350,13 @@ func TestCacheFetchAfterCleanup(t *testing.T) {
 	// Add 120 items
 	for i := 1; i <= 120; i++ {
 		newModel := createModel(i)
-		c.Post(newModel, false)
+		_, _, _ = c.Post(newModel, false)
 	}
 
 	// Delete first 105 items (triggers cleanup)
 	for i := 1; i <= 105; i++ {
 		deleteModel := createModel(i)
-		c.Delete(deleteModel, false)
+		_, _, _ = c.Delete(deleteModel, false)
 	}
 
 	// Fetch all remaining items
@@ -1379,13 +1379,13 @@ func TestCacheUniqueKeyConcurrentOperations(t *testing.T) {
 	for i := 1; i <= 50; i++ {
 		newModel := createModel(i)
 		newModel.MyInt32 = int32(i * 1000)
-		c.Post(newModel, false)
+		_, _, _ = c.Post(newModel, false)
 	}
 
 	// Delete odd items
 	for i := 1; i <= 50; i += 2 {
 		deleteModel := createModel(i)
-		c.Delete(deleteModel, false)
+		_, _, _ = c.Delete(deleteModel, false)
 	}
 
 	// Verify even items still accessible by unique key
@@ -1417,7 +1417,7 @@ func TestCacheGetWithBothKeys(t *testing.T) {
 	model1.MyInt32 = 555
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Get with both keys set - primary key takes precedence
 	lookup := &testtypes.TestProto{MyString: "string-1", MyInt32: 555}
@@ -1437,7 +1437,7 @@ func TestCacheUniqueKeyEmptyValue(t *testing.T) {
 	model1.MyInt32 = 0 // Zero value for unique key
 
 	c := cache.NewCache(model1, nil, nil, res)
-	c.Post(model1, false)
+	_, _, _ = c.Post(model1, false)
 
 	// Should still be retrievable by primary key
 	lookup := &testtypes.TestProto{MyString: "string-1"}
@@ -1458,7 +1458,7 @@ func TestCacheTTLCleanup(t *testing.T) {
 
 	// Add some items
 	for i := 1; i <= 5; i++ {
-		c.Post(createModel(i), false)
+		_, _, _ = c.Post(createModel(i), false)
 	}
 
 	// Perform different queries to create cached query entries
@@ -1500,7 +1500,7 @@ func TestCacheTTLCleanupKeepsRecentQueries(t *testing.T) {
 
 	// Add some items
 	for i := 1; i <= 5; i++ {
-		c.Post(createModel(i), false)
+		_, _, _ = c.Post(createModel(i), false)
 	}
 
 	// Perform a query
@@ -1532,7 +1532,7 @@ func TestCacheTTLQueryAccessUpdatesLastUsed(t *testing.T) {
 
 	// Add some items
 	for i := 1; i <= 5; i++ {
-		c.Post(createModel(i), false)
+		_, _, _ = c.Post(createModel(i), false)
 	}
 
 	// Perform a query

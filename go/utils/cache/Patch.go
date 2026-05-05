@@ -24,13 +24,13 @@ import (
 // the fields present in the input value, preserving other existing fields. If the item
 // doesn't exist, it creates a new entry. If createNotification is true, generates an
 // Update notification containing only the changed properties for distributed sync.
-func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
+func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, *l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {
-		return nil, errors.New("Patch error " + err.Error())
+		return nil, nil, errors.New("Patch error " + err.Error())
 	}
 	if pk == "" {
-		return nil, errors.New("Patch Interface does not contain the Key attributes")
+		return nil, nil, errors.New("Patch Interface does not contain the Key attributes")
 	}
 
 	this.mtx.Lock()
@@ -63,13 +63,13 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 		}
 
 		if !createNotification {
-			return n, e
+			return n, nil, e
 		}
 
 		//Clone the value for the notification
 		//itemClone := cloner.Clone(v)
 		n, e = this.createAddNotification(vClone, pk)
-		return n, e
+		return n, this.createClientNotification(n), e
 	}
 
 	//Create a new updater
@@ -77,13 +77,13 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 	//Dry update to detect changes without mutating the cached item
 	e = patchUpdater.DryUpdate(item, v)
 	if e != nil {
-		return n, e
+		return n, nil, e
 	}
 
 	//if there are no changes, then nothing to do
 	changes := patchUpdater.Changes()
 	if changes == nil {
-		return n, e
+		return n, nil, e
 	}
 
 	//Remove the item from the stats to make sure if one of the attributes
@@ -103,9 +103,10 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 	}
 
 	if !createNotification {
-		return n, e
+		return n, nil, e
 	}
 
 	n, e = this.createUpdateNotification(changes, pk)
-	return n, e
+	cn := this.createClientNotificationForPatch(item, pk)
+	return n, cn, e
 }

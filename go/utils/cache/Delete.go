@@ -22,13 +22,13 @@ import (
 // Delete removes an item from the cache by extracting its key from the provided value.
 // If createNotification is true, generates a Delete notification for distributed sync.
 // Returns an error if the item does not exist in the cache.
-func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
+func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, *l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if pk == "" {
-		return nil, errors.New("Interface does not contain the Key attributes")
+		return nil, nil, errors.New("Interface does not contain the Key attributes")
 	}
 
 	this.mtx.Lock()
@@ -42,21 +42,21 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 	if this.cacheEnabled() {
 		item, ok = this.iCache.delete(pk, uk)
 		if !ok {
-			return n, errors.New("Delete Key " + pk + " not found")
+			return n, nil, errors.New("Delete Key " + pk + " not found")
 		}
 	}
 
 	if this.store != nil {
 		item, e = this.store.Delete(pk)
 		if e != nil {
-			return n, e
+			return n, nil, e
 		}
 	}
 
 	if !createNotification {
-		return n, e
+		return n, nil, e
 	}
 
 	n, e = this.createDeleteNotification(item, pk)
-	return n, e
+	return n, this.createClientNotification(n), e
 }

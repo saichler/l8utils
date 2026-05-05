@@ -23,14 +23,14 @@ import (
 // Post adds a new item to the cache. If the item already exists, it performs a replace
 // operation instead. The input value is cloned before storage to prevent external mutation.
 // If createNotification is true, generates an Add or Replace notification for distributed sync.
-// Returns the notification set (if created) and any error encountered.
-func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, error) {
+// Returns the delta notification, client notification (if subscribers exist), and any error.
+func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8NotificationSet, *l8notify.L8NotificationSet, error) {
 	pk, uk, err := this.KeysFor(v)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if pk == "" {
-		return nil, errors.New("Post Interface does not contain the Key attributes ")
+		return nil, nil, errors.New("Post Interface does not contain the Key attributes ")
 	}
 
 	//Make sure we clone the input value, so the caller don't have a reference to the cache element
@@ -62,15 +62,15 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 		if this.store != nil {
 			e = this.store.Put(pk, v)
 			if e != nil {
-				return n, e
+				return n, nil, e
 			}
 		}
 		//Create the notification using the clone outside the current go routine
 		if createNotification {
 			n, e = this.createAddNotification(itemClone, pk)
-			return n, e
+			return n, this.createClientNotification(n), e
 		}
-		return n, e
+		return n, nil, e
 	}
 
 	//From this point onwards, it the Put implementation, e.g. item exist and is full
@@ -85,12 +85,12 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 	if this.store != nil {
 		e = this.store.Put(pk, vClone)
 		if e != nil {
-			return n, e
+			return n, nil, e
 		}
 	}
 
 	if !createNotification {
-		return n, e
+		return n, nil, e
 	}
 
 	//From this point onward, the item is no longer in the cache
@@ -102,15 +102,15 @@ func (this *Cache) Post(v interface{}, createNotification bool) (*l8notify.L8Not
 	//update the item clone with the new element where nil is valid
 	e = putUpdater.Update(item, vClone)
 	if e != nil {
-		return n, e
+		return n, nil, e
 	}
 
 	//if there are changes, then nothing to do
 	changes := putUpdater.Changes()
 	if changes == nil || len(changes) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	n, e = this.createReplaceNotification(item, v, pk)
-	return n, e
+	return n, this.createClientNotification(n), e
 }
