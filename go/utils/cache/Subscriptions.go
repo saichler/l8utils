@@ -20,10 +20,10 @@ import (
 
 const DefaultSubscriptionTTL = 300 // 5 minutes
 
-// Subscription represents a single browser tab's interest in change notifications
-// for a specific model type. Each browser tab has a unique bearer token.
+// Subscription represents a user's interest in change notifications
+// for a specific model type. Keyed by AAAId (authenticated user identity).
 type Subscription struct {
-	Token     string
+	AAAId     string
 	QueryHash string
 	QueryText string
 	lastSeen  int64
@@ -46,13 +46,13 @@ func (this *subscriptions) register(sub *Subscription) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 	sub.lastSeen = time.Now().Unix()
-	this.subs[sub.Token] = sub
+	this.subs[sub.AAAId] = sub
 }
 
-func (this *subscriptions) unregister(token string) {
+func (this *subscriptions) unregister(aaaId string) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	delete(this.subs, token)
+	delete(this.subs, aaaId)
 }
 
 func (this *subscriptions) subscribers() []*Subscription {
@@ -79,9 +79,9 @@ func (this *subscriptions) evictStale(ttlSeconds int64) int {
 	defer this.mu.Unlock()
 	now := time.Now().Unix()
 	removed := 0
-	for token, sub := range this.subs {
+	for aaaId, sub := range this.subs {
 		if now-sub.lastSeen > ttlSeconds {
-			delete(this.subs, token)
+			delete(this.subs, aaaId)
 			removed++
 		}
 	}

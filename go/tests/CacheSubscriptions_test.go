@@ -28,14 +28,14 @@ func TestSubscriptionRegister(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "hash-abc", "select * from TestProto")
+	c.RegisterSubscription("aaa-1", "hash-abc", "select * from TestProto")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
 		t.Fatalf("Expected 1 subscriber, got %d", len(subs))
 	}
-	if subs[0].Token != "token-1" {
-		t.Errorf("Expected token 'token-1', got '%s'", subs[0].Token)
+	if subs[0].AAAId != "aaa-1" {
+		t.Errorf("Expected AAAId 'aaa-1', got '%s'", subs[0].AAAId)
 	}
 	if subs[0].QueryHash != "hash-abc" {
 		t.Errorf("Expected hash 'hash-abc', got '%s'", subs[0].QueryHash)
@@ -45,13 +45,13 @@ func TestSubscriptionRegister(t *testing.T) {
 	}
 }
 
-func TestSubscriptionReplacesSameToken(t *testing.T) {
+func TestSubscriptionReplacesSameAAAId(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "hash-old", "select * from TestProto")
-	c.RegisterSubscription("token-1", "hash-new", "select * from TestProto where MyString=hello")
+	c.RegisterSubscription("aaa-1", "hash-old", "select * from TestProto")
+	c.RegisterSubscription("aaa-1", "hash-new", "select * from TestProto where MyString=hello")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
@@ -67,16 +67,16 @@ func TestSubscriptionUnregister(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "h1", "q1")
-	c.RegisterSubscription("token-2", "h2", "q2")
-	c.UnregisterSubscription("token-1")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-2", "h2", "q2")
+	c.UnregisterSubscription("aaa-1")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
 		t.Fatalf("Expected 1 subscriber after unregister, got %d", len(subs))
 	}
-	if subs[0].Token != "token-2" {
-		t.Errorf("Expected remaining token 'token-2', got '%s'", subs[0].Token)
+	if subs[0].AAAId != "aaa-2" {
+		t.Errorf("Expected remaining AAAId 'aaa-2', got '%s'", subs[0].AAAId)
 	}
 }
 
@@ -85,8 +85,8 @@ func TestSubscriptionUnregisterNonExistent(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "h1", "q1")
-	c.UnregisterSubscription("token-999")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.UnregisterSubscription("aaa-999")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
@@ -99,14 +99,14 @@ func TestSubscribersReturnsCopy(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
 
 	subs := c.Subscribers()
-	subs[0].Token = "mutated"
+	subs[0].AAAId = "mutated"
 
 	fresh := c.Subscribers()
-	if fresh[0].Token != "token-1" {
-		t.Errorf("Mutation leaked into cache: got '%s'", fresh[0].Token)
+	if fresh[0].AAAId != "aaa-1" {
+		t.Errorf("Mutation leaked into cache: got '%s'", fresh[0].AAAId)
 	}
 }
 
@@ -119,24 +119,24 @@ func TestHasSubscribers(t *testing.T) {
 		t.Error("Expected no subscribers on empty cache")
 	}
 
-	c.RegisterSubscription("token-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
 	if !c.HasSubscribers() {
 		t.Error("Expected HasSubscribers true after register")
 	}
 
-	c.UnregisterSubscription("token-1")
+	c.UnregisterSubscription("aaa-1")
 	if c.HasSubscribers() {
 		t.Error("Expected HasSubscribers false after unregister all")
 	}
 }
 
-func TestSubscriptionMultipleTokens(t *testing.T) {
+func TestSubscriptionMultipleAAAIds(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
 	for i := 0; i < 10; i++ {
-		c.RegisterSubscription(fmt.Sprintf("token-%d", i), fmt.Sprintf("h%d", i), fmt.Sprintf("q%d", i))
+		c.RegisterSubscription(fmt.Sprintf("aaa-%d", i), fmt.Sprintf("h%d", i), fmt.Sprintf("q%d", i))
 	}
 
 	subs := c.Subscribers()
@@ -144,13 +144,13 @@ func TestSubscriptionMultipleTokens(t *testing.T) {
 		t.Fatalf("Expected 10 subscribers, got %d", len(subs))
 	}
 
-	tokens := make(map[string]bool)
+	ids := make(map[string]bool)
 	for _, s := range subs {
-		tokens[s.Token] = true
+		ids[s.AAAId] = true
 	}
 	for i := 0; i < 10; i++ {
-		if !tokens[fmt.Sprintf("token-%d", i)] {
-			t.Errorf("Missing token-%d", i)
+		if !ids[fmt.Sprintf("aaa-%d", i)] {
+			t.Errorf("Missing aaa-%d", i)
 		}
 	}
 }
@@ -165,12 +165,12 @@ func TestSubscriptionConcurrentSafety(t *testing.T) {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
-			token := fmt.Sprintf("token-%d", idx)
-			c.RegisterSubscription(token, "h", "q")
+			aaaId := fmt.Sprintf("aaa-%d", idx)
+			c.RegisterSubscription(aaaId, "h", "q")
 			c.Subscribers()
 			c.HasSubscribers()
 			if idx%3 == 0 {
-				c.UnregisterSubscription(token)
+				c.UnregisterSubscription(aaaId)
 			}
 		}(i)
 	}
@@ -190,9 +190,9 @@ func TestSubscriptionEvictStale(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-old", "h1", "q1")
+	c.RegisterSubscription("aaa-old", "h1", "q1")
 	time.Sleep(2 * time.Second)
-	c.RegisterSubscription("token-fresh", "h2", "q2")
+	c.RegisterSubscription("aaa-fresh", "h2", "q2")
 
 	evicted := c.EvictStaleSubscriptions(1)
 	if evicted != 1 {
@@ -203,8 +203,8 @@ func TestSubscriptionEvictStale(t *testing.T) {
 	if len(subs) != 1 {
 		t.Fatalf("Expected 1 remaining, got %d", len(subs))
 	}
-	if subs[0].Token != "token-fresh" {
-		t.Errorf("Expected 'token-fresh' to survive, got '%s'", subs[0].Token)
+	if subs[0].AAAId != "aaa-fresh" {
+		t.Errorf("Expected 'aaa-fresh' to survive, got '%s'", subs[0].AAAId)
 	}
 }
 
@@ -213,10 +213,10 @@ func TestSubscriptionRefreshPreventsEviction(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("token-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
 	time.Sleep(2 * time.Second)
 	// Re-register refreshes lastSeen
-	c.RegisterSubscription("token-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", "h1", "q1")
 
 	evicted := c.EvictStaleSubscriptions(1)
 	if evicted != 0 {

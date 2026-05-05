@@ -200,21 +200,21 @@ func (this *Cache) ModelType() string {
 	return this.modelType
 }
 
-// RegisterSubscription registers a browser tab (identified by bearer token) for
-// real-time change notifications on this cache's model type. Called by the service
+// RegisterSubscription registers a user (identified by AAAId) for real-time
+// change notifications on this cache's model type. Called by the service
 // handler after Fetch when the query has Register=true.
-func (this *Cache) RegisterSubscription(token, queryHash, queryText string) {
+func (this *Cache) RegisterSubscription(aaaId, queryHash, queryText string) {
 	this.subs.register(&Subscription{
-		Token:     token,
+		AAAId:     aaaId,
 		QueryHash: queryHash,
 		QueryText: queryText,
 	})
 }
 
-// UnregisterSubscription removes a subscription for the given token.
-// Called when a WebSocket disconnects or a tab navigates away.
-func (this *Cache) UnregisterSubscription(token string) {
-	this.subs.unregister(token)
+// UnregisterSubscription removes a subscription for the given AAAId.
+// Called when a WebSocket disconnects or a user navigates away.
+func (this *Cache) UnregisterSubscription(aaaId string) {
+	this.subs.unregister(aaaId)
 }
 
 // Subscribers returns all active subscriptions for this cache's model type.
