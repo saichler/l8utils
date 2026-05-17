@@ -152,7 +152,7 @@ func TestCachePost(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(10)
-	notification, _, _, err := c.Post(newModel, true)
+	notification, _, err := c.Post(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -175,7 +175,7 @@ func TestCachePostNoNotification(t *testing.T) {
 	c := cache.NewCache(model, nil, nil, res)
 
 	newModel := createModel(20)
-	notification, _, _, err := c.Post(newModel, false)
+	notification, _, err := c.Post(newModel, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -203,7 +203,7 @@ func TestCachePostReplace(t *testing.T) {
 	model1Updated := createModel(1)
 	model1Updated.MyInt32 = 999
 
-	notification, _, _, err := c.Post(model1Updated, true)
+	notification, _, err := c.Post(model1Updated, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -312,7 +312,7 @@ func TestCachePatch(t *testing.T) {
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 777
 
-	notification, _, _, err := c.Patch(patchModel, true)
+	notification, _, err := c.Patch(patchModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -343,7 +343,7 @@ func TestCachePatchNewItem(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	newModel := createModel(40)
-	notification, _, _, err := c.Patch(newModel, true)
+	notification, _, err := c.Patch(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -369,7 +369,7 @@ func TestCachePatchNoNotification(t *testing.T) {
 	patchModel := createModel(1)
 	patchModel.MyInt32 = 555
 
-	notification, _, _, err := c.Patch(patchModel, false)
+	notification, _, err := c.Patch(patchModel, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -388,7 +388,7 @@ func TestCacheDelete(t *testing.T) {
 	c := cache.NewCache(model1, initElements, nil, res)
 	c.SetNotificationsFor("test-service", 1)
 
-	notification, _, _, err := c.Delete(model1, true)
+	notification, _, err := c.Delete(model1, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -417,7 +417,7 @@ func TestCacheDeleteNoNotification(t *testing.T) {
 	initElements := []interface{}{model1}
 	c := cache.NewCache(model1, initElements, nil, res)
 
-	notification, _, _, err := c.Delete(model1, false)
+	notification, _, err := c.Delete(model1, false)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -440,7 +440,7 @@ func TestCacheDeleteNotFound(t *testing.T) {
 	c := cache.NewCache(model1, nil, nil, res)
 
 	model999 := createModel(999)
-	notification, _, _, err := c.Delete(model999, true)
+	notification, _, err := c.Delete(model999, true)
 
 	if err == nil {
 		t.Error("Expected error when deleting non-existent item")
@@ -460,7 +460,7 @@ func TestCacheSetNotificationsFor(t *testing.T) {
 
 	// Test that notifications work after setting
 	newModel := createModel(50)
-	notification, _, _, err := c.Post(newModel, true)
+	notification, _, err := c.Post(newModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -490,7 +490,7 @@ func TestCacheNotificationSequence(t *testing.T) {
 	// Post 3 items and collect sequences
 	for i := 1; i <= 3; i++ {
 		newModel := createModel(i * 10)
-		notification, _, _, err := c.Post(newModel, true)
+		notification, _, err := c.Post(newModel, true)
 		if err != nil {
 			t.Fatalf("Expected no error on post %d, got: %v", i, err)
 		}
@@ -763,7 +763,7 @@ func TestCachePostNoChanges(t *testing.T) {
 	c.SetNotificationsFor("test-service", 1)
 
 	// Post same model again
-	notification, _, _, err := c.Post(model1, true)
+	notification, _, err := c.Post(model1, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -829,7 +829,7 @@ func TestCachePatchNoChanges(t *testing.T) {
 	// Patch with same values
 	patchModel := createModel(1)
 
-	notification, _, _, err := c.Patch(patchModel, true)
+	notification, _, err := c.Patch(patchModel, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
@@ -889,7 +889,7 @@ func TestCachePostUpdateReplaceNotification(t *testing.T) {
 	model1Updated.MyInt32 = 150
 	model1Updated.MyString = "different"
 
-	notification, _, _, err := c.Post(model1Updated, true)
+	notification, _, err := c.Post(model1Updated, true)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)

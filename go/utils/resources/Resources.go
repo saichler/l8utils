@@ -51,6 +51,7 @@ type Resources struct {
 	serializers  map[ifs.SerializerMode]ifs.ISerializer
 	introspector ifs.IIntrospector
 	sysConfig    *l8sysconfig.L8SysConfig
+	events       ifs.IEvents
 }
 
 // NewResources creates a new Resources container with the specified logger.
@@ -114,6 +115,12 @@ func (this *Resources) Set(any interface{}) {
 		this.introspector = introspector
 		return
 	}
+
+	events, ok := any.(ifs.IEvents)
+	if ok {
+		this.events = events
+		return
+	}
 	v := reflect.ValueOf(any)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -130,6 +137,7 @@ func (this *Resources) Copy(other ifs.IResources) {
 	this.introspector = other.Introspector()
 	this.dataListener = other.DataListener()
 	this.sysConfig = other.SysConfig()
+	this.events = other.Events()
 }
 
 // Registry returns the type registry component.
@@ -173,6 +181,11 @@ func (this *Resources) SysConfig() *l8sysconfig.L8SysConfig {
 // Introspector returns the introspector component.
 func (this *Resources) Introspector() ifs.IIntrospector {
 	return this.introspector
+}
+
+// Events returns the events component.
+func (this *Resources) Events() ifs.IEvents {
+	return this.events
 }
 
 // WebPrefix returns the web endpoint prefix from the system configuration,
