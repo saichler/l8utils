@@ -17,7 +17,7 @@ type Events struct {
 	vnic ifs.IVNic
 }
 
-func (this *Events) SetVnic(vnic ifs.IVNic) {
+func (this *Events) SetVNic(vnic ifs.IVNic) {
 	this.vnic = vnic
 }
 
