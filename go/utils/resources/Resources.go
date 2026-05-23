@@ -24,6 +24,7 @@ package resources
 
 import (
 	"encoding/base64"
+	"github.com/saichler/l8utils/go/utils/events"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -58,6 +59,7 @@ type Resources struct {
 func NewResources(logger ifs.ILogger) ifs.IResources {
 	r := &Resources{}
 	r.logger = logger
+	r.events = &events.Events{}
 	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
 	r.security = sec.NewShallowSecurityProvider()
 	return r
