@@ -18,7 +18,6 @@ type Events struct {
 }
 
 func (this *Events) SetVNic(vnic ifs.IVNic) {
-	fmt.Printf("[DEBUG-EVT] SetVNic called, vnic is nil: %v, Events addr: %p\n", vnic == nil, this)
 	this.vnic = vnic
 }
 
@@ -41,10 +40,7 @@ func (this *Events) PostEvent(category l8events.EventCategory, eventType string,
 }
 
 func (this *Events) PostAuditEvent(evt *l8events.AuditEvent) {
-	fmt.Printf("[DEBUG-EVT] PostAuditEvent called, Events addr: %p, vnic is nil: %v\n", this, this.vnic == nil)
-	record := auditToRecord(evt)
-	fmt.Printf("[DEBUG-EVT] Converted to record: category=%v, message=%s\n", record.Category, record.Message)
-	this.post(record)
+	this.post(auditToRecord(evt))
 }
 
 func (this *Events) PostSystemEvent(evt *l8events.SystemEvent) {
@@ -56,10 +52,7 @@ func (this *Events) PostMonitoringEvent(evt *l8events.MonitoringEvent) {
 }
 
 func (this *Events) PostSecurityEvent(evt *l8events.SecurityEvent) {
-	fmt.Printf("[DEBUG-EVT] PostSecurityEvent called, Events addr: %p, vnic is nil: %v\n", this, this.vnic == nil)
-	record := securityToRecord(evt)
-	fmt.Printf("[DEBUG-EVT] Converted to record: category=%v, message=%s\n", record.Category, record.Message)
-	this.post(record)
+	this.post(securityToRecord(evt))
 }
 
 func (this *Events) PostIntegrationEvent(evt *l8events.IntegrationEvent) {
@@ -111,17 +104,12 @@ func (this *Events) PostAutomationEvent(evt *l8events.AutomationEvent) {
 }
 
 func (this *Events) post(payload interface{}) {
-	fmt.Printf("[DEBUG-EVT] post() called, Events addr: %p, vnic is nil: %v\n", this, this.vnic == nil)
 	if this.vnic == nil {
-		fmt.Println("[DEBUG-EVT] ABORT: vnic is nil, cannot post event:", payload)
+		fmt.Println("Events services does not have a VNic for:", payload)
 		return
 	}
-	fmt.Printf("[DEBUG-EVT] Calling Unicast to %s/%d for POST\n", EventsServiceName, EventsServiceArea)
 	err := this.vnic.Unicast("", EventsServiceName, EventsServiceArea, ifs.POST, payload)
 	if err != nil {
-		fmt.Println("[DEBUG-EVT] Unicast error:", err.Error())
 		this.vnic.Resources().Logger().Warning("PostEvent: " + err.Error())
-	} else {
-		fmt.Println("[DEBUG-EVT] Unicast succeeded")
 	}
 }

@@ -6,11 +6,30 @@ import (
 	"time"
 )
 
+var categoryNames = map[l8events.EventCategory]string{
+	l8events.EventCategory_EVENT_CATEGORY_AUDIT:        "Audit Event",
+	l8events.EventCategory_EVENT_CATEGORY_SECURITY:     "Security Event",
+	l8events.EventCategory_EVENT_CATEGORY_SYSTEM:       "System Event",
+	l8events.EventCategory_EVENT_CATEGORY_MONITORING:   "Monitoring Event",
+	l8events.EventCategory_EVENT_CATEGORY_INTEGRATION:  "Integration Event",
+	l8events.EventCategory_EVENT_CATEGORY_NETWORK:      "Network Event",
+	l8events.EventCategory_EVENT_CATEGORY_KUBERNETES:   "Kubernetes Event",
+	l8events.EventCategory_EVENT_CATEGORY_PERFORMANCE:  "Performance Event",
+	l8events.EventCategory_EVENT_CATEGORY_SYSLOG:       "Syslog Event",
+	l8events.EventCategory_EVENT_CATEGORY_TRAP:         "Trap Event",
+	l8events.EventCategory_EVENT_CATEGORY_COMPUTE:      "Compute Event",
+	l8events.EventCategory_EVENT_CATEGORY_STORAGE:      "Storage Event",
+	l8events.EventCategory_EVENT_CATEGORY_POWER:        "Power Event",
+	l8events.EventCategory_EVENT_CATEGORY_GPU:          "GPU Event",
+	l8events.EventCategory_EVENT_CATEGORY_TOPOLOGY:     "Topology Event",
+	l8events.EventCategory_EVENT_CATEGORY_AUTOMATION:   "Automation Event",
+}
+
 func toRecord(category l8events.EventCategory, subCategory fmt.Stringer,
 	sourceId, sourceType, sourceName, message string) *l8events.EventRecord {
-	eventType := ""
-	if subCategory != nil {
-		eventType = subCategory.String()
+	eventType := categoryNames[category]
+	if eventType == "" {
+		eventType = "Event"
 	}
 	return &l8events.EventRecord{
 		Category:   category,
@@ -28,11 +47,12 @@ func auditToRecord(evt *l8events.AuditEvent) *l8events.EventRecord {
 	r := toRecord(l8events.EventCategory_EVENT_CATEGORY_AUDIT, evt.SubCategory,
 		evt.SourceId, evt.SourceType, "", evt.Message)
 	r.Attributes = map[string]string{
-		"userId":     evt.UserId,
-		"userName":   evt.UserName,
-		"userIp":     evt.UserIp,
-		"action":     evt.Action,
-		"entityName": evt.EntityName,
+		"subCategory": evt.SubCategory.String(),
+		"userId":      evt.UserId,
+		"userName":    evt.UserName,
+		"userIp":      evt.UserIp,
+		"action":      evt.Action,
+		"entityName":  evt.EntityName,
 	}
 	return r
 }
@@ -42,6 +62,7 @@ func securityToRecord(evt *l8events.SecurityEvent) *l8events.EventRecord {
 		evt.SourceId, evt.SourceType, "", evt.Message)
 	r.Severity = l8events.Severity_SEVERITY_WARNING
 	r.Attributes = map[string]string{
+		"subCategory":    evt.SubCategory.String(),
 		"userId":         evt.UserId,
 		"userName":       evt.UserName,
 		"userIp":         evt.UserIp,
