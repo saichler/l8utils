@@ -25,7 +25,7 @@ import (
 func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8api.L8MetaData) {
 	this.mtx.Lock()
 	defer this.mtx.Unlock()
-	values, metadata := this.iCache.fetch(start, blockSize, q)
+	values, metadata := this.iCache.fetch(start, blockSize, q, this.r)
 
 	// Aggregate queries return empty slice with results in metadata
 	if q.IsAggregate() {

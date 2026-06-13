@@ -203,7 +203,7 @@ func (this *Cache) ModelType() string {
 // RegisterSubscription registers a user (identified by AAAId) for real-time
 // change notifications on this cache's model type. Called by the service
 // handler after Fetch when the query has Register=true.
-func (this *Cache) RegisterSubscription(aaaId, queryHash, queryText string) {
+func (this *Cache) RegisterSubscription(aaaId string, queryHash int32, queryText string) {
 	this.subs.register(&Subscription{
 		AAAId:     aaaId,
 		QueryHash: queryHash,

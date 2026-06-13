@@ -28,7 +28,7 @@ func TestSubscriptionRegister(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "hash-abc", "select * from TestProto")
+	c.RegisterSubscription("aaa-1", 12345, "select * from TestProto")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
@@ -37,8 +37,8 @@ func TestSubscriptionRegister(t *testing.T) {
 	if subs[0].AAAId != "aaa-1" {
 		t.Errorf("Expected AAAId 'aaa-1', got '%s'", subs[0].AAAId)
 	}
-	if subs[0].QueryHash != "hash-abc" {
-		t.Errorf("Expected hash 'hash-abc', got '%s'", subs[0].QueryHash)
+	if subs[0].QueryHash != 12345 {
+		t.Errorf("Expected hash 12345, got %d", subs[0].QueryHash)
 	}
 	if subs[0].QueryText != "select * from TestProto" {
 		t.Errorf("Expected query text, got '%s'", subs[0].QueryText)
@@ -50,15 +50,15 @@ func TestSubscriptionReplacesSameAAAId(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "hash-old", "select * from TestProto")
-	c.RegisterSubscription("aaa-1", "hash-new", "select * from TestProto where MyString=hello")
+	c.RegisterSubscription("aaa-1", 111, "select * from TestProto")
+	c.RegisterSubscription("aaa-1", 222, "select * from TestProto where MyString=hello")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
 		t.Fatalf("Expected 1 subscriber after replace, got %d", len(subs))
 	}
-	if subs[0].QueryHash != "hash-new" {
-		t.Errorf("Expected replaced hash 'hash-new', got '%s'", subs[0].QueryHash)
+	if subs[0].QueryHash != 222 {
+		t.Errorf("Expected replaced hash 222, got %d", subs[0].QueryHash)
 	}
 }
 
@@ -67,8 +67,8 @@ func TestSubscriptionUnregister(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "h1", "q1")
-	c.RegisterSubscription("aaa-2", "h2", "q2")
+	c.RegisterSubscription("aaa-1", 1, "q1")
+	c.RegisterSubscription("aaa-2", 2, "q2")
 	c.UnregisterSubscription("aaa-1")
 
 	subs := c.Subscribers()
@@ -85,7 +85,7 @@ func TestSubscriptionUnregisterNonExistent(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", 1, "q1")
 	c.UnregisterSubscription("aaa-999")
 
 	subs := c.Subscribers()
@@ -99,7 +99,7 @@ func TestSubscribersReturnsCopy(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", 1, "q1")
 
 	subs := c.Subscribers()
 	subs[0].AAAId = "mutated"
@@ -119,7 +119,7 @@ func TestHasSubscribers(t *testing.T) {
 		t.Error("Expected no subscribers on empty cache")
 	}
 
-	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", 1, "q1")
 	if !c.HasSubscribers() {
 		t.Error("Expected HasSubscribers true after register")
 	}
@@ -136,7 +136,7 @@ func TestSubscriptionMultipleAAAIds(t *testing.T) {
 	defer c.Close()
 
 	for i := 0; i < 10; i++ {
-		c.RegisterSubscription(fmt.Sprintf("aaa-%d", i), fmt.Sprintf("h%d", i), fmt.Sprintf("q%d", i))
+		c.RegisterSubscription(fmt.Sprintf("aaa-%d", i), int32(i), fmt.Sprintf("q%d", i))
 	}
 
 	subs := c.Subscribers()
@@ -166,7 +166,7 @@ func TestSubscriptionConcurrentSafety(t *testing.T) {
 		go func(idx int) {
 			defer wg.Done()
 			aaaId := fmt.Sprintf("aaa-%d", idx)
-			c.RegisterSubscription(aaaId, "h", "q")
+			c.RegisterSubscription(aaaId, 0, "q")
 			c.Subscribers()
 			c.HasSubscribers()
 			if idx%3 == 0 {
@@ -190,9 +190,9 @@ func TestSubscriptionEvictStale(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-old", "h1", "q1")
+	c.RegisterSubscription("aaa-old", 1, "q1")
 	time.Sleep(2 * time.Second)
-	c.RegisterSubscription("aaa-fresh", "h2", "q2")
+	c.RegisterSubscription("aaa-fresh", 2, "q2")
 
 	evicted := c.EvictStaleSubscriptions(1)
 	if evicted != 1 {
@@ -213,10 +213,10 @@ func TestSubscriptionRefreshPreventsEviction(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", 1, "q1")
 	time.Sleep(2 * time.Second)
 	// Re-register refreshes lastSeen
-	c.RegisterSubscription("aaa-1", "h1", "q1")
+	c.RegisterSubscription("aaa-1", 1, "q1")
 
 	evicted := c.EvictStaleSubscriptions(1)
 	if evicted != 0 {

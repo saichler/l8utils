@@ -86,17 +86,12 @@ func (this *Cache) Patch(v interface{}, createNotification bool) (*l8notify.L8No
 		return n, nil, e
 	}
 
-	//Remove the item from the stats to make sure if one of the attributes
-	//that are going to change affect the stats
-	this.iCache.removeFromMetadata(pk)
-
 	//Apply the changes to the existing item in the cache
 	for _, change := range changes {
 		change.Apply(item)
 	}
 
-	//Re-Add the item to the stats
-	this.iCache.addToMetadata(item)
+	this.iCache.stampChanged()
 
 	if this.store != nil {
 		e = this.store.Put(pk, item)

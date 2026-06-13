@@ -24,7 +24,7 @@ const DefaultSubscriptionTTL = 300 // 5 minutes
 // for a specific model type. Keyed by AAAId (authenticated user identity).
 type Subscription struct {
 	AAAId     string
-	QueryHash string
+	QueryHash int32
 	QueryText string
 	lastSeen  int64
 }

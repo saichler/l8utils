@@ -27,8 +27,15 @@ func (this *Cache) Metadata() map[string]float64 {
 	this.mtx.RLock()
 	defer this.mtx.RUnlock()
 	result := make(map[string]float64)
-	for k, v := range this.iCache.globalMetadata.KeyCount.Counts {
-		result[k] = v
+	if this.iCache.metadataFunc != nil {
+		for _, elem := range this.iCache.cache {
+			for name, f := range this.iCache.metadataFunc {
+				ok1, _ := f(elem)
+				if ok1 {
+					result[name]++
+				}
+			}
+		}
 	}
 	return result
 }

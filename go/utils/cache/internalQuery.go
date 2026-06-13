@@ -28,54 +28,55 @@ type internalQuery struct {
 	query    ifs.IQuery
 	data     []string
 	stamp    int64
-	hash     string
+	hash     int64
 	metadata *l8api.L8MetaData
 	lastUsed int64
 }
 
 func newInternalQuery(query ifs.IQuery) *internalQuery {
 	iq := &internalQuery{query: query}
-	iq.hash = query.Hash()
+	iq.hash = int64(query.Hash())
 	iq.metadata = newMetadata()
 	iq.lastUsed = time.Now().Unix()
 	return iq
 }
 
-func (this *internalQuery) prepare(cache map[string]interface{}, addedOrder []string, stamp int64, descending bool, metadataFunc map[string]func(interface{}) (bool, string)) {
+func (this *internalQuery) prepare(cache map[string]interface{}, stamp int64, descending bool, metadataFunc map[string]func(interface{}) (bool, string), r ifs.IResources, aaaId string) {
 	this.stamp = stamp
+	this.metadata = newMetadata()
 
 	data := make([]string, 0)
-
-	//if added order is not nil, there is no criteria the query
-	//so just use the added order as data
-	if addedOrder != nil {
-		data = addedOrder
-	} else {
-		this.metadata = newMetadata()
-		for k, v := range cache {
-			if this.query.Match(v) {
-				data = append(data, k)
-				addToMetadata(v, metadataFunc, this.metadata)
-			}
-		}
+	hasScopeFilter := r != nil && r.Security() != nil && aaaId != ""
+	uuid := ""
+	if r != nil && r.SysConfig() != nil {
+		uuid = r.SysConfig().LocalUuid
 	}
 
-	//sort the data
+	for k, v := range cache {
+		if !this.query.Match(v) {
+			continue
+		}
+		if hasScopeFilter {
+			if r.Security().ScopeItem(r, v, uuid, aaaId) == nil {
+				continue
+			}
+		}
+		data = append(data, k)
+		addToMetadata(v, metadataFunc, this.metadata)
+	}
+
 	sort.Slice(data, func(i, j int) bool {
-		//if the added order is nil and the query have a sort by
-		if addedOrder == nil && this.query.SortBy() != "" {
+		if this.query.SortBy() != "" {
 			v1 := this.query.SortByValue(cache[data[i]])
 			v2 := this.query.SortByValue(cache[data[j]])
 			if v1 != nil && v2 != nil {
-				reuslt := lessThan(v1, v2)
+				result := lessThan(v1, v2)
 				if descending {
-					return !reuslt
-				} else {
-					return reuslt
+					return !result
 				}
+				return result
 			}
 		}
-		//We just sort according to the key
 		return lessThan(data[i], data[j])
 	})
 	this.data = data
