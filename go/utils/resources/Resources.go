@@ -25,6 +25,8 @@ package resources
 import (
 	"encoding/base64"
 	"github.com/saichler/l8utils/go/utils/events"
+	"github.com/saichler/l8utils/go/utils/integration"
+	"github.com/saichler/l8utils/go/utils/notify"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -53,6 +55,8 @@ type Resources struct {
 	introspector ifs.IIntrospector
 	sysConfig    *l8sysconfig.L8SysConfig
 	events       ifs.IEvents
+	notify       ifs.INotify
+	integration  ifs.IIntegration
 }
 
 // NewResources creates a new Resources container with the specified logger.
@@ -60,6 +64,8 @@ func NewResources(logger ifs.ILogger) ifs.IResources {
 	r := &Resources{}
 	r.logger = logger
 	r.events = &events.Events{}
+	r.notify = &notify.Notify{}
+	r.integration = &integration.Integration{}
 	r.serializers = make(map[ifs.SerializerMode]ifs.ISerializer)
 	r.security = sec.NewShallowSecurityProvider()
 	return r
@@ -123,6 +129,18 @@ func (this *Resources) Set(any interface{}) {
 		this.events = events
 		return
 	}
+
+	notify, ok := any.(ifs.INotify)
+	if ok {
+		this.notify = notify
+		return
+	}
+
+	integration, ok := any.(ifs.IIntegration)
+	if ok {
+		this.integration = integration
+		return
+	}
 	v := reflect.ValueOf(any)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -140,6 +158,8 @@ func (this *Resources) Copy(other ifs.IResources) {
 	this.dataListener = other.DataListener()
 	this.sysConfig = other.SysConfig()
 	this.events = other.Events()
+	this.notify = other.Notify()
+	this.integration = other.Integration()
 }
 
 // Registry returns the type registry component.
@@ -188,6 +208,16 @@ func (this *Resources) Introspector() ifs.IIntrospector {
 // Events returns the events component.
 func (this *Resources) Events() ifs.IEvents {
 	return this.events
+}
+
+// Notify returns the notify component.
+func (this *Resources) Notify() ifs.INotify {
+	return this.notify
+}
+
+// Integration returns the integration config lookup component.
+func (this *Resources) Integration() ifs.IIntegration {
+	return this.integration
 }
 
 // WebPrefix returns the web endpoint prefix from the system configuration,
