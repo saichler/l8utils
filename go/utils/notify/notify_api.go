@@ -2,7 +2,7 @@ package notify
 
 import (
 	"github.com/saichler/l8types/go/ifs"
-	ntf "github.com/saichler/l8types/go/types/l8notifysvc"
+	ntf "github.com/saichler/l8types/go/types/l8notify"
 )
 
 const (
