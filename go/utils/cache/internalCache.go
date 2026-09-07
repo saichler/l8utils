@@ -73,8 +73,23 @@ func (this *internalCache) put(pk, uk string, value interface{}) {
 	this.cache[pk] = value
 	this.putUnique(pk, uk)
 	if !ok {
-		this.stamp = time.Now().Unix()
+		this.bumpStamp()
 	}
+}
+
+// bumpStamp advances the cache's write-generation counter, invalidating any
+// cached query whose own stamp no longer matches (see fetch()). Deliberately
+// NOT time.Now().Unix(): that has only 1-second resolution, so two writes
+// (or a write and a query-cache refresh) landing in the same wall-clock
+// second would collide on the same stamp value and the second write would
+// be silently invisible to any already-cached query until some later write
+// happened to land in a different second — an intermittent stale-read bug
+// under any fast-moving workload (e.g. a write immediately followed by a
+// query for it). All callers of put/delete/stampChanged already hold the
+// owning Cache's mutex (see Cache.Post/Patch/Delete/Fetch), so a plain
+// increment is safe without its own atomicity.
+func (this *internalCache) bumpStamp() {
+	this.stamp++
 }
 
 func (this *internalCache) get(pk, uk string) (interface{}, bool) {
@@ -95,12 +110,12 @@ func (this *internalCache) delete(pk, uk string) (interface{}, bool) {
 	}
 	delete(this.cache, pk)
 	this.deleteUnique(pk, uk)
-	this.stamp = time.Now().Unix()
+	this.bumpStamp()
 	return item, ok
 }
 
 func (this *internalCache) stampChanged() {
-	this.stamp = time.Now().Unix()
+	this.bumpStamp()
 }
 
 func (this *internalCache) size() int {
