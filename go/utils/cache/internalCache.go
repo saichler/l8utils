@@ -122,24 +122,16 @@ func (this *internalCache) size() int {
 	return len(this.cache)
 }
 
-func hashString(s string) int32 {
-	var h int32
-	for _, c := range s {
-		h = 31*h + int32(c)
-	}
-	return h
-}
-
 func (this *internalCache) fetch(start, blockSize int, q ifs.IQuery, r ifs.IResources) ([]interface{}, *l8api.L8MetaData) {
 	if q.IsAggregate() {
 		return this.fetchAggregate(q)
 	}
 
+	// q.Hash() already folds AAAId into the same hash as the query text
+	// (l8ql's interpreter.Query.Hash()), so no separate combination is
+	// needed here.
 	aaaId := q.AAAId()
 	hash := int64(q.Hash())
-	if aaaId != "" {
-		hash = hash<<32 | int64(hashString(aaaId))
-	}
 
 	dq, ok := this.queries[hash]
 	if !ok {
