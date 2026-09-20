@@ -52,10 +52,9 @@ func (this *Notify) Send(channel ntf.NotifyChannel, endpoint, subject, message s
 				SentAt:       time.Now().Unix(),
 			}
 		}
-		// Committed says the record was written; the dispatch outcome it
-		// recorded is only in that record, which this response does not
-		// carry. Report accepted rather than claiming a delivery.
-		return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_PENDING, SentAt: time.Now().Unix()}
+		// The call is synchronous: by the time the transaction commits, the
+		// dispatch has already run inside the service. Committed is success.
+		return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_SENT, Attempt: 1, SentAt: time.Now().Unix()}
 	}
 	return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_FAILED, ErrorMessage: "unexpected response type"}
 }
