@@ -47,9 +47,17 @@ func (this *Cache) Delete(v interface{}, createNotification bool) (*l8notify.L8N
 	}
 
 	if this.store != nil {
-		item, e = this.store.Delete(pk)
+		var storeItem interface{}
+		storeItem, e = this.store.Delete(pk)
 		if e != nil {
 			return n, nil, e
+		}
+		// Keep the latest non-nil value for the notification: a store that
+		// doesn't return the deleted item must not wipe out the one the
+		// cache already produced, or the delete notification travels with
+		// no old value.
+		if storeItem != nil {
+			item = storeItem
 		}
 	}
 
