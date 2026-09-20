@@ -1,8 +1,11 @@
 package notify
 
 import (
+	"time"
+
 	"github.com/saichler/l8types/go/ifs"
 	ntf "github.com/saichler/l8types/go/types/l8notify"
+	"github.com/saichler/l8types/go/types/l8services"
 )
 
 const (
@@ -33,12 +36,26 @@ func (this *Notify) Send(channel ntf.NotifyChannel, endpoint, subject, message s
 	if resp.Error() != nil {
 		return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_FAILED, ErrorMessage: resp.Error().Error()}
 	}
-	posted, ok := resp.Element().(*ntf.NotifyRecord)
-	if !ok {
-		return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_FAILED, ErrorMessage: "unexpected response type"}
+	if posted, ok := resp.Element().(*ntf.NotifyRecord); ok {
+		return &ntf.DeliveryResult{
+			Status: posted.Status, HttpStatus: posted.HttpStatus,
+			ErrorMessage: posted.ErrorMessage, Attempt: posted.Attempt, SentAt: posted.SentAt,
+		}
 	}
-	return &ntf.DeliveryResult{
-		Status: posted.Status, HttpStatus: posted.HttpStatus,
-		ErrorMessage: posted.ErrorMessage, Attempt: posted.Attempt, SentAt: posted.SentAt,
+	// The Notify service is transactional, so a POST answers with the
+	// transaction rather than the persisted record.
+	if tr, ok := resp.Element().(*l8services.L8Transaction); ok {
+		if ifs.TransactionState(tr.State) != ifs.Committed {
+			return &ntf.DeliveryResult{
+				Status:       ntf.DeliveryStatus_DELIVERY_STATUS_FAILED,
+				ErrorMessage: ifs.App("notification was not committed (", ifs.TransactionState(tr.State).String(), "): ", tr.ErrMsg),
+				SentAt:       time.Now().Unix(),
+			}
+		}
+		// Committed says the record was written; the dispatch outcome it
+		// recorded is only in that record, which this response does not
+		// carry. Report accepted rather than claiming a delivery.
+		return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_PENDING, SentAt: time.Now().Unix()}
 	}
+	return &ntf.DeliveryResult{Status: ntf.DeliveryStatus_DELIVERY_STATUS_FAILED, ErrorMessage: "unexpected response type"}
 }
