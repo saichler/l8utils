@@ -26,6 +26,9 @@ func (this *Integration) SetVNic(vnic ifs.IVNic) {
 }
 
 func (this *Integration) GetIntegrationConfig(name string) (*ntf.IntegrationConfig, error) {
+	if this.vnic == nil {
+		return nil, fmt.Errorf("no VNic")
+	}
 	filter := &ntf.IntegrationConfig{Name: name}
 	if handler, ok := this.vnic.Resources().Services().ServiceHandler(IntegrationServiceName, IntegrationServiceArea); ok {
 		resp := handler.Get(object.New(nil, filter), this.vnic)
@@ -50,6 +53,9 @@ func (this *Integration) GetIntegrationConfig(name string) (*ntf.IntegrationConf
 }
 
 func (this *Integration) ListIntegrationConfigs(integrationType ntf.IntegrationType) ([]*ntf.IntegrationConfig, error) {
+	if this.vnic == nil {
+		return nil, fmt.Errorf("no VNic")
+	}
 	query := "select * from IntegrationConfig"
 	if integrationType != ntf.IntegrationType_INTEGRATION_TYPE_UNSPECIFIED {
 		query = fmt.Sprintf("select * from IntegrationConfig where type=%d", int32(integrationType))
