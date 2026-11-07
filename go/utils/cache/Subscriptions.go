@@ -15,27 +15,34 @@ package cache
 
 import (
 	"sync"
-	"time"
 
 	"github.com/saichler/l8types/go/ifs"
 )
 
-const DefaultSubscriptionTTL = 300 // 5 minutes
-
-// Subscription represents a user's interest in change notifications
-// for a specific model type. Keyed by AAAId (authenticated user identity).
+// Subscription represents one client component's interest in change
+// notifications for a specific model type. A user (AAAId) can hold several,
+// one per component, told apart by RegisterId; the pair is the key.
 // Query is the live, already-parsed query object -- stored directly (not
 // re-derived from text) so a write can call Query.Match() against the
 // changed record without re-parsing
 // (l8utils/plans/generic-websocket-change-notifications.md Phase 2).
+//
+// A subscription lives until its owner unregisters it (an evicted client
+// component, or the web server when the user's websocket closes); there is
+// no time-based expiry, since a live view applies pushes in place and does
+// not re-fetch to stay registered.
 type Subscription struct {
-	AAAId    string
-	Query    ifs.IQuery
-	lastSeen int64
+	AAAId      string
+	RegisterId string
+	Query      ifs.IQuery
 }
 
-// subscriptions tracks which browser tabs are subscribed to change notifications
-// for a single Cache instance (one model type). Thread-safe for concurrent access.
+func subscriptionKey(aaaId, registerId string) string {
+	return aaaId + "/" + registerId
+}
+
+// subscriptions tracks the registered client components for a single Cache
+// instance (one model type). Thread-safe for concurrent access.
 type subscriptions struct {
 	mu   sync.RWMutex
 	subs map[string]*Subscription
@@ -50,14 +57,13 @@ func newSubscriptions() *subscriptions {
 func (this *subscriptions) register(sub *Subscription) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	sub.lastSeen = time.Now().Unix()
-	this.subs[sub.AAAId] = sub
+	this.subs[subscriptionKey(sub.AAAId, sub.RegisterId)] = sub
 }
 
-func (this *subscriptions) unregister(aaaId string) {
+func (this *subscriptions) unregister(aaaId, registerId string) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	delete(this.subs, aaaId)
+	delete(this.subs, subscriptionKey(aaaId, registerId))
 }
 
 func (this *subscriptions) subscribers() []*Subscription {
@@ -75,20 +81,4 @@ func (this *subscriptions) hasSubscribers() bool {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 	return len(this.subs) > 0
-}
-
-// evictStale removes subscriptions not refreshed within ttlSeconds.
-// Returns the number of evicted subscriptions.
-func (this *subscriptions) evictStale(ttlSeconds int64) int {
-	this.mu.Lock()
-	defer this.mu.Unlock()
-	now := time.Now().Unix()
-	removed := 0
-	for aaaId, sub := range this.subs {
-		if now-sub.lastSeen > ttlSeconds {
-			delete(this.subs, aaaId)
-			removed++
-		}
-	}
-	return removed
 }

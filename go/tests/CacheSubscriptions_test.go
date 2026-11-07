@@ -17,22 +17,37 @@ import (
 	"fmt"
 	"sync"
 	"testing"
-	"time"
 
+	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/testtypes"
+	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8utils/go/utils/cache"
 )
 
-// registerViaFetch is the only real entry point for subscription
-// registration since Phase 3 (l8utils/plans/generic-websocket-change-notifications.md):
-// Cache.RegisterSubscription is now private, called by Fetch() itself
-// whenever the query has register=true and an AAAId. "register" is a plain
-// substring match in the query text (l8ql's getBoolTag), no "=true" needed.
+// fetchWithRegister sends a query through Fetch the way a client's does: the
+// register action and register id are fields of the query body (not its
+// text), carried onto the parsed query by object.NewFromQuery.
+func fetchWithRegister(c *cache.Cache, aaaId, registerId string, action l8api.L8Register,
+	gsql string, res ifs.IResources) ([]interface{}, ifs.IQuery) {
+	elems, e := object.NewFromQuery(&l8api.L8Query{Text: gsql, AaaId: aaaId,
+		Register: action, RegisterId: registerId}, res)
+	if e != nil {
+		panic(e)
+	}
+	q, e := elems.Query(res)
+	if e != nil {
+		panic(e)
+	}
+	values, _ := c.Fetch(0, 10, q)
+	return values, q
+}
+
+// registerViaFetch registers the client component aaaId+"main" -- Fetch() is
+// the only entry point for registration since Phase 3
+// (l8utils/plans/generic-websocket-change-notifications.md).
 func registerViaFetch(c *cache.Cache, aaaId, gsql string, res ifs.IResources) ifs.IQuery {
-	q := createIQuery(gsql+" register", res)
-	q.SetAAAId(aaaId)
-	c.Fetch(0, 10, q)
+	_, q := fetchWithRegister(c, aaaId, "main", l8api.L8Register_L8_REGISTER_REGISTER, gsql, res)
 	return q
 }
 
@@ -53,8 +68,11 @@ func TestSubscriptionRegister(t *testing.T) {
 	if subs[0].Query == nil {
 		t.Fatal("Expected a non-nil Query")
 	}
-	if !subs[0].Query.Register() {
-		t.Error("Expected the stored query to have Register()==true")
+	if subs[0].Query.Register() != l8api.L8Register_L8_REGISTER_REGISTER {
+		t.Error("Expected the stored query to have Register()==Register")
+	}
+	if subs[0].RegisterId != "main" {
+		t.Errorf("Expected RegisterId 'main', got '%s'", subs[0].RegisterId)
 	}
 }
 
@@ -77,15 +95,14 @@ func TestSubscriptionIgnoredWithoutAAAId(t *testing.T) {
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	q := createIQuery("select * from TestProto register", res)
-	c.Fetch(0, 10, q)
+	fetchWithRegister(c, "", "main", l8api.L8Register_L8_REGISTER_REGISTER, "select * from TestProto", res)
 
 	if c.HasSubscribers() {
 		t.Error("Expected no subscription from a registered query with no AAAId")
 	}
 }
 
-func TestSubscriptionReplacesSameAAAId(t *testing.T) {
+func TestSubscriptionReplacesSameComponent(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
@@ -97,7 +114,7 @@ func TestSubscriptionReplacesSameAAAId(t *testing.T) {
 	if len(subs) != 1 {
 		t.Fatalf("Expected 1 subscriber after replace, got %d", len(subs))
 	}
-	if subs[0].Query.Text() != "select * from TestProto where MyString='hello' register" {
+	if subs[0].Query.Text() != "select * from TestProto where MyString='hello'" {
 		t.Errorf("Expected replaced query text, got '%s'", subs[0].Query.Text())
 	}
 }
@@ -109,7 +126,7 @@ func TestSubscriptionUnregister(t *testing.T) {
 
 	registerViaFetch(c, "aaa-1", "select * from TestProto", res)
 	registerViaFetch(c, "aaa-2", "select * from TestProto", res)
-	c.UnregisterSubscription("aaa-1")
+	c.UnregisterSubscription("aaa-1", "main")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
@@ -126,7 +143,7 @@ func TestSubscriptionUnregisterNonExistent(t *testing.T) {
 	defer c.Close()
 
 	registerViaFetch(c, "aaa-1", "select * from TestProto", res)
-	c.UnregisterSubscription("aaa-999")
+	c.UnregisterSubscription("aaa-999", "main")
 
 	subs := c.Subscribers()
 	if len(subs) != 1 {
@@ -164,7 +181,7 @@ func TestHasSubscribers(t *testing.T) {
 		t.Error("Expected HasSubscribers true after register")
 	}
 
-	c.UnregisterSubscription("aaa-1")
+	c.UnregisterSubscription("aaa-1", "main")
 	if c.HasSubscribers() {
 		t.Error("Expected HasSubscribers false after unregister all")
 	}
@@ -210,7 +227,7 @@ func TestSubscriptionConcurrentSafety(t *testing.T) {
 			c.Subscribers()
 			c.HasSubscribers()
 			if idx%3 == 0 {
-				c.UnregisterSubscription(aaaId)
+				c.UnregisterSubscription(aaaId, "main")
 			}
 		}(i)
 	}
@@ -225,45 +242,66 @@ func TestSubscriptionConcurrentSafety(t *testing.T) {
 	}
 }
 
-func TestSubscriptionEvictStale(t *testing.T) {
+// One user holds one registration per client component: two components on
+// the same model keep their own queries, and unregistering one leaves the
+// other untouched.
+func TestSubscriptionOnePerComponent(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	registerViaFetch(c, "aaa-old", "select * from TestProto", res)
-	time.Sleep(2 * time.Second)
-	registerViaFetch(c, "aaa-fresh", "select * from TestProto", res)
-
-	evicted := c.EvictStaleSubscriptions(1)
-	if evicted != 1 {
-		t.Errorf("Expected 1 evicted, got %d", evicted)
+	fetchWithRegister(c, "aaa-1", "table", l8api.L8Register_L8_REGISTER_REGISTER,
+		"select * from TestProto where MyString='a'", res)
+	fetchWithRegister(c, "aaa-1", "chart", l8api.L8Register_L8_REGISTER_REGISTER,
+		"select * from TestProto where MyString='b'", res)
+	if n := len(c.Subscribers()); n != 2 {
+		t.Fatalf("Expected 2 subscriptions for two components, got %d", n)
 	}
 
+	fetchWithRegister(c, "aaa-1", "table", l8api.L8Register_L8_REGISTER_UNREGISTER,
+		"select * from TestProto where MyString='a'", res)
 	subs := c.Subscribers()
-	if len(subs) != 1 {
-		t.Fatalf("Expected 1 remaining, got %d", len(subs))
-	}
-	if subs[0].AAAId != "aaa-fresh" {
-		t.Errorf("Expected 'aaa-fresh' to survive, got '%s'", subs[0].AAAId)
+	if len(subs) != 1 || subs[0].RegisterId != "chart" {
+		t.Fatalf("Expected only 'chart' to remain, got %v", subs)
 	}
 }
 
-func TestSubscriptionRefreshPreventsEviction(t *testing.T) {
+// An Unregister removes the registration and fetches nothing: the client
+// only sends it to drop interest, never for data.
+func TestUnregisterFetchesNothing(t *testing.T) {
+	res := newResources()
+	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
+	defer c.Close()
+	c.Post(createModel(1), false)
+
+	values, _ := fetchWithRegister(c, "aaa-1", "main", l8api.L8Register_L8_REGISTER_REGISTER,
+		"select * from TestProto", res)
+	if len(values) != 1 {
+		t.Fatalf("Expected the registering fetch to return the row, got %d", len(values))
+	}
+	values, _ = fetchWithRegister(c, "aaa-1", "main", l8api.L8Register_L8_REGISTER_UNREGISTER,
+		"select * from TestProto", res)
+	if len(values) != 0 {
+		t.Errorf("Expected Unregister to return no rows, got %d", len(values))
+	}
+	if c.HasSubscribers() {
+		t.Error("Expected Unregister to remove the subscription")
+	}
+}
+
+// Old clients put "register=true" in the query text; it still registers,
+// under an empty register id.
+func TestRegisterFromQueryText(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	registerViaFetch(c, "aaa-1", "select * from TestProto", res)
-	time.Sleep(2 * time.Second)
-	// Re-fetching the same registered query refreshes lastSeen.
-	registerViaFetch(c, "aaa-1", "select * from TestProto", res)
-
-	evicted := c.EvictStaleSubscriptions(1)
-	if evicted != 0 {
-		t.Errorf("Expected 0 evicted after refresh, got %d", evicted)
-	}
-	if !c.HasSubscribers() {
-		t.Error("Expected subscriber to survive after refresh")
+	q := createIQuery("select * from TestProto register=true", res)
+	q.SetAAAId("aaa-1")
+	c.Fetch(0, 10, q)
+	subs := c.Subscribers()
+	if len(subs) != 1 || subs[0].RegisterId != "" {
+		t.Fatalf("Expected one subscription with an empty register id, got %v", subs)
 	}
 }
 
@@ -331,24 +369,21 @@ func TestClientNotificationNoSubscribersIsNil(t *testing.T) {
 }
 
 // TestFetchRegistersAndRefreshes is the direct test of Phase 3's own change:
-// Fetch() itself is what creates/refreshes the subscription, unconditionally
-// on every call with register=true, not just the first.
+// Fetch() itself is what creates/replaces the subscription, on every call
+// with Register, not just the first.
 func TestFetchRegistersAndRefreshes(t *testing.T) {
 	res := newResources()
 	c := cache.NewCache(&testtypes.TestProto{}, nil, nil, res)
 	defer c.Close()
 
-	q := createIQuery("select * from TestProto register", res)
-	q.SetAAAId("aaa-1")
-
-	c.Fetch(0, 10, q)
+	fetchWithRegister(c, "aaa-1", "main", l8api.L8Register_L8_REGISTER_REGISTER, "select * from TestProto", res)
 	if !c.HasSubscribers() {
-		t.Fatal("Expected Fetch with register=true to create a subscription")
+		t.Fatal("Expected Fetch with Register to create a subscription")
 	}
 
 	// A second Fetch of the same query must not error or duplicate --
-	// still exactly one subscriber for this AAAId.
-	c.Fetch(0, 10, q)
+	// still exactly one subscriber for this component.
+	fetchWithRegister(c, "aaa-1", "main", l8api.L8Register_L8_REGISTER_REGISTER, "select * from TestProto", res)
 	if len(c.Subscribers()) != 1 {
 		t.Errorf("Expected exactly 1 subscriber after two fetches, got %d", len(c.Subscribers()))
 	}

@@ -200,23 +200,24 @@ func (this *Cache) ModelType() string {
 	return this.modelType
 }
 
-// registerSubscription registers a user (identified by AAAId) for real-time
-// change notifications on this cache's model type, keyed on q (used directly
-// for Match()-based filtering on write, see notifications.go). Called by
-// Fetch() itself whenever the query has Register=true -- private, since
-// there is no other legitimate entry point
+// registerSubscription registers (or replaces) the client component
+// aaaId+registerId for real-time change notifications on this cache's model
+// type, keyed on q (used directly for Match()-based filtering on write, see
+// notifications.go). Called by Fetch() itself for a query with Register --
+// private, since there is no other legitimate entry point
 // (l8utils/plans/generic-websocket-change-notifications.md Phase 3).
-func (this *Cache) registerSubscription(aaaId string, q ifs.IQuery) {
+func (this *Cache) registerSubscription(aaaId, registerId string, q ifs.IQuery) {
 	this.subs.register(&Subscription{
-		AAAId: aaaId,
-		Query: q,
+		AAAId:      aaaId,
+		RegisterId: registerId,
+		Query:      q,
 	})
 }
 
-// UnregisterSubscription removes a subscription for the given AAAId.
-// Called when a WebSocket disconnects or a user navigates away.
-func (this *Cache) UnregisterSubscription(aaaId string) {
-	this.subs.unregister(aaaId)
+// UnregisterSubscription removes the client component aaaId+registerId's
+// subscription. Fetch() calls it for a query with Unregister.
+func (this *Cache) UnregisterSubscription(aaaId, registerId string) {
+	this.subs.unregister(aaaId, registerId)
 }
 
 // Subscribers returns all active subscriptions for this cache's model type.
@@ -228,12 +229,6 @@ func (this *Cache) Subscribers() []*Subscription {
 // HasSubscribers returns true if any tokens are subscribed to this cache.
 func (this *Cache) HasSubscribers() bool {
 	return this.subs.hasSubscribers()
-}
-
-// EvictStaleSubscriptions removes subscriptions not refreshed within ttlSeconds.
-// Returns the number evicted. Used for testing; in production the TTL cleaner calls this automatically.
-func (this *Cache) EvictStaleSubscriptions(ttlSeconds int64) int {
-	return this.subs.evictStale(ttlSeconds)
 }
 
 // Close stops the TTL cleaner goroutine and releases cache resources.
