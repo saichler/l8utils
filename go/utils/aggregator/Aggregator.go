@@ -13,15 +13,22 @@ type Aggregator struct {
 	queue             *queues.Queue
 	running           bool
 	intervalInSeconds int64
+	maxSize           int
 	timeoutInSeconds  int64
+	flushSignal       chan struct{}
 }
 
-func NewAggregator(vnic ifs.IVNic, intervalInSeconds, timeoutInSeconds int64) *Aggregator {
+// NewAggregator creates an aggregator that flushes when either cap is reached:
+// every intervalInSeconds, or as soon as maxSize elements are queued.
+// A maxSize of 0 or less disables the size cap.
+func NewAggregator(vnic ifs.IVNic, intervalInSeconds int64, maxSize int, timeoutInSeconds int64) *Aggregator {
 	agg := &Aggregator{}
 	agg.vnic = vnic
 	agg.queue = queues.NewQueue("Aggregator", 100000)
 	agg.running = true
 	agg.intervalInSeconds = intervalInSeconds
+	agg.maxSize = maxSize
+	agg.flushSignal = make(chan struct{}, 1)
 
 	go agg.start()
 	return agg
@@ -44,11 +51,24 @@ func (this *Aggregator) Shutdown() {
 func (this *Aggregator) AddElement(any interface{}, method ifs.VNicMethod, destination, serviceName string, serviceArea byte, action ifs.Action) {
 	entry := &ElemEntry{any: any, serviceName: serviceName, serviceArea: serviceArea, action: action, method: method, destination: destination}
 	this.queue.Add(entry)
+	if this.maxSize > 0 && this.queue.Size() >= this.maxSize {
+		// Wake the flush loop; a signal already pending is enough.
+		select {
+		case this.flushSignal <- struct{}{}:
+		default:
+		}
+	}
 }
 
+// start runs the flush loop. Flushing happens only here, so batches never overlap.
 func (this *Aggregator) start() {
+	ticker := time.NewTicker(time.Second * time.Duration(this.intervalInSeconds))
+	defer ticker.Stop()
 	for this.running {
-		time.Sleep(time.Second * time.Duration(this.intervalInSeconds))
+		select {
+		case <-ticker.C:
+		case <-this.flushSignal:
+		}
 		this.flush()
 	}
 }

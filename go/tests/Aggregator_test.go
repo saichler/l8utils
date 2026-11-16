@@ -127,7 +127,7 @@ func (m *MockVNic) Leader(serviceName string, serviceArea byte, action ifs.Actio
 
 func TestAggregatorSingleElement(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("test-data", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
@@ -157,7 +157,7 @@ func TestAggregatorSingleElement(t *testing.T) {
 
 func TestAggregatorMultipleElementsSameAttributes(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.Multicast, "", "service-1", 1, ifs.POST)
@@ -185,7 +185,7 @@ func TestAggregatorMultipleElementsSameAttributes(t *testing.T) {
 
 func TestAggregatorDifferentMethods(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
@@ -211,7 +211,7 @@ func TestAggregatorDifferentMethods(t *testing.T) {
 
 func TestAggregatorDifferentDestinations(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
@@ -237,7 +237,7 @@ func TestAggregatorDifferentDestinations(t *testing.T) {
 
 func TestAggregatorDifferentServices(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.RoundRobin, "", "service-1", 1, ifs.POST)
@@ -263,7 +263,7 @@ func TestAggregatorDifferentServices(t *testing.T) {
 
 func TestAggregatorDifferentActions(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.Proximity, "", "service-1", 1, ifs.POST)
@@ -289,7 +289,7 @@ func TestAggregatorDifferentActions(t *testing.T) {
 
 func TestAggregatorDifferentServiceAreas(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("data-1", ifs.Leader, "", "service-1", 1, ifs.POST)
@@ -315,7 +315,7 @@ func TestAggregatorDifferentServiceAreas(t *testing.T) {
 
 func TestAggregatorRequest(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	agg.AddElement("request-data", ifs.Request, "dest-1", "service-1", 1, ifs.GET)
@@ -336,7 +336,7 @@ func TestAggregatorRequest(t *testing.T) {
 
 func TestAggregatorShutdown(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 10, 5)
+	agg := aggregator.NewAggregator(mockVNic, 10, 0, 5)
 
 	agg.AddElement("data-1", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
 	agg.Shutdown()
@@ -347,7 +347,7 @@ func TestAggregatorShutdown(t *testing.T) {
 
 func TestAggregatorMixedBatching(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	// Add elements that should be batched together
@@ -390,7 +390,7 @@ func TestAggregatorMixedBatching(t *testing.T) {
 
 func TestAggregatorEmptyFlush(t *testing.T) {
 	mockVNic := NewMockVNic()
-	agg := aggregator.NewAggregator(mockVNic, 1, 5)
+	agg := aggregator.NewAggregator(mockVNic, 1, 0, 5)
 	defer agg.Shutdown()
 
 	// Wait for flush without adding elements
@@ -399,6 +399,34 @@ func TestAggregatorEmptyFlush(t *testing.T) {
 	calls := mockVNic.GetCalls()
 	if len(calls) != 0 {
 		Log.Fail(t, "Expected 0 calls for empty flush, got", len(calls))
+		return
+	}
+}
+
+func TestAggregatorSizeCap(t *testing.T) {
+	mockVNic := NewMockVNic()
+	// The interval is long, so only the size cap can trigger this flush.
+	agg := aggregator.NewAggregator(mockVNic, 10, 3, 5)
+	defer agg.Shutdown()
+
+	agg.AddElement("data-1", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
+	agg.AddElement("data-2", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
+	time.Sleep(time.Millisecond * 300)
+	if len(mockVNic.GetCalls()) != 0 {
+		Log.Fail(t, "Expected no flush below the size cap")
+		return
+	}
+
+	agg.AddElement("data-3", ifs.Unicast, "dest-1", "service-1", 1, ifs.POST)
+	time.Sleep(time.Millisecond * 300)
+	calls := mockVNic.GetCalls()
+	if len(calls) != 1 {
+		Log.Fail(t, "Expected 1 call after reaching the size cap, got", len(calls))
+		return
+	}
+	data, ok := calls[0].data.([]interface{})
+	if !ok || len(data) != 3 {
+		Log.Fail(t, "Expected the size-cap batch to have 3 elements")
 		return
 	}
 }
