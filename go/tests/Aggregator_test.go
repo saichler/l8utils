@@ -95,7 +95,7 @@ func (m *MockVNic) Running() bool                 { return true }
 func (m *MockVNic) SetResponse(*ifs.Message, ifs.IElements) {}
 func (m *MockVNic) IsVnet() bool                  { return false }
 
-func (m *MockVNic) Unicast(destination, serviceName string, serviceArea byte, action ifs.Action, data interface{}) error {
+func (m *MockVNic) Unicast(destination, serviceName string, serviceArea byte, action ifs.Action, data interface{}, aaa ...string) error {
 	m.recordCall(ifs.Unicast, destination, serviceName, serviceArea, action, data)
 	return nil
 }
