@@ -6,7 +6,7 @@
 set -e
 
 # We build the amd64 image, giving the docker desktop can run this with Rosetta
-docker build --no-cache --platform=linux/amd64 -t saichler/protoc:latest .
+docker build --no-cache --platform=linux/amd64 -t registry.layer-8.dev:44443/library/protoc:latest .
 
 # Push the image to the repository for others to use
-docker push saichler/protoc:latest
+docker push registry.layer-8.dev:44443/library/protoc:latest
