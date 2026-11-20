@@ -29,19 +29,20 @@ func (this *Cache) Fetch(start, blockSize int, q ifs.IQuery) ([]interface{}, *l8
 	// Register (or replace) this query as the live subscription of the client
 	// component q.AAAId()+q.RegisterId(); every re-fetch (paging, a new
 	// filter) replaces it, so the server always matches the component's
-	// current query. Unregister removes it and fetches nothing.
+	// current query and page. Unregister removes it and fetches nothing.
 	// (l8utils/plans/generic-websocket-change-notifications.md Phase 3).
-	if q.AAAId() != "" {
-		switch q.Register() {
-		case l8api.L8Register_L8_REGISTER_REGISTER:
-			this.registerSubscription(q.AAAId(), q.RegisterId(), q)
-		case l8api.L8Register_L8_REGISTER_UNREGISTER:
-			this.UnregisterSubscription(q.AAAId(), q.RegisterId())
-			return []interface{}{}, &l8api.L8MetaData{}
-		}
+	if q.AAAId() != "" && q.Register() == l8api.L8Register_L8_REGISTER_UNREGISTER {
+		this.UnregisterSubscription(q.AAAId(), q.RegisterId())
+		return []interface{}{}, &l8api.L8MetaData{}
 	}
 
 	values, metadata := this.iCache.fetch(start, blockSize, q, this.r)
+
+	// Registered after the fetch, so the subscription records the page it
+	// returned (probler/plans/websocket-page-scoped-notifications.md Phase 1).
+	if q.AAAId() != "" && q.Register() == l8api.L8Register_L8_REGISTER_REGISTER {
+		this.registerSubscription(q.AAAId(), q.RegisterId(), q, start, blockSize, values)
+	}
 
 	// Aggregate queries return empty slice with results in metadata
 	if q.IsAggregate() {

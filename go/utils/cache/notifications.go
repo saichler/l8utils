@@ -36,7 +36,7 @@ func (this *Cache) createClientNotification(delta *l8notify.L8NotificationSet, v
 	if delta == nil || !this.HasSubscribers() {
 		return nil
 	}
-	aaaIds := this.matchingSubscriberAaaIds(value)
+	aaaIds := this.matchingSubscriberAaaIds(value, delta.ModelKey, delta.Type)
 	if len(aaaIds) == 0 {
 		return nil
 	}
@@ -56,7 +56,7 @@ func (this *Cache) createClientNotificationForPatch(item interface{}, key string
 	if !this.HasSubscribers() {
 		return nil
 	}
-	aaaIds := this.matchingSubscriberAaaIds(item)
+	aaaIds := this.matchingSubscriberAaaIds(item, key, l8notify.L8NotificationType_Patch)
 	if len(aaaIds) == 0 {
 		return nil
 	}
@@ -70,15 +70,18 @@ func (this *Cache) createClientNotificationForPatch(item interface{}, key string
 }
 
 // matchingSubscriberAaaIds returns the AAAId of every registered subscriber
-// whose query matches value, or nil if none do.
-func (this *Cache) matchingSubscriberAaaIds(value interface{}) map[string]bool {
+// whose displayed data the write of value (primary key key, type t) belongs
+// to -- its query matches and, for a paged view, the change is on (or, for
+// an add, sorts into) its displayed page -- or nil if none
+// (probler/plans/websocket-page-scoped-notifications.md Phase 1).
+func (this *Cache) matchingSubscriberAaaIds(value interface{}, key string, t l8notify.L8NotificationType) map[string]bool {
 	subs := this.Subscribers()
 	if len(subs) == 0 {
 		return nil
 	}
 	var ids map[string]bool
 	for _, s := range subs {
-		if s.Query == nil || !s.Query.Match(value) {
+		if !s.wants(value, key, t) {
 			continue
 		}
 		if ids == nil {

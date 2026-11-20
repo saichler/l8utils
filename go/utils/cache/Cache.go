@@ -206,12 +206,37 @@ func (this *Cache) ModelType() string {
 // notifications.go). Called by Fetch() itself for a query with Register --
 // private, since there is no other legitimate entry point
 // (l8utils/plans/generic-websocket-change-notifications.md Phase 3).
-func (this *Cache) registerSubscription(aaaId, registerId string, q ifs.IQuery) {
-	this.subs.register(&Subscription{
+//
+// page is what that Fetch returned (start/blockSize as passed to it): a
+// paged fetch (blockSize > 0, not an aggregate) records the displayed page,
+// so notifications are scoped to it
+// (probler/plans/websocket-page-scoped-notifications.md Phase 1).
+func (this *Cache) registerSubscription(aaaId, registerId string, q ifs.IQuery, start, blockSize int, page []interface{}) {
+	sub := &Subscription{
 		AAAId:      aaaId,
 		RegisterId: registerId,
 		Query:      q,
-	})
+	}
+	if blockSize > 0 && !q.IsAggregate() {
+		sub.Paged = true
+		sub.FirstPage = start == 0
+		sub.Full = len(page) >= blockSize
+		sub.PageKeys = make(map[string]bool, len(page))
+		for i, v := range page {
+			pk, _, err := this.KeysFor(v)
+			if err != nil {
+				continue
+			}
+			sub.PageKeys[pk] = true
+			if i == 0 {
+				sub.First = orderValue(q, v, pk)
+			}
+			if i == len(page)-1 {
+				sub.Last = orderValue(q, v, pk)
+			}
+		}
+	}
+	this.subs.register(sub)
 }
 
 // UnregisterSubscription removes the client component aaaId+registerId's
