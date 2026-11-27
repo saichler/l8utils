@@ -165,7 +165,7 @@ func (this *Request) SetResponse(resp ifs.IElements) {
 		case this.responseChan <- resp:
 			// Response sent successfully
 		default:
-			// Channel already has a response or is closed
+			// Channel already holds a response
 		}
 	})
 }
@@ -176,8 +176,12 @@ func (this *Request) cleanup() {
 		this.requests.DelRequest(this.msgNum, this.msgSource)
 	}
 
-	// Close the response channel to free resources
-	close(this.responseChan)
+	// responseChan is intentionally not closed. A reply goroutine may have
+	// fetched this Request before it was removed above and call SetResponse
+	// after Wait returned; sending on a closed channel panics even inside a
+	// select with a default. The channel is buffered (1) and written at most
+	// once, so that late send never blocks and is garbage collected with the
+	// Request.
 
 	// Cancel context if not already canceled
 	if this.cancel != nil {

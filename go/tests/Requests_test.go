@@ -559,3 +559,32 @@ func TestFastResponseBeforeTimeout(t *testing.T) {
 
 	wg.Wait()
 }
+
+// TestLateResponseAfterTimeout reproduces a reply that was looked up before the
+// request timed out and delivered after Wait's cleanup. It must be dropped
+// quietly, not panic with "send on closed channel".
+func TestLateResponseAfterTimeout(t *testing.T) {
+	reqs := requests.NewRequests()
+	req, _ := reqs.NewRequest(1, "source1", 1, Log)
+
+	// The RX goroutine resolves the request while it is still pending...
+	inFlight := reqs.GetRequest(1, "source1")
+
+	// ...the caller times out and cleans up...
+	if resp := req.Wait(); resp.Error() == nil {
+		Log.Fail(t, "expected a timeout error")
+		return
+	}
+
+	// ...and only then is the reply delivered.
+	defer func() {
+		if r := recover(); r != nil {
+			Log.Fail(t, "late SetResponse panicked: ", r)
+		}
+	}()
+	inFlight.SetResponse(&MockElement{data: "late"})
+
+	if resp := req.Response(); resp.Error() == nil {
+		Log.Fail(t, "a late response must not replace the timeout result")
+	}
+}
