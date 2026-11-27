@@ -109,8 +109,6 @@ func (this *Events) post(payload interface{}) {
 		return
 	}
 	err := this.vnic.Unicast("", EventsServiceName, EventsServiceArea, ifs.POST, payload)
-	fmt.Println("DEBUG-EVT l8utils Events.post alias=", this.vnic.Resources().SysConfig().LocalAlias,
-		"vnicType=", fmt.Sprintf("%T", this.vnic), "err=", err)
 	if err != nil {
 		this.vnic.Resources().Logger().Warning("PostEvent: " + err.Error())
 	}
