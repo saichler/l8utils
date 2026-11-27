@@ -157,9 +157,6 @@ func (this *Resources) Copy(other ifs.IResources) {
 	this.introspector = other.Introspector()
 	this.dataListener = other.DataListener()
 	this.sysConfig = other.SysConfig()
-	this.events = other.Events()
-	this.notify = other.Notify()
-	this.integration = other.Integration()
 }
 
 // Registry returns the type registry component.
